@@ -33,7 +33,13 @@ function AddEventModal({
   const [allDay, setAllDay] = useState(false);
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState("other");
-  const [selectedMemberIds, setSelectedMemberIds] = useState([]);
+
+const [recurrenceRule, setRecurrenceRule] = useState("");
+const [recurrenceEndType, setRecurrenceEndType] = useState("never");
+const [recurrenceEndDate, setRecurrenceEndDate] = useState("");
+const [recurrenceCount, setRecurrenceCount] = useState("");
+
+const [selectedMemberIds, setSelectedMemberIds] = useState([]);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
@@ -51,11 +57,28 @@ function AddEventModal({
       setEndDate(eventToEdit.end_date || eventToEdit.start_date || defaultDate);
       setEndTime(eventToEdit.end_time || "10:00");
       setAllDay(Boolean(eventToEdit.all_day));
-      setLocation(eventToEdit.location || "");
-      setCategory(eventToEdit.category || "other");
-      setSelectedMemberIds(
-        (eventToEdit.members || []).map((member) => member.id)
-      );
+     setLocation(eventToEdit.location || "");
+setCategory(eventToEdit.category || "other");
+
+setRecurrenceRule(eventToEdit.recurrence_rule || "");
+
+if (eventToEdit.recurrence_count) {
+  setRecurrenceEndType("count");
+  setRecurrenceCount(String(eventToEdit.recurrence_count));
+  setRecurrenceEndDate("");
+} else if (eventToEdit.recurrence_end_date) {
+  setRecurrenceEndType("date");
+  setRecurrenceEndDate(eventToEdit.recurrence_end_date);
+  setRecurrenceCount("");
+} else {
+  setRecurrenceEndType("never");
+  setRecurrenceEndDate("");
+  setRecurrenceCount("");
+}
+
+setSelectedMemberIds(
+  (eventToEdit.members || []).map((member) => member.id)
+);
     } else {
       setTitle("");
       setDescription("");
@@ -65,8 +88,14 @@ function AddEventModal({
       setEndTime("10:00");
       setAllDay(false);
       setLocation("");
-      setCategory("other");
-      setSelectedMemberIds([]);
+setCategory("other");
+
+setRecurrenceRule("");
+setRecurrenceEndType("never");
+setRecurrenceEndDate("");
+setRecurrenceCount("");
+
+setSelectedMemberIds([]);
     }
 
     setError("");
@@ -123,7 +152,20 @@ function AddEventModal({
             allDay,
             location: location.trim() || null,
             category,
-            memberIds: selectedMemberIds,
+
+recurrenceRule: recurrenceRule || null,
+
+recurrenceEndDate:
+  recurrenceRule && recurrenceEndType === "date"
+    ? recurrenceEndDate || null
+    : null,
+
+recurrenceCount:
+  recurrenceRule && recurrenceEndType === "count"
+    ? Number(recurrenceCount) || null
+    : null,
+
+memberIds: selectedMemberIds,
           }),
         }
       );
@@ -299,6 +341,85 @@ function AddEventModal({
               </label>
             )}
           </div>
+
+<div className="event-form-grid">
+  <label className="event-form-field">
+    <span>Repeat</span>
+
+    <select
+      value={recurrenceRule}
+      onChange={(event) => {
+        const value = event.target.value;
+
+        setRecurrenceRule(value);
+
+        if (!value) {
+          setRecurrenceEndType("never");
+          setRecurrenceEndDate("");
+          setRecurrenceCount("");
+        }
+      }}
+    >
+      <option value="">Does not repeat</option>
+      <option value="daily">Daily</option>
+      <option value="weekly">Weekly</option>
+      <option value="fortnightly">Fortnightly</option>
+      <option value="monthly">Monthly</option>
+      <option value="yearly">Yearly</option>
+    </select>
+  </label>
+
+  {recurrenceRule && (
+    <label className="event-form-field">
+      <span>Ends</span>
+
+      <select
+        value={recurrenceEndType}
+        onChange={(event) => {
+          setRecurrenceEndType(event.target.value);
+          setRecurrenceEndDate("");
+          setRecurrenceCount("");
+        }}
+      >
+        <option value="never">Never</option>
+        <option value="date">On a date</option>
+        <option value="count">After occurrences</option>
+      </select>
+    </label>
+  )}
+</div>
+
+{recurrenceRule && recurrenceEndType === "date" && (
+  <label className="event-form-field">
+    <span>Repeat until</span>
+
+    <input
+      type="date"
+      value={recurrenceEndDate}
+      min={startDate}
+      onChange={(event) =>
+        setRecurrenceEndDate(event.target.value)
+      }
+    />
+  </label>
+)}
+
+{recurrenceRule && recurrenceEndType === "count" && (
+  <label className="event-form-field">
+    <span>Number of occurrences</span>
+
+    <input
+      type="number"
+      min="1"
+      max="500"
+      value={recurrenceCount}
+      onChange={(event) =>
+        setRecurrenceCount(event.target.value)
+      }
+      placeholder="e.g. 10"
+    />
+  </label>
+)}
 
           <div className="event-form-grid">
             <label className="event-form-field">

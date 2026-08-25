@@ -302,7 +302,7 @@ function CalendarPage({
 
                     return (
                       <div
-  key={event.id}
+  key={event.occurrence_key || event.id}
   className="calendar-event"
   role="button"
   tabIndex={0}
