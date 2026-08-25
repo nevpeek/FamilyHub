@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import "./App.css";
 import CalendarPage from "./pages/CalendarPage";
+import AddEventModal from "./components/AddEventModal";
 
 const API_BASE_URL = "http://localhost:3001";
 
@@ -65,6 +66,8 @@ function App() {
   const [activePage, setActivePage] = useState("home");
   const [selectedMemberId, setSelectedMemberId] = useState("all");
   const [currentTime, setCurrentTime] = useState(() => new Date());
+  const [addEventOpen, setAddEventOpen] = useState(false);
+  const [eventRefreshKey, setEventRefreshKey] = useState(0);
 
   useEffect(() => {
     async function loadFamilyMembers() {
@@ -115,10 +118,14 @@ function App() {
             </p>
           </div>
 
-          <button type="button" className="add-event-button">
-            <Plus size={22} />
-            <span>Add Event</span>
-          </button>
+          <button
+  type="button"
+  className="add-event-button"
+  onClick={() => setAddEventOpen(true)}
+>
+  <Plus size={22} />
+  <span>Add Event</span>
+</button>
         </section>
 
         <section className="family-filter-section">
@@ -314,11 +321,13 @@ function App() {
         {activePage === "home" && renderHomePage()}
 
         {activePage === "calendar" && (
-          <CalendarPage
-            members={members}
-            selectedMemberId={selectedMemberId}
-            setSelectedMemberId={setSelectedMemberId}
-          />
+         <CalendarPage
+  members={members}
+  selectedMemberId={selectedMemberId}
+  setSelectedMemberId={setSelectedMemberId}
+  onAddEvent={() => setAddEventOpen(true)}
+  eventRefreshKey={eventRefreshKey}
+/>
         )}
 
         {activePage === "tasks" && (
@@ -361,6 +370,16 @@ function App() {
           );
         })}
       </nav>
+
+<AddEventModal
+  isOpen={addEventOpen}
+  onClose={() => setAddEventOpen(false)}
+  members={members}
+  onEventCreated={() => {
+    setEventRefreshKey((current) => current + 1);
+  }}
+/>
+
     </div>
   );
 }

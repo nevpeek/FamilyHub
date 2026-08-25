@@ -61,6 +61,8 @@ function CalendarPage({
   members,
   selectedMemberId,
   setSelectedMemberId,
+  onAddEvent,
+  eventRefreshKey,
 }) {
   const today = useMemo(() => new Date(), []);
 
@@ -122,10 +124,11 @@ function CalendarPage({
     }
 
     loadEvents();
-  }, [
+   }, [
     gridStartDate,
     gridEndDate,
     selectedMemberId,
+    eventRefreshKey,
   ]);
 
   const eventsByDate = useMemo(() => {
@@ -165,10 +168,14 @@ function CalendarPage({
           </p>
         </div>
 
-        <button type="button" className="add-event-button">
-          <Plus size={22} />
-          <span>Add Event</span>
-        </button>
+        <button
+  type="button"
+  className="add-event-button"
+  onClick={onAddEvent}
+>
+  <Plus size={22} />
+  <span>Add Event</span>
+</button>
       </section>
 
       <section className="calendar-family-filters">
