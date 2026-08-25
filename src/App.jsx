@@ -10,6 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import "./App.css";
+import CalendarPage from "./pages/CalendarPage";
 
 const API_BASE_URL = "http://localhost:3001";
 
@@ -102,27 +103,9 @@ function App() {
     );
   }, [activePage]);
 
-  return (
-    <div className="familyhub-shell">
-      <header className="familyhub-header">
-        <div className="brand-area">
-          <div className="brand-mark">
-            <Users size={28} />
-          </div>
-
-          <div>
-            <p className="brand-kicker">Family command centre</p>
-            <h1>FamilyHub</h1>
-          </div>
-        </div>
-
-        <div className="header-date">
-          <strong>{formatClock(currentTime)}</strong>
-          <span>{formatLongDate(currentTime)}</span>
-        </div>
-      </header>
-
-      <main className="familyhub-main">
+  function renderHomePage() {
+    return (
+      <>
         <section className="page-title-row">
           <div>
             <p className="section-kicker">{activePageLabel}</p>
@@ -149,7 +132,9 @@ function App() {
           {loading && <p className="status-message">Loading family...</p>}
 
           {error && (
-            <p className="status-message status-message-error">{error}</p>
+            <p className="status-message status-message-error">
+              {error}
+            </p>
           )}
 
           {!loading && !error && (
@@ -206,7 +191,11 @@ function App() {
                   <h3>{formatLongDate(currentTime)}</h3>
                 </div>
 
-                <button type="button" className="text-button">
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => setActivePage("calendar")}
+                >
                   View calendar
                   <ChevronRight size={18} />
                 </button>
@@ -297,6 +286,61 @@ function App() {
             </article>
           </aside>
         </section>
+      </>
+    );
+  }
+
+  return (
+    <div className="familyhub-shell">
+      <header className="familyhub-header">
+        <div className="brand-area">
+          <div className="brand-mark">
+            <Users size={28} />
+          </div>
+
+          <div>
+            <p className="brand-kicker">Family command centre</p>
+            <h1>FamilyHub</h1>
+          </div>
+        </div>
+
+        <div className="header-date">
+          <strong>{formatClock(currentTime)}</strong>
+          <span>{formatLongDate(currentTime)}</span>
+        </div>
+      </header>
+
+      <main className="familyhub-main">
+        {activePage === "home" && renderHomePage()}
+
+        {activePage === "calendar" && (
+          <CalendarPage
+            members={members}
+            selectedMemberId={selectedMemberId}
+            setSelectedMemberId={setSelectedMemberId}
+          />
+        )}
+
+        {activePage === "tasks" && (
+          <div className="placeholder-page">
+            <p className="section-kicker">Tasks</p>
+            <h2>Tasks are coming next</h2>
+          </div>
+        )}
+
+        {activePage === "meals" && (
+          <div className="placeholder-page">
+            <p className="section-kicker">Meals</p>
+            <h2>Meal planning is coming soon</h2>
+          </div>
+        )}
+
+        {activePage === "shopping" && (
+          <div className="placeholder-page">
+            <p className="section-kicker">Shopping</p>
+            <h2>Shopping lists are coming soon</h2>
+          </div>
+        )}
       </main>
 
       <nav className="bottom-navigation" aria-label="Primary navigation">
