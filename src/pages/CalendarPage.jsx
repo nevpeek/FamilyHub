@@ -1,14 +1,15 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
   Plus,
 } from "lucide-react";
 
+const API_BASE_URL = "http://localhost:3001";
+
 function getMonthGrid(year, month) {
   const firstDay = new Date(year, month, 1);
 
-  // Convert JS Sunday=0 to Monday=0
   const mondayIndex = (firstDay.getDay() + 6) % 7;
 
   const gridStart = new Date(year, month, 1 - mondayIndex);
@@ -32,6 +33,30 @@ function isSameDate(a, b) {
   );
 }
 
+function formatDateKey(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function formatEventTime(time) {
+  if (!time) {
+    return "";
+  }
+
+  const [hourText, minuteText] = time.split(":");
+
+  const date = new Date();
+  date.setHours(Number(hourText), Number(minuteText), 0, 0);
+
+  return new Intl.DateTimeFormat("en-AU", {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+}
+
 function CalendarPage({
   members,
   selectedMemberId,
@@ -42,6 +67,10 @@ function CalendarPage({
   const [visibleDate, setVisibleDate] = useState(
     () => new Date(today.getFullYear(), today.getMonth(), 1)
   );
+
+  const [events, setEvents] = useState([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
+  const [eventsError, setEventsError] = useState("");
 
   const year = visibleDate.getFullYear();
   const month = visibleDate.getMonth();
@@ -54,6 +83,62 @@ function CalendarPage({
     month: "long",
     year: "numeric",
   }).format(visibleDate);
+
+  const gridStartDate = formatDateKey(days[0].date);
+  const gridEndDate = formatDateKey(days[days.length - 1].date);
+
+  useEffect(() => {
+    async function loadEvents() {
+      setEventsLoading(true);
+      setEventsError("");
+
+      try {
+        const params = new URLSearchParams({
+          start: gridStartDate,
+          end: gridEndDate,
+        });
+
+        if (selectedMemberId !== "all") {
+          params.set("memberId", String(selectedMemberId));
+        }
+
+        const response = await fetch(
+          `${API_BASE_URL}/api/events?${params.toString()}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to load events");
+        }
+
+        const data = await response.json();
+
+        setEvents(data.events || []);
+      } catch (err) {
+        console.error(err);
+        setEventsError("Unable to load calendar events");
+      } finally {
+        setEventsLoading(false);
+      }
+    }
+
+    loadEvents();
+  }, [
+    gridStartDate,
+    gridEndDate,
+    selectedMemberId,
+  ]);
+
+  const eventsByDate = useMemo(() => {
+    const map = new Map();
+
+    for (const event of events) {
+      const existing = map.get(event.start_date) || [];
+      existing.push(event);
+      map.set(event.start_date, existing);
+    }
+
+    return map;
+  }, [events]);
 
   function goToPreviousMonth() {
     setVisibleDate(new Date(year, month - 1, 1));
@@ -115,6 +200,12 @@ function CalendarPage({
         ))}
       </section>
 
+      {eventsError && (
+        <p className="status-message status-message-error">
+          {eventsError}
+        </p>
+      )}
+
       <section className="calendar-panel">
         <div className="calendar-toolbar">
           <div className="calendar-toolbar-left">
@@ -145,9 +236,17 @@ function CalendarPage({
             </button>
           </div>
 
-          <strong className="calendar-month-label">
-            {monthLabel}
-          </strong>
+          <div className="calendar-toolbar-status">
+            {eventsLoading && (
+              <span className="calendar-loading">
+                Loading events...
+              </span>
+            )}
+
+            <strong className="calendar-month-label">
+              {monthLabel}
+            </strong>
+          </div>
         </div>
 
         <div className="calendar-weekdays">
@@ -163,11 +262,13 @@ function CalendarPage({
         <div className="calendar-grid">
           {days.map(({ date, isCurrentMonth }) => {
             const isToday = isSameDate(date, today);
+            const dateKey = formatDateKey(date);
+            const dayEvents = eventsByDate.get(dateKey) || [];
 
             return (
               <button
                 type="button"
-                key={date.toISOString()}
+                key={dateKey}
                 className={[
                   "calendar-day",
                   !isCurrentMonth ? "outside-month" : "",
@@ -181,9 +282,51 @@ function CalendarPage({
                 </span>
 
                 <div className="calendar-day-events">
-                  <span className="calendar-empty-day">
-                    No events
-                  </span>
+                  {dayEvents.length === 0 && !eventsLoading && (
+                    <span className="calendar-empty-day">
+                      No events
+                    </span>
+                  )}
+
+                  {dayEvents.map((event) => {
+                    const primaryMember = event.members?.[0];
+
+                    return (
+                      <div
+                        key={event.id}
+                        className="calendar-event"
+                        style={{
+                          borderLeftColor:
+                            primaryMember?.colour || "#64748B",
+                        }}
+                      >
+                        <div className="calendar-event-title">
+                          {event.title}
+                        </div>
+
+                        <div className="calendar-event-meta">
+                          {event.all_day
+                            ? "All day"
+                            : formatEventTime(event.start_time)}
+                        </div>
+
+                        {event.members?.length > 0 && (
+                          <div className="calendar-event-members">
+                            {event.members.map((member) => (
+                              <span
+                                key={member.id}
+                                className="calendar-event-member-dot"
+                                style={{
+                                  backgroundColor: member.colour,
+                                }}
+                                title={member.name}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </button>
             );

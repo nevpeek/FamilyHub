@@ -365,109 +365,6 @@
   color: #ffffff;
 }
 
-@media (max-width: 1100px) {
-  .family-filters {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .dashboard-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .dashboard-side-column {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 800px) {
-  .familyhub-header {
-    padding: 20px;
-  }
-
-  .header-date span {
-    display: none;
-  }
-
-  .familyhub-main {
-    width: min(100% - 28px, 1500px);
-    padding-top: 24px;
-  }
-
-  .page-title-row {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .add-event-button {
-    width: 100%;
-  }
-
-  .family-filters {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .dashboard-side-column {
-    grid-template-columns: 1fr;
-  }
-
-  .upcoming-placeholder {
-    grid-template-columns: 1fr;
-  }
-
-  .nav-button {
-    min-width: 74px;
-    padding: 0 10px;
-  }
-
-  .nav-button span {
-    font-size: 0.72rem;
-  }
-}
-
-@media (max-width: 520px) {
-  .familyhub-header {
-    align-items: flex-start;
-  }
-
-  .brand-mark {
-    width: 46px;
-    height: 46px;
-  }
-
-  .brand-area h1 {
-    font-size: 1.4rem;
-  }
-
-  .header-date strong {
-    font-size: 1.25rem;
-  }
-
-  .family-filters {
-    grid-template-columns: 1fr;
-  }
-
-  .bottom-navigation {
-    right: 10px;
-    bottom: 10px;
-    left: 10px;
-    justify-content: space-between;
-    transform: none;
-  }
-
-  .nav-button {
-    min-width: 0;
-    flex: 1;
-    flex-direction: column;
-    gap: 2px;
-    padding: 5px;
-  }
-
-  .nav-button span {
-    font-size: 0.65rem;
-  }
-}
-
 .calendar-page {
   display: flex;
   flex-direction: column;
@@ -673,6 +570,70 @@
   font-size: 2rem;
 }
 
+.calendar-toolbar-status {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.calendar-loading {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.calendar-event {
+  overflow: hidden;
+  padding: 7px 8px;
+  border-left: 4px solid #64748b;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.calendar-event-title {
+  overflow: hidden;
+  color: #172033;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-event-meta {
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.calendar-event-members {
+  display: flex;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.calendar-event-member-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+@media (max-width: 1100px) {
+  .family-filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-side-column {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 900px) {
   .calendar-page-heading {
     align-items: stretch;
@@ -689,6 +650,51 @@
   }
 }
 
+@media (max-width: 800px) {
+  .familyhub-header {
+    padding: 20px;
+  }
+
+  .header-date span {
+    display: none;
+  }
+
+  .familyhub-main {
+    width: min(100% - 28px, 1500px);
+    padding-top: 24px;
+  }
+
+  .page-title-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .add-event-button {
+    width: 100%;
+  }
+
+  .family-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-side-column {
+    grid-template-columns: 1fr;
+  }
+
+  .upcoming-placeholder {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-button {
+    min-width: 74px;
+    padding: 0 10px;
+  }
+
+  .nav-button span {
+    font-size: 0.72rem;
+  }
+}
+
 @media (max-width: 600px) {
   .calendar-toolbar {
     align-items: flex-start;
@@ -697,5 +703,48 @@
 
   .calendar-month-label {
     order: -1;
+  }
+}
+
+@media (max-width: 520px) {
+  .familyhub-header {
+    align-items: flex-start;
+  }
+
+  .brand-mark {
+    width: 46px;
+    height: 46px;
+  }
+
+  .brand-area h1 {
+    font-size: 1.4rem;
+  }
+
+  .header-date strong {
+    font-size: 1.25rem;
+  }
+
+  .family-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-navigation {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    justify-content: space-between;
+    transform: none;
+  }
+
+  .nav-button {
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    padding: 5px;
+  }
+
+  .nav-button span {
+    font-size: 0.65rem;
   }
 }
