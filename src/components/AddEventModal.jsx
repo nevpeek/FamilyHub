@@ -1,37 +1,76 @@
-import { useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Trash2, X } from "lucide-react";
 
 const API_BASE_URL = "http://localhost:3001";
+
+function formatDateKey(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
 
 function AddEventModal({
   isOpen,
   onClose,
   members,
   initialDate,
-  onEventCreated,
+  eventToEdit,
+  onEventSaved,
+  onEventDeleted,
 }) {
-  const todayKey = useMemo(() => {
-    const date = initialDate || new Date();
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
+  const defaultDate = useMemo(() => {
+    return initialDate ? formatDateKey(initialDate) : formatDateKey(new Date());
   }, [initialDate]);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [startDate, setStartDate] = useState(todayKey);
+  const [startDate, setStartDate] = useState(defaultDate);
   const [startTime, setStartTime] = useState("09:00");
-  const [endDate, setEndDate] = useState(todayKey);
+  const [endDate, setEndDate] = useState(defaultDate);
   const [endTime, setEndTime] = useState("10:00");
   const [allDay, setAllDay] = useState(false);
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState("other");
   const [selectedMemberIds, setSelectedMemberIds] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    if (eventToEdit) {
+      setTitle(eventToEdit.title || "");
+      setDescription(eventToEdit.description || "");
+      setStartDate(eventToEdit.start_date || defaultDate);
+      setStartTime(eventToEdit.start_time || "09:00");
+      setEndDate(eventToEdit.end_date || eventToEdit.start_date || defaultDate);
+      setEndTime(eventToEdit.end_time || "10:00");
+      setAllDay(Boolean(eventToEdit.all_day));
+      setLocation(eventToEdit.location || "");
+      setCategory(eventToEdit.category || "other");
+      setSelectedMemberIds(
+        (eventToEdit.members || []).map((member) => member.id)
+      );
+    } else {
+      setTitle("");
+      setDescription("");
+      setStartDate(defaultDate);
+      setStartTime("09:00");
+      setEndDate(defaultDate);
+      setEndTime("10:00");
+      setAllDay(false);
+      setLocation("");
+      setCategory("other");
+      setSelectedMemberIds([]);
+    }
+
+    setError("");
+  }, [isOpen, eventToEdit, defaultDate]);
 
   if (!isOpen) {
     return null;
@@ -65,38 +104,83 @@ function AddEventModal({
     setSaving(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/events`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: title.trim(),
-          description: description.trim() || null,
-          startDate,
-          startTime: allDay ? null : startTime,
-          endDate: endDate || startDate,
-          endTime: allDay ? null : endTime,
-          allDay,
-          location: location.trim() || null,
-          category,
-          memberIds: selectedMemberIds,
-        }),
-      });
+      const response = await fetch(
+        eventToEdit
+          ? `${API_BASE_URL}/api/events/${eventToEdit.id}`
+          : `${API_BASE_URL}/api/events`,
+        {
+          method: eventToEdit ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: title.trim(),
+            description: description.trim() || null,
+            startDate,
+            startTime: allDay ? null : startTime,
+            endDate: endDate || startDate,
+            endTime: allDay ? null : endTime,
+            allDay,
+            location: location.trim() || null,
+            category,
+            memberIds: selectedMemberIds,
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to create event");
+        throw new Error(data.error || "Failed to save event");
       }
 
-      onEventCreated?.(data.event);
+      onEventSaved?.(data.event);
       onClose();
     } catch (err) {
       console.error(err);
-      setError(err.message || "Unable to create event");
+      setError(err.message || "Unable to save event");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!eventToEdit) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Delete "${eventToEdit.title}"? This cannot be undone.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeleting(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/events/${eventToEdit.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to delete event");
+      }
+
+      onEventDeleted?.(eventToEdit.id);
+      onClose();
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Unable to delete event");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -106,7 +190,7 @@ function AddEventModal({
         <div className="event-modal-header">
           <div>
             <p className="section-kicker">Calendar</p>
-            <h2>Add Event</h2>
+            <h2>{eventToEdit ? "Edit Event" : "Add Event"}</h2>
           </div>
 
           <button
@@ -151,7 +235,6 @@ function AddEventModal({
                       className="event-member-option-dot"
                       style={{ backgroundColor: member.colour }}
                     />
-
                     {member.name}
                   </button>
                 );
@@ -220,7 +303,6 @@ function AddEventModal({
           <div className="event-form-grid">
             <label className="event-form-field">
               <span>Category</span>
-
               <select
                 value={category}
                 onChange={(event) => setCategory(event.target.value)}
@@ -258,29 +340,43 @@ function AddEventModal({
             />
           </label>
 
-          {error && (
-            <p className="event-form-error">
-              {error}
-            </p>
-          )}
+          {error && <p className="event-form-error">{error}</p>}
 
           <div className="event-form-actions">
-            <button
-              type="button"
-              className="event-secondary-button"
-              onClick={onClose}
-              disabled={saving}
-            >
-              Cancel
-            </button>
+            {eventToEdit && (
+              <button
+                type="button"
+                className="event-delete-button"
+                onClick={handleDelete}
+                disabled={saving || deleting}
+              >
+                <Trash2 size={18} />
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+            )}
 
-            <button
-              type="submit"
-              className="add-event-button"
-              disabled={saving}
-            >
-              {saving ? "Saving..." : "Save Event"}
-            </button>
+            <div className="event-form-actions-right">
+              <button
+                type="button"
+                className="event-secondary-button"
+                onClick={onClose}
+                disabled={saving || deleting}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="add-event-button"
+                disabled={saving || deleting}
+              >
+                {saving
+                  ? "Saving..."
+                  : eventToEdit
+                    ? "Save Changes"
+                    : "Save Event"}
+              </button>
+            </div>
           </div>
         </form>
       </div>

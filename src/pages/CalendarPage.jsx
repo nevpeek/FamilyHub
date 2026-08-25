@@ -62,6 +62,7 @@ function CalendarPage({
   selectedMemberId,
   setSelectedMemberId,
   onAddEvent,
+  onEditEvent,
   eventRefreshKey,
 }) {
   const today = useMemo(() => new Date(), []);
@@ -276,6 +277,7 @@ function CalendarPage({
               <button
                 type="button"
                 key={dateKey}
+                onClick={() => onAddEvent?.(date)}
                 className={[
                   "calendar-day",
                   !isCurrentMonth ? "outside-month" : "",
@@ -300,8 +302,21 @@ function CalendarPage({
 
                     return (
                       <div
-                        key={event.id}
-                        className="calendar-event"
+  key={event.id}
+  className="calendar-event"
+  role="button"
+  tabIndex={0}
+  onClick={(clickEvent) => {
+    clickEvent.stopPropagation();
+    onEditEvent?.(event);
+  }}
+  onKeyDown={(keyEvent) => {
+    if (keyEvent.key === "Enter" || keyEvent.key === " ") {
+      keyEvent.preventDefault();
+      keyEvent.stopPropagation();
+      onEditEvent?.(event);
+    }
+  }}
                         style={{
                           borderLeftColor:
                             primaryMember?.colour || "#64748B",

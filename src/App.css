@@ -941,3 +941,62 @@
     width: 100%;
   }
 }
+
+.calendar-event {
+  cursor: pointer;
+}
+
+.calendar-event:hover {
+  background: #eef4fb;
+}
+
+.calendar-event:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.event-form-actions {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.event-form-actions-right {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.event-delete-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 18px;
+  border: 1px solid #fecaca;
+  border-radius: 15px;
+  background: #fff7f7;
+  color: #b91c1c;
+  font-weight: 800;
+}
+
+.event-delete-button:hover {
+  background: #fef2f2;
+}
+
+@media (max-width: 650px) {
+  .event-form-actions,
+  .event-form-actions-right {
+    width: 100%;
+    flex-direction: column-reverse;
+  }
+
+  .event-form-actions-right {
+    margin-left: 0;
+  }
+
+  .event-delete-button,
+  .event-form-actions-right button {
+    width: 100%;
+  }
+}

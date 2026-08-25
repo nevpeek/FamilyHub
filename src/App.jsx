@@ -67,7 +67,9 @@ function App() {
   const [selectedMemberId, setSelectedMemberId] = useState("all");
   const [currentTime, setCurrentTime] = useState(() => new Date());
   const [addEventOpen, setAddEventOpen] = useState(false);
-  const [eventRefreshKey, setEventRefreshKey] = useState(0);
+const [selectedEvent, setSelectedEvent] = useState(null);
+const [selectedEventDate, setSelectedEventDate] = useState(null);
+const [eventRefreshKey, setEventRefreshKey] = useState(0);
 
   useEffect(() => {
     async function loadFamilyMembers() {
@@ -121,7 +123,11 @@ function App() {
           <button
   type="button"
   className="add-event-button"
-  onClick={() => setAddEventOpen(true)}
+  onClick={() => {
+  setSelectedEvent(null);
+  setSelectedEventDate(null);
+  setAddEventOpen(true);
+}}
 >
   <Plus size={22} />
   <span>Add Event</span>
@@ -321,11 +327,21 @@ function App() {
         {activePage === "home" && renderHomePage()}
 
         {activePage === "calendar" && (
-         <CalendarPage
+
+     <CalendarPage
   members={members}
   selectedMemberId={selectedMemberId}
   setSelectedMemberId={setSelectedMemberId}
-  onAddEvent={() => setAddEventOpen(true)}
+  onAddEvent={(date = null) => {
+    setSelectedEvent(null);
+    setSelectedEventDate(date);
+    setAddEventOpen(true);
+  }}
+  onEditEvent={(event) => {
+    setSelectedEvent(event);
+    setSelectedEventDate(null);
+    setAddEventOpen(true);
+  }}
   eventRefreshKey={eventRefreshKey}
 />
         )}
@@ -373,9 +389,18 @@ function App() {
 
 <AddEventModal
   isOpen={addEventOpen}
-  onClose={() => setAddEventOpen(false)}
+  onClose={() => {
+    setAddEventOpen(false);
+    setSelectedEvent(null);
+    setSelectedEventDate(null);
+  }}
   members={members}
-  onEventCreated={() => {
+  initialDate={selectedEventDate}
+  eventToEdit={selectedEvent}
+  onEventSaved={() => {
+    setEventRefreshKey((current) => current + 1);
+  }}
+  onEventDeleted={() => {
     setEventRefreshKey((current) => current + 1);
   }}
 />
