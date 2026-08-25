@@ -1,12 +1,69 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  CalendarDays,
+  CheckSquare,
+  ChevronRight,
+  Home,
+  Plus,
+  ShoppingCart,
+  Soup,
+  Users,
+} from "lucide-react";
 import "./App.css";
 
 const API_BASE_URL = "http://localhost:3001";
+
+const navigationItems = [
+  {
+    id: "home",
+    label: "Home",
+    icon: Home,
+  },
+  {
+    id: "calendar",
+    label: "Calendar",
+    icon: CalendarDays,
+  },
+  {
+    id: "tasks",
+    label: "Tasks",
+    icon: CheckSquare,
+  },
+  {
+    id: "meals",
+    label: "Meals",
+    icon: Soup,
+  },
+  {
+    id: "shopping",
+    label: "Shopping",
+    icon: ShoppingCart,
+  },
+];
+
+function formatLongDate(date) {
+  return new Intl.DateTimeFormat("en-AU", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
+function formatClock(date) {
+  return new Intl.DateTimeFormat("en-AU", {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+}
 
 function App() {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activePage, setActivePage] = useState("home");
+  const [selectedMemberId, setSelectedMemberId] = useState("all");
+  const [currentTime, setCurrentTime] = useState(() => new Date());
 
   useEffect(() => {
     async function loadFamilyMembers() {
@@ -31,97 +88,235 @@ function App() {
     loadFamilyMembers();
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const activePageLabel = useMemo(() => {
+    return (
+      navigationItems.find((item) => item.id === activePage)?.label || "Home"
+    );
+  }, [activePage]);
+
   return (
-    <div className="familyhub-app">
-      <header className="topbar">
-        <div>
-          <p className="eyebrow">Family command centre</p>
-          <h1>FamilyHub</h1>
+    <div className="familyhub-shell">
+      <header className="familyhub-header">
+        <div className="brand-area">
+          <div className="brand-mark">
+            <Users size={28} />
+          </div>
+
+          <div>
+            <p className="brand-kicker">Family command centre</p>
+            <h1>FamilyHub</h1>
+          </div>
         </div>
 
-        <div className="status-pill">
-          <span className="status-dot" />
-          Online
+        <div className="header-date">
+          <strong>{formatClock(currentTime)}</strong>
+          <span>{formatLongDate(currentTime)}</span>
         </div>
       </header>
 
-      <main>
-        <section className="welcome-card">
+      <main className="familyhub-main">
+        <section className="page-title-row">
           <div>
-            <p className="eyebrow">Welcome home</p>
-            <h2>Your family, all in one place.</h2>
-            <p className="welcome-copy">
-              Calendar, tasks, meals, shopping and everything your family
-              needs to stay organised.
+            <p className="section-kicker">{activePageLabel}</p>
+            <h2>Good morning</h2>
+            <p className="page-description">
+              Here&apos;s what&apos;s happening with the family.
             </p>
           </div>
 
-          <button type="button" className="primary-button">
-            + Add Event
+          <button type="button" className="add-event-button">
+            <Plus size={22} />
+            <span>Add Event</span>
           </button>
         </section>
 
-        <section className="family-section">
+        <section className="family-filter-section">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">Family</p>
-              <h2>Who's here</h2>
+              <p className="section-kicker">Family</p>
+              <h3>Show schedule for</h3>
             </div>
-
-            <span>{members.length} members</span>
           </div>
 
-          {loading && <p className="message">Loading family...</p>}
+          {loading && <p className="status-message">Loading family...</p>}
 
-          {error && <p className="message error-message">{error}</p>}
+          {error && (
+            <p className="status-message status-message-error">{error}</p>
+          )}
 
           {!loading && !error && (
-            <div className="member-grid">
+            <div className="family-filters">
+              <button
+                type="button"
+                className={`family-filter ${
+                  selectedMemberId === "all" ? "selected" : ""
+                }`}
+                onClick={() => setSelectedMemberId("all")}
+              >
+                <div className="family-avatar family-avatar-all">
+                  <Users size={22} />
+                </div>
+
+                <div className="family-filter-copy">
+                  <strong>Everyone</strong>
+                  <span>All schedules</span>
+                </div>
+              </button>
+
               {members.map((member) => (
-                <article className="member-card" key={member.id}>
+                <button
+                  type="button"
+                  key={member.id}
+                  className={`family-filter ${
+                    selectedMemberId === member.id ? "selected" : ""
+                  }`}
+                  onClick={() => setSelectedMemberId(member.id)}
+                >
                   <div
-                    className="member-avatar"
+                    className="family-avatar"
                     style={{ backgroundColor: member.colour }}
                   >
                     {member.initials || member.name.charAt(0)}
                   </div>
 
-                  <div>
-                    <h3>{member.name}</h3>
-                    <p>Family member</p>
+                  <div className="family-filter-copy">
+                    <strong>{member.name}</strong>
+                    <span>Family member</span>
                   </div>
-                </article>
+                </button>
               ))}
             </div>
           )}
         </section>
 
-        <section className="dashboard-grid">
-          <article className="dashboard-card">
-            <p className="eyebrow">Today</p>
-            <h2>No events yet</h2>
-            <p>Your family calendar will appear here.</p>
-          </article>
+        <section className="dashboard-layout">
+          <div className="dashboard-main-column">
+            <article className="panel today-panel">
+              <div className="panel-heading">
+                <div>
+                  <p className="section-kicker">Today</p>
+                  <h3>{formatLongDate(currentTime)}</h3>
+                </div>
 
-          <article className="dashboard-card">
-            <p className="eyebrow">Tasks</p>
-            <h2>All caught up</h2>
-            <p>Chores and reminders will appear here.</p>
-          </article>
+                <button type="button" className="text-button">
+                  View calendar
+                  <ChevronRight size={18} />
+                </button>
+              </div>
 
-          <article className="dashboard-card">
-            <p className="eyebrow">Dinner</p>
-            <h2>Nothing planned</h2>
-            <p>Your meal planner will appear here.</p>
-          </article>
+              <div className="empty-state">
+                <div className="empty-icon">
+                  <CalendarDays size={28} />
+                </div>
 
-          <article className="dashboard-card">
-            <p className="eyebrow">Shopping</p>
-            <h2>List is empty</h2>
-            <p>Shared shopping items will appear here.</p>
-          </article>
+                <div>
+                  <h4>No events today</h4>
+                  <p>
+                    Events for the selected family members will appear here.
+                  </p>
+                </div>
+              </div>
+            </article>
+
+            <article className="panel upcoming-panel">
+              <div className="panel-heading">
+                <div>
+                  <p className="section-kicker">Coming up</p>
+                  <h3>Next few days</h3>
+                </div>
+              </div>
+
+              <div className="upcoming-placeholder">
+                <div>
+                  <span>Tomorrow</span>
+                  <strong>No events planned</strong>
+                </div>
+
+                <div>
+                  <span>Friday</span>
+                  <strong>No events planned</strong>
+                </div>
+
+                <div>
+                  <span>Saturday</span>
+                  <strong>No events planned</strong>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <aside className="dashboard-side-column">
+            <article className="panel quick-panel">
+              <div className="panel-heading">
+                <div>
+                  <p className="section-kicker">Tasks</p>
+                  <h3>Today&apos;s chores</h3>
+                </div>
+              </div>
+
+              <div className="small-empty-state">
+                <CheckSquare size={24} />
+                <span>No tasks due today</span>
+              </div>
+            </article>
+
+            <article className="panel quick-panel">
+              <div className="panel-heading">
+                <div>
+                  <p className="section-kicker">Dinner</p>
+                  <h3>Tonight&apos;s meal</h3>
+                </div>
+              </div>
+
+              <div className="small-empty-state">
+                <Soup size={24} />
+                <span>Nothing planned yet</span>
+              </div>
+            </article>
+
+            <article className="panel quick-panel">
+              <div className="panel-heading">
+                <div>
+                  <p className="section-kicker">Shopping</p>
+                  <h3>Shared list</h3>
+                </div>
+              </div>
+
+              <div className="small-empty-state">
+                <ShoppingCart size={24} />
+                <span>Your shopping list is empty</span>
+              </div>
+            </article>
+          </aside>
         </section>
       </main>
+
+      <nav className="bottom-navigation" aria-label="Primary navigation">
+        {navigationItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activePage === item.id;
+
+          return (
+            <button
+              type="button"
+              key={item.id}
+              className={`nav-button ${isActive ? "active" : ""}`}
+              onClick={() => setActivePage(item.id)}
+            >
+              <Icon size={22} />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }
