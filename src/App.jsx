@@ -12,6 +12,8 @@ import {
 import "./App.css";
 import CalendarPage from "./pages/CalendarPage";
 import AddEventModal from "./components/AddEventModal";
+import RecurringEventChoiceModal from "./components/RecurringEventChoiceModal";
+import OccurrenceActionModal from "./components/OccurrenceActionModal";
 
 const API_BASE_URL = "http://localhost:3001";
 
@@ -69,6 +71,11 @@ function App() {
   const [addEventOpen, setAddEventOpen] = useState(false);
 const [selectedEvent, setSelectedEvent] = useState(null);
 const [selectedEventDate, setSelectedEventDate] = useState(null);
+
+const [recurringChoiceEvent, setRecurringChoiceEvent] = useState(null);
+const [occurrenceActionEvent, setOccurrenceActionEvent] = useState(null);
+const [occurrenceEditEvent, setOccurrenceEditEvent] = useState(null);
+
 const [eventRefreshKey, setEventRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -338,10 +345,15 @@ const [eventRefreshKey, setEventRefreshKey] = useState(0);
     setAddEventOpen(true);
   }}
   onEditEvent={(event) => {
-    setSelectedEvent(event);
-    setSelectedEventDate(null);
-    setAddEventOpen(true);
-  }}
+  if (event.is_recurring && event.is_occurrence) {
+    setRecurringChoiceEvent(event);
+    return;
+  }
+
+  setSelectedEvent(event);
+  setSelectedEventDate(null);
+  setAddEventOpen(true);
+}}
   eventRefreshKey={eventRefreshKey}
 />
         )}
@@ -402,6 +414,53 @@ const [eventRefreshKey, setEventRefreshKey] = useState(0);
   }}
   onEventDeleted={() => {
     setEventRefreshKey((current) => current + 1);
+  }}
+/>
+
+<RecurringEventChoiceModal
+  isOpen={Boolean(recurringChoiceEvent)}
+  event={recurringChoiceEvent}
+  onClose={() => {
+    setRecurringChoiceEvent(null);
+  }}
+  onThisEvent={() => {
+    setOccurrenceActionEvent(recurringChoiceEvent);
+    setRecurringChoiceEvent(null);
+  }}
+  onEntireSeries={() => {
+    setSelectedEvent(recurringChoiceEvent);
+    setSelectedEventDate(null);
+    setRecurringChoiceEvent(null);
+    setAddEventOpen(true);
+  }}
+/>
+
+<OccurrenceActionModal
+  isOpen={Boolean(occurrenceActionEvent)}
+  event={occurrenceActionEvent}
+  onClose={() => {
+    setOccurrenceActionEvent(null);
+  }}
+  onEditOccurrence={(event) => {
+    setOccurrenceEditEvent(event);
+    setOccurrenceActionEvent(null);
+  }}
+  onOccurrenceDeleted={() => {
+    setEventRefreshKey((current) => current + 1);
+  }}
+/>
+
+<AddEventModal
+  isOpen={Boolean(occurrenceEditEvent)}
+  onClose={() => {
+    setOccurrenceEditEvent(null);
+  }}
+  members={members}
+  eventToEdit={occurrenceEditEvent}
+  occurrenceEditMode
+  onEventSaved={() => {
+    setEventRefreshKey((current) => current + 1);
+    setOccurrenceEditEvent(null);
   }}
 />
 

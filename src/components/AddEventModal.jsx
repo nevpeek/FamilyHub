@@ -17,11 +17,14 @@ function AddEventModal({
   members,
   initialDate,
   eventToEdit,
+  occurrenceEditMode = false,
   onEventSaved,
   onEventDeleted,
 }) {
   const defaultDate = useMemo(() => {
-    return initialDate ? formatDateKey(initialDate) : formatDateKey(new Date());
+    return initialDate
+      ? formatDateKey(initialDate)
+      : formatDateKey(new Date());
   }, [initialDate]);
 
   const [title, setTitle] = useState("");
@@ -34,12 +37,17 @@ function AddEventModal({
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState("other");
 
-const [recurrenceRule, setRecurrenceRule] = useState("");
-const [recurrenceEndType, setRecurrenceEndType] = useState("never");
-const [recurrenceEndDate, setRecurrenceEndDate] = useState("");
-const [recurrenceCount, setRecurrenceCount] = useState("");
+  const [recurrenceRule, setRecurrenceRule] = useState("");
+  const [recurrenceEndType, setRecurrenceEndType] =
+    useState("never");
+  const [recurrenceEndDate, setRecurrenceEndDate] =
+    useState("");
+  const [recurrenceCount, setRecurrenceCount] =
+    useState("");
 
-const [selectedMemberIds, setSelectedMemberIds] = useState([]);
+  const [selectedMemberIds, setSelectedMemberIds] =
+    useState([]);
+
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
@@ -52,33 +60,56 @@ const [selectedMemberIds, setSelectedMemberIds] = useState([]);
     if (eventToEdit) {
       setTitle(eventToEdit.title || "");
       setDescription(eventToEdit.description || "");
-      setStartDate(eventToEdit.start_date || defaultDate);
-      setStartTime(eventToEdit.start_time || "09:00");
-      setEndDate(eventToEdit.end_date || eventToEdit.start_date || defaultDate);
-      setEndTime(eventToEdit.end_time || "10:00");
+
+      setStartDate(
+        eventToEdit.start_date || defaultDate
+      );
+
+      setStartTime(
+        eventToEdit.start_time || "09:00"
+      );
+
+      setEndDate(
+        eventToEdit.end_date ||
+          eventToEdit.start_date ||
+          defaultDate
+      );
+
+      setEndTime(
+        eventToEdit.end_time || "10:00"
+      );
+
       setAllDay(Boolean(eventToEdit.all_day));
-     setLocation(eventToEdit.location || "");
-setCategory(eventToEdit.category || "other");
+      setLocation(eventToEdit.location || "");
+      setCategory(eventToEdit.category || "other");
 
-setRecurrenceRule(eventToEdit.recurrence_rule || "");
+      setRecurrenceRule(
+        eventToEdit.recurrence_rule || ""
+      );
 
-if (eventToEdit.recurrence_count) {
-  setRecurrenceEndType("count");
-  setRecurrenceCount(String(eventToEdit.recurrence_count));
-  setRecurrenceEndDate("");
-} else if (eventToEdit.recurrence_end_date) {
-  setRecurrenceEndType("date");
-  setRecurrenceEndDate(eventToEdit.recurrence_end_date);
-  setRecurrenceCount("");
-} else {
-  setRecurrenceEndType("never");
-  setRecurrenceEndDate("");
-  setRecurrenceCount("");
-}
+      if (eventToEdit.recurrence_count) {
+        setRecurrenceEndType("count");
+        setRecurrenceCount(
+          String(eventToEdit.recurrence_count)
+        );
+        setRecurrenceEndDate("");
+      } else if (eventToEdit.recurrence_end_date) {
+        setRecurrenceEndType("date");
+        setRecurrenceEndDate(
+          eventToEdit.recurrence_end_date
+        );
+        setRecurrenceCount("");
+      } else {
+        setRecurrenceEndType("never");
+        setRecurrenceEndDate("");
+        setRecurrenceCount("");
+      }
 
-setSelectedMemberIds(
-  (eventToEdit.members || []).map((member) => member.id)
-);
+      setSelectedMemberIds(
+        (eventToEdit.members || []).map(
+          (member) => member.id
+        )
+      );
     } else {
       setTitle("");
       setDescription("");
@@ -88,18 +119,23 @@ setSelectedMemberIds(
       setEndTime("10:00");
       setAllDay(false);
       setLocation("");
-setCategory("other");
+      setCategory("other");
 
-setRecurrenceRule("");
-setRecurrenceEndType("never");
-setRecurrenceEndDate("");
-setRecurrenceCount("");
+      setRecurrenceRule("");
+      setRecurrenceEndType("never");
+      setRecurrenceEndDate("");
+      setRecurrenceCount("");
 
-setSelectedMemberIds([]);
+      setSelectedMemberIds([]);
     }
 
     setError("");
-  }, [isOpen, eventToEdit, defaultDate]);
+  }, [
+    isOpen,
+    eventToEdit,
+    defaultDate,
+    occurrenceEditMode,
+  ]);
 
   if (!isOpen) {
     return null;
@@ -108,7 +144,9 @@ setSelectedMemberIds([]);
   function toggleMember(memberId) {
     setSelectedMemberIds((current) => {
       if (current.includes(memberId)) {
-        return current.filter((id) => id !== memberId);
+        return current.filter(
+          (id) => id !== memberId
+        );
       }
 
       return [...current, memberId];
@@ -126,68 +164,154 @@ setSelectedMemberIds([]);
     }
 
     if (selectedMemberIds.length === 0) {
-      setError("Please select at least one family member.");
+      setError(
+        "Please select at least one family member."
+      );
+      return;
+    }
+
+    if (
+      !allDay &&
+      startDate === endDate &&
+      startTime &&
+      endTime &&
+      endTime <= startTime
+    ) {
+      setError(
+        "End time must be later than start time."
+      );
+      return;
+    }
+
+    if (
+      recurrenceRule &&
+      recurrenceEndType === "date" &&
+      !recurrenceEndDate
+    ) {
+      setError(
+        "Please select when the recurring event ends."
+      );
+      return;
+    }
+
+    if (
+      recurrenceRule &&
+      recurrenceEndType === "count" &&
+      (!recurrenceCount ||
+        Number(recurrenceCount) < 1)
+    ) {
+      setError(
+        "Please enter the number of occurrences."
+      );
       return;
     }
 
     setSaving(true);
 
     try {
-      const response = await fetch(
-        eventToEdit
-          ? `${API_BASE_URL}/api/events/${eventToEdit.id}`
-          : `${API_BASE_URL}/api/events`,
-        {
-          method: eventToEdit ? "PUT" : "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title: title.trim(),
-            description: description.trim() || null,
-            startDate,
-            startTime: allDay ? null : startTime,
-            endDate: endDate || startDate,
-            endTime: allDay ? null : endTime,
-            allDay,
-            location: location.trim() || null,
-            category,
+      let url = `${API_BASE_URL}/api/events`;
+      let method = "POST";
 
-recurrenceRule: recurrenceRule || null,
+      if (occurrenceEditMode && eventToEdit) {
+        const seriesEventId =
+          eventToEdit.series_event_id ||
+          eventToEdit.series_id ||
+          eventToEdit.id;
 
-recurrenceEndDate:
-  recurrenceRule && recurrenceEndType === "date"
-    ? recurrenceEndDate || null
-    : null,
+        const occurrenceDate =
+          eventToEdit.occurrence_date ||
+          eventToEdit.recurrence_parent_date ||
+          eventToEdit.start_date;
 
-recurrenceCount:
-  recurrenceRule && recurrenceEndType === "count"
-    ? Number(recurrenceCount) || null
-    : null,
+        url =
+          `${API_BASE_URL}/api/events/` +
+          `${seriesEventId}/occurrences/` +
+          `${occurrenceDate}`;
 
-memberIds: selectedMemberIds,
-          }),
-        }
-      );
+        method = "PUT";
+      } else if (eventToEdit) {
+        url =
+          `${API_BASE_URL}/api/events/` +
+          `${eventToEdit.id}`;
+
+        method = "PUT";
+      }
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: title.trim(),
+          description:
+            description.trim() || null,
+
+          startDate,
+          startTime:
+            allDay ? null : startTime,
+
+          endDate:
+            endDate || startDate,
+
+          endTime:
+            allDay ? null : endTime,
+
+          allDay,
+
+          location:
+            location.trim() || null,
+
+          category,
+
+          recurrenceRule:
+            occurrenceEditMode
+              ? null
+              : recurrenceRule || null,
+
+          recurrenceEndDate:
+            occurrenceEditMode
+              ? null
+              : recurrenceRule &&
+                  recurrenceEndType === "date"
+                ? recurrenceEndDate || null
+                : null,
+
+          recurrenceCount:
+            occurrenceEditMode
+              ? null
+              : recurrenceRule &&
+                  recurrenceEndType === "count"
+                ? Number(recurrenceCount) || null
+                : null,
+
+          memberIds: selectedMemberIds,
+        }),
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to save event");
+        throw new Error(
+          data.error || "Failed to save event"
+        );
       }
 
       onEventSaved?.(data.event);
       onClose();
     } catch (err) {
       console.error(err);
-      setError(err.message || "Unable to save event");
+
+      setError(
+        err.message || "Unable to save event"
+      );
     } finally {
       setSaving(false);
     }
   }
 
   async function handleDelete() {
-    if (!eventToEdit) {
+    if (!eventToEdit || occurrenceEditMode) {
       return;
     }
 
@@ -213,14 +337,19 @@ memberIds: selectedMemberIds,
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to delete event");
+        throw new Error(
+          data.error || "Failed to delete event"
+        );
       }
 
       onEventDeleted?.(eventToEdit.id);
       onClose();
     } catch (err) {
       console.error(err);
-      setError(err.message || "Unable to delete event");
+
+      setError(
+        err.message || "Unable to delete event"
+      );
     } finally {
       setDeleting(false);
     }
@@ -228,11 +357,24 @@ memberIds: selectedMemberIds,
 
   return (
     <div className="event-modal-backdrop">
-      <div className="event-modal" role="dialog" aria-modal="true">
+      <div
+        className="event-modal"
+        role="dialog"
+        aria-modal="true"
+      >
         <div className="event-modal-header">
           <div>
-            <p className="section-kicker">Calendar</p>
-            <h2>{eventToEdit ? "Edit Event" : "Add Event"}</h2>
+            <p className="section-kicker">
+              Calendar
+            </p>
+
+            <h2>
+              {occurrenceEditMode
+                ? "Edit This Occurrence"
+                : eventToEdit
+                  ? "Edit Event"
+                  : "Add Event"}
+            </h2>
           </div>
 
           <button
@@ -245,13 +387,19 @@ memberIds: selectedMemberIds,
           </button>
         </div>
 
-        <form className="event-form" onSubmit={handleSubmit}>
+        <form
+          className="event-form"
+          onSubmit={handleSubmit}
+        >
           <label className="event-form-field">
             <span>Event title</span>
+
             <input
               type="text"
               value={title}
-              onChange={(event) => setTitle(event.target.value)}
+              onChange={(event) =>
+                setTitle(event.target.value)
+              }
               placeholder="e.g. Dentist appointment"
               autoFocus
             />
@@ -262,7 +410,10 @@ memberIds: selectedMemberIds,
 
             <div className="event-member-options">
               {members.map((member) => {
-                const selected = selectedMemberIds.includes(member.id);
+                const selected =
+                  selectedMemberIds.includes(
+                    member.id
+                  );
 
                 return (
                   <button
@@ -271,12 +422,18 @@ memberIds: selectedMemberIds,
                     className={`event-member-option ${
                       selected ? "selected" : ""
                     }`}
-                    onClick={() => toggleMember(member.id)}
+                    onClick={() =>
+                      toggleMember(member.id)
+                    }
                   >
                     <span
                       className="event-member-option-dot"
-                      style={{ backgroundColor: member.colour }}
+                      style={{
+                        backgroundColor:
+                          member.colour,
+                      }}
                     />
+
                     {member.name}
                   </button>
                 );
@@ -288,22 +445,29 @@ memberIds: selectedMemberIds,
             <input
               type="checkbox"
               checked={allDay}
-              onChange={(event) => setAllDay(event.target.checked)}
+              onChange={(event) =>
+                setAllDay(event.target.checked)
+              }
             />
+
             <span>All-day event</span>
           </label>
 
           <div className="event-form-grid">
             <label className="event-form-field">
               <span>Start date</span>
+
               <input
                 type="date"
                 value={startDate}
                 onChange={(event) => {
-                  setStartDate(event.target.value);
+                  const newDate =
+                    event.target.value;
 
-                  if (endDate < event.target.value) {
-                    setEndDate(event.target.value);
+                  setStartDate(newDate);
+
+                  if (endDate < newDate) {
+                    setEndDate(newDate);
                   }
                 }}
               />
@@ -312,140 +476,216 @@ memberIds: selectedMemberIds,
             {!allDay && (
               <label className="event-form-field">
                 <span>Start time</span>
+
                 <input
                   type="time"
                   value={startTime}
-                  onChange={(event) => setStartTime(event.target.value)}
+                  onChange={(event) =>
+                    setStartTime(
+                      event.target.value
+                    )
+                  }
                 />
               </label>
             )}
 
             <label className="event-form-field">
               <span>End date</span>
+
               <input
                 type="date"
                 value={endDate}
                 min={startDate}
-                onChange={(event) => setEndDate(event.target.value)}
+                onChange={(event) =>
+                  setEndDate(event.target.value)
+                }
               />
             </label>
 
             {!allDay && (
               <label className="event-form-field">
                 <span>End time</span>
+
                 <input
                   type="time"
                   value={endTime}
-                  onChange={(event) => setEndTime(event.target.value)}
+                  onChange={(event) =>
+                    setEndTime(
+                      event.target.value
+                    )
+                  }
                 />
               </label>
             )}
           </div>
 
-<div className="event-form-grid">
-  <label className="event-form-field">
-    <span>Repeat</span>
+          {!occurrenceEditMode && (
+            <>
+              <div className="event-form-grid">
+                <label className="event-form-field">
+                  <span>Repeat</span>
 
-    <select
-      value={recurrenceRule}
-      onChange={(event) => {
-        const value = event.target.value;
+                  <select
+                    value={recurrenceRule}
+                    onChange={(event) => {
+                      const value =
+                        event.target.value;
 
-        setRecurrenceRule(value);
+                      setRecurrenceRule(value);
 
-        if (!value) {
-          setRecurrenceEndType("never");
-          setRecurrenceEndDate("");
-          setRecurrenceCount("");
-        }
-      }}
-    >
-      <option value="">Does not repeat</option>
-      <option value="daily">Daily</option>
-      <option value="weekly">Weekly</option>
-      <option value="fortnightly">Fortnightly</option>
-      <option value="monthly">Monthly</option>
-      <option value="yearly">Yearly</option>
-    </select>
-  </label>
+                      if (!value) {
+                        setRecurrenceEndType(
+                          "never"
+                        );
+                        setRecurrenceEndDate("");
+                        setRecurrenceCount("");
+                      }
+                    }}
+                  >
+                    <option value="">
+                      Does not repeat
+                    </option>
+                    <option value="daily">
+                      Daily
+                    </option>
+                    <option value="weekly">
+                      Weekly
+                    </option>
+                    <option value="fortnightly">
+                      Fortnightly
+                    </option>
+                    <option value="monthly">
+                      Monthly
+                    </option>
+                    <option value="yearly">
+                      Yearly
+                    </option>
+                  </select>
+                </label>
 
-  {recurrenceRule && (
-    <label className="event-form-field">
-      <span>Ends</span>
+                {recurrenceRule && (
+                  <label className="event-form-field">
+                    <span>Ends</span>
 
-      <select
-        value={recurrenceEndType}
-        onChange={(event) => {
-          setRecurrenceEndType(event.target.value);
-          setRecurrenceEndDate("");
-          setRecurrenceCount("");
-        }}
-      >
-        <option value="never">Never</option>
-        <option value="date">On a date</option>
-        <option value="count">After occurrences</option>
-      </select>
-    </label>
-  )}
-</div>
+                    <select
+                      value={recurrenceEndType}
+                      onChange={(event) => {
+                        setRecurrenceEndType(
+                          event.target.value
+                        );
+                        setRecurrenceEndDate("");
+                        setRecurrenceCount("");
+                      }}
+                    >
+                      <option value="never">
+                        Never
+                      </option>
+                      <option value="date">
+                        On a date
+                      </option>
+                      <option value="count">
+                        After occurrences
+                      </option>
+                    </select>
+                  </label>
+                )}
+              </div>
 
-{recurrenceRule && recurrenceEndType === "date" && (
-  <label className="event-form-field">
-    <span>Repeat until</span>
+              {recurrenceRule &&
+                recurrenceEndType === "date" && (
+                  <label className="event-form-field">
+                    <span>Repeat until</span>
 
-    <input
-      type="date"
-      value={recurrenceEndDate}
-      min={startDate}
-      onChange={(event) =>
-        setRecurrenceEndDate(event.target.value)
-      }
-    />
-  </label>
-)}
+                    <input
+                      type="date"
+                      value={recurrenceEndDate}
+                      min={startDate}
+                      onChange={(event) =>
+                        setRecurrenceEndDate(
+                          event.target.value
+                        )
+                      }
+                    />
+                  </label>
+                )}
 
-{recurrenceRule && recurrenceEndType === "count" && (
-  <label className="event-form-field">
-    <span>Number of occurrences</span>
+              {recurrenceRule &&
+                recurrenceEndType === "count" && (
+                  <label className="event-form-field">
+                    <span>
+                      Number of occurrences
+                    </span>
 
-    <input
-      type="number"
-      min="1"
-      max="500"
-      value={recurrenceCount}
-      onChange={(event) =>
-        setRecurrenceCount(event.target.value)
-      }
-      placeholder="e.g. 10"
-    />
-  </label>
-)}
+                    <input
+                      type="number"
+                      min="1"
+                      max="500"
+                      value={recurrenceCount}
+                      onChange={(event) =>
+                        setRecurrenceCount(
+                          event.target.value
+                        )
+                      }
+                      placeholder="e.g. 10"
+                    />
+                  </label>
+                )}
+            </>
+          )}
 
           <div className="event-form-grid">
             <label className="event-form-field">
               <span>Category</span>
+
               <select
                 value={category}
-                onChange={(event) => setCategory(event.target.value)}
+                onChange={(event) =>
+                  setCategory(
+                    event.target.value
+                  )
+                }
               >
-                <option value="other">Other</option>
-                <option value="school">School</option>
-                <option value="sport">Sport</option>
-                <option value="work">Work</option>
-                <option value="medical">Medical</option>
-                <option value="birthday">Birthday</option>
-                <option value="appointment">Appointment</option>
-                <option value="family">Family</option>
-                <option value="holiday">Holiday</option>
+                <option value="other">
+                  Other
+                </option>
+                <option value="school">
+                  School
+                </option>
+                <option value="sport">
+                  Sport
+                </option>
+                <option value="work">
+                  Work
+                </option>
+                <option value="medical">
+                  Medical
+                </option>
+                <option value="birthday">
+                  Birthday
+                </option>
+                <option value="appointment">
+                  Appointment
+                </option>
+                <option value="family">
+                  Family
+                </option>
+                <option value="holiday">
+                  Holiday
+                </option>
               </select>
             </label>
 
             <label className="event-form-field">
               <span>Location</span>
+
               <input
                 type="text"
                 value={location}
-                onChange={(event) => setLocation(event.target.value)}
+                onChange={(event) =>
+                  setLocation(
+                    event.target.value
+                  )
+                }
                 placeholder="Optional"
               />
             </label>
@@ -453,28 +693,43 @@ memberIds: selectedMemberIds,
 
           <label className="event-form-field">
             <span>Notes</span>
+
             <textarea
               rows="4"
               value={description}
-              onChange={(event) => setDescription(event.target.value)}
+              onChange={(event) =>
+                setDescription(
+                  event.target.value
+                )
+              }
               placeholder="Optional notes"
             />
           </label>
 
-          {error && <p className="event-form-error">{error}</p>}
+          {error && (
+            <p className="event-form-error">
+              {error}
+            </p>
+          )}
 
           <div className="event-form-actions">
-            {eventToEdit && (
-              <button
-                type="button"
-                className="event-delete-button"
-                onClick={handleDelete}
-                disabled={saving || deleting}
-              >
-                <Trash2 size={18} />
-                {deleting ? "Deleting..." : "Delete"}
-              </button>
-            )}
+            {eventToEdit &&
+              !occurrenceEditMode && (
+                <button
+                  type="button"
+                  className="event-delete-button"
+                  onClick={handleDelete}
+                  disabled={
+                    saving || deleting
+                  }
+                >
+                  <Trash2 size={18} />
+
+                  {deleting
+                    ? "Deleting..."
+                    : "Delete"}
+                </button>
+              )}
 
             <div className="event-form-actions-right">
               <button
@@ -493,9 +748,11 @@ memberIds: selectedMemberIds,
               >
                 {saving
                   ? "Saving..."
-                  : eventToEdit
-                    ? "Save Changes"
-                    : "Save Event"}
+                  : occurrenceEditMode
+                    ? "Save This Occurrence"
+                    : eventToEdit
+                      ? "Save Changes"
+                      : "Save Event"}
               </button>
             </div>
           </div>

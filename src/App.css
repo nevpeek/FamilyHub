@@ -1000,3 +1000,79 @@
     width: 100%;
   }
 }
+
+.recurring-choice-modal,
+.occurrence-action-modal {
+  width: min(560px, 100%);
+  border-radius: 26px;
+  background: #ffffff;
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.28);
+}
+
+.recurring-choice-content,
+.occurrence-action-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px 26px 26px;
+}
+
+.recurring-choice-content > p,
+.occurrence-action-content > p {
+  margin: 0 0 4px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.recurring-choice-button {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  min-height: 82px;
+  padding: 14px 16px;
+  border: 1px solid #dfe5ed;
+  border-radius: 18px;
+  background: #ffffff;
+  text-align: left;
+}
+
+.recurring-choice-button:hover {
+  border-color: #2563eb;
+  background: #f8fbff;
+}
+
+.recurring-choice-icon {
+  display: grid;
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 14px;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.recurring-choice-button > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.recurring-choice-button strong {
+  color: #172033;
+  font-size: 1rem;
+}
+
+.recurring-choice-button span {
+  color: #64748b;
+  font-size: 0.84rem;
+}
+
+.recurring-choice-cancel {
+  margin-top: 4px;
+}
+
+.occurrence-delete-button {
+  width: 100%;
+}
