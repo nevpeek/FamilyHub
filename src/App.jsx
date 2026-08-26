@@ -21,6 +21,7 @@ import AddEventModal from "./components/AddEventModal";
 import RecurringEventChoiceModal from "./components/RecurringEventChoiceModal";
 import OccurrenceActionModal from "./components/OccurrenceActionModal";
 import TaskModal from "./components/TaskModal";
+import RecurringTaskChoiceModal from "./components/RecurringTaskChoiceModal";
 import MealModal from "./components/MealModal";
 import ShoppingItemModal from "./components/ShoppingItemModal";
 import FamilyMemberModal from "./components/FamilyMemberModal";
@@ -126,6 +127,10 @@ const [eventRefreshKey, setEventRefreshKey] = useState(0);
 const [taskRefreshKey, setTaskRefreshKey] = useState(0);
 const [taskModalOpen, setTaskModalOpen] = useState(false);
 const [selectedTask, setSelectedTask] = useState(null);
+
+const [recurringChoiceTask, setRecurringChoiceTask] = useState(null);
+const [taskEditMode, setTaskEditMode] = useState(null);
+
 const [mealRefreshKey, setMealRefreshKey] = useState(0);
 const [mealModalOpen, setMealModalOpen] = useState(false);
 const [selectedMeal, setSelectedMeal] = useState(null);
@@ -1167,9 +1172,17 @@ const upcomingDays = Array.from(
     setTaskModalOpen(true);
   }}
   onEditTask={(task) => {
-    setSelectedTask(task);
-    setTaskModalOpen(true);
-  }}
+  if (
+    task.is_recurring &&
+    task.is_occurrence
+  ) {
+    setRecurringChoiceTask(task);
+    return;
+  }
+
+  setSelectedTask(task);
+  setTaskModalOpen(true);
+}}
   onTaskChanged={() => {
     setTaskRefreshKey((current) => current + 1);
   }}
@@ -1333,19 +1346,82 @@ const upcomingDays = Array.from(
   }}
 />
 
+<RecurringTaskChoiceModal
+  isOpen={Boolean(recurringChoiceTask)}
+  task={recurringChoiceTask}
+  onClose={() => {
+    setRecurringChoiceTask(null);
+  }}
+onThisTask={() => {
+  if (!recurringChoiceTask) {
+    return;
+  }
+
+  setSelectedTask(recurringChoiceTask);
+  setTaskEditMode("occurrence");
+  setRecurringChoiceTask(null);
+  setTaskModalOpen(true);
+}}
+onThisAndFuture={() => {
+  if (!recurringChoiceTask) {
+    return;
+  }
+
+  setSelectedTask(recurringChoiceTask);
+  setTaskEditMode("future");
+  setRecurringChoiceTask(null);
+  setTaskModalOpen(true);
+}}
+  onEntireSeries={async () => {
+  if (!recurringChoiceTask) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/tasks/${recurringChoiceTask.id}`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          "Unable to load recurring task"
+      );
+    }
+
+    setSelectedTask(data.task);
+    setTaskEditMode("series");
+    setRecurringChoiceTask(null);
+    setTaskModalOpen(true);
+  } catch (err) {
+    console.error(err);
+
+    window.alert(
+      err.message ||
+        "Unable to load recurring task"
+    );
+  }
+}}
+/>
+
 <TaskModal
   open={taskModalOpen}
   task={selectedTask}
+  editMode={taskEditMode}
   members={members}
   onClose={() => {
-    setTaskModalOpen(false);
-    setSelectedTask(null);
-  }}
+  setTaskModalOpen(false);
+  setSelectedTask(null);
+  setTaskEditMode(null);
+}}
   onSaved={() => {
-    setTaskRefreshKey((current) => current + 1);
-    setTaskModalOpen(false);
-    setSelectedTask(null);
-  }}
+  setTaskRefreshKey((current) => current + 1);
+  setTaskModalOpen(false);
+  setSelectedTask(null);
+  setTaskEditMode(null);
+}}
 />
 
 <MealModal

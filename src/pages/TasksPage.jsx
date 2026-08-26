@@ -3,6 +3,7 @@ import {
   CheckCircle2,
   Circle,
   Plus,
+  Repeat2,
 } from "lucide-react";
 
 const API_BASE_URL = "http://localhost:3001";
@@ -142,10 +143,15 @@ function TasksPage({
             "Content-Type":
               "application/json",
           },
-          body: JSON.stringify({
-            completed:
-              !task.is_completed,
-          }),
+         body: JSON.stringify({
+  completed:
+    !task.is_completed,
+
+  occurrenceDate:
+    task.is_occurrence
+      ? task.occurrence_date
+      : null,
+}),
         }
       );
 
@@ -159,18 +165,26 @@ function TasksPage({
       }
 
       setTasks((current) =>
-        current
-          .map((item) =>
-            item.id === task.id
-              ? data.task
-              : item
-          )
-          .filter((item) =>
-            showCompleted
-              ? true
-              : !item.is_completed
-          )
-      );
+  current
+    .map((item) => {
+      const itemKey =
+        item.occurrence_key ||
+        String(item.id);
+
+      const taskKey =
+        task.occurrence_key ||
+        String(task.id);
+
+      return itemKey === taskKey
+        ? data.task
+        : item;
+    })
+    .filter((item) =>
+      showCompleted
+        ? true
+        : !item.is_completed
+    )
+);
       onTaskChanged?.();
 
     } catch (err) {
@@ -188,7 +202,10 @@ function TasksPage({
 
     return (
       <article
-        key={task.id}
+  key={
+    task.occurrence_key ||
+    task.id
+  }
         className={`task-card ${
           task.is_completed
             ? "completed"
@@ -240,19 +257,35 @@ function TasksPage({
           </div>
 
           <div className="task-card-meta">
-            <span>
-              {formatTaskDate(
-                task.due_date
-              )}
+           <div className="task-card-date-details">
+  <span>
+    {formatTaskDate(
+      task.due_date
+    )}
 
-              {task.due_time
-                ? ` · ${formatTaskTime(
-                    task.due_time
-                  )}`
-                : ""}
-            </span>
+    {task.due_time
+      ? ` · ${formatTaskTime(
+          task.due_time
+        )}`
+      : ""}
+  </span>
 
-            <div className="task-card-members">
+  {task.is_recurring && (
+    <span className="task-recurring-badge">
+      <Repeat2 size={13} />
+
+      {task.recurrence_rule === "daily"
+        ? "Daily"
+        : task.recurrence_rule === "weekly"
+          ? "Weekly"
+          : task.recurrence_rule === "monthly"
+            ? "Monthly"
+            : "Repeats"}
+    </span>
+  )}
+</div>
+
+<div className="task-card-members">
               {(task.members || []).map(
                 (member) => (
                   <span

@@ -9,6 +9,7 @@ const API_BASE_URL = "http://localhost:3001";
 function TaskModal({
   open,
   task,
+  editMode,
   members,
   onClose,
   onSaved,
@@ -22,10 +23,22 @@ function TaskModal({
     useState("normal");
   const [category, setCategory] =
     useState("chore");
-  const [memberIds, setMemberIds] =
-    useState([]);
-  const [saving, setSaving] =
-    useState(false);
+const [memberIds, setMemberIds] =
+  useState([]);
+
+const [isRecurring, setIsRecurring] =
+  useState(false);
+
+const [recurrenceRule, setRecurrenceRule] =
+  useState("weekly");
+
+const [
+  recurrenceEndDate,
+  setRecurrenceEndDate,
+] = useState("");
+
+const [saving, setSaving] =
+  useState(false);
   const [error, setError] = useState("");
 
   const isEditing = Boolean(task?.id);
@@ -40,9 +53,21 @@ function TaskModal({
     setDueDate(task?.due_date || "");
     setDueTime(task?.due_time || "");
     setPriority(task?.priority || "normal");
-    setCategory(task?.category || "chore");
+setCategory(task?.category || "chore");
 
-    setMemberIds(
+setIsRecurring(
+  Boolean(task?.is_recurring)
+);
+
+setRecurrenceRule(
+  task?.recurrence_rule || "weekly"
+);
+
+setRecurrenceEndDate(
+  task?.recurrence_end_date || ""
+);
+
+setMemberIds(
       task?.members?.map(
         (member) => member.id
       ) || []
@@ -74,25 +99,51 @@ function TaskModal({
       return;
     }
 
-    if (memberIds.length === 0) {
-      setError(
-        "Select at least one family member."
-      );
-      return;
-    }
+   if (memberIds.length === 0) {
+  setError(
+    "Select at least one family member."
+  );
+  return;
+}
 
-    setSaving(true);
+if (isRecurring && !dueDate) {
+  setError(
+    "Choose a due date for the recurring task."
+  );
+  return;
+}
+
+if (
+  isRecurring &&
+  recurrenceEndDate &&
+  recurrenceEndDate < dueDate
+) {
+  setError(
+    "The recurrence end date cannot be before the due date."
+  );
+  return;
+}
+
+setSaving(true);
     setError("");
 
     try {
       const response = await fetch(
-        isEditing
-          ? `${API_BASE_URL}/api/tasks/${task.id}`
-          : `${API_BASE_URL}/api/tasks`,
-        {
-          method: isEditing
-            ? "PUT"
-            : "POST",
+  editMode === "occurrence"
+  ? `${API_BASE_URL}/api/tasks/${task.id}/occurrences/${task.occurrence_date}`
+  : editMode === "future"
+    ? `${API_BASE_URL}/api/tasks/${task.id}/future/${task.occurrence_date}`
+    : isEditing
+      ? `${API_BASE_URL}/api/tasks/${task.id}`
+      : `${API_BASE_URL}/api/tasks`,
+  {
+    method:
+  editMode === "occurrence" ||
+  editMode === "future"
+    ? "PUT"
+    : isEditing
+      ? "PUT"
+      : "POST",
           headers: {
             "Content-Type":
               "application/json",
@@ -104,8 +155,19 @@ function TaskModal({
             dueDate: dueDate || null,
             dueTime: dueTime || null,
             priority,
-            category,
-            memberIds,
+category,
+memberIds,
+isRecurring,
+recurrenceRule:
+  isRecurring
+    ? recurrenceRule
+    : null,
+recurrenceEndDate:
+  isRecurring &&
+  recurrenceEndDate
+    ? recurrenceEndDate
+    : null,
+recurrenceCount: null,
           }),
         }
       );
@@ -137,9 +199,13 @@ function TaskModal({
       return;
     }
 
-    const confirmed = window.confirm(
-      `Delete "${task.title}"?`
-    );
+const confirmed = window.confirm(
+  editMode === "occurrence"
+    ? `Delete only this occurrence of "${task.title}"?`
+    : editMode === "future"
+      ? `Delete this occurrence and all future occurrences of "${task.title}"?`
+      : `Delete the entire "${task.title}" series?`
+);
 
     if (!confirmed) {
       return;
@@ -149,12 +215,19 @@ function TaskModal({
     setError("");
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/tasks/${task.id}`,
-        {
-          method: "DELETE",
-        }
-      );
+    const deleteUrl =
+  editMode === "occurrence"
+    ? `${API_BASE_URL}/api/tasks/${task.id}/occurrences/${task.occurrence_date}`
+    : editMode === "future"
+      ? `${API_BASE_URL}/api/tasks/${task.id}/future/${task.occurrence_date}`
+      : `${API_BASE_URL}/api/tasks/${task.id}`;
+
+const response = await fetch(
+  deleteUrl,
+  {
+    method: "DELETE",
+  }
+);
 
       const data = await response.json();
 
@@ -244,58 +317,134 @@ function TaskModal({
           </label>
 
           <div className="event-form-field event-form-full">
-            <span>Family members</span>
+  <span>Family members</span>
 
-            <div className="event-member-picker">
-              {members.map((member) => {
-                const selected =
-                  memberIds.includes(
-                    member.id
-                  );
+  <div className="event-member-picker">
+    {members.map((member) => {
+      const selected =
+        memberIds.includes(
+          member.id
+        );
 
-                return (
-                  <button
-                    type="button"
-                    key={member.id}
-                    className={`event-member-option ${
-                      selected
-                        ? "selected"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      toggleMember(
-                        member.id
-                      )
-                    }
-                  >
-                    <span
-                      className="event-member-option-dot"
-                      style={{
-                        backgroundColor:
-                          member.colour,
-                      }}
-                    />
+      return (
+        <button
+          type="button"
+          key={member.id}
+          className={`event-member-option ${
+            selected
+              ? "selected"
+              : ""
+          }`}
+          onClick={() =>
+            toggleMember(
+              member.id
+            )
+          }
+        >
+          <span
+            className="event-member-option-dot"
+            style={{
+              backgroundColor:
+                member.colour,
+            }}
+          />
 
-                    {member.name}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          {member.name}
+        </button>
+      );
+    })}
+  </div>
+</div>
 
-          <label className="event-form-field">
-            <span>Due date</span>
+<label className="event-form-field">
+  <span>Due date</span>
 
-            <input
-              type="date"
-              value={dueDate}
-              onChange={(event) =>
-                setDueDate(
-                  event.target.value
-                )
-              }
-            />
-          </label>
+  <input
+    type="date"
+    value={dueDate}
+    disabled={
+  editMode === "occurrence" ||
+  editMode === "future"
+}
+    onChange={(event) =>
+      setDueDate(
+        event.target.value
+      )
+    }
+  />
+</label>
+
+{editMode !== "occurrence" && (
+  <>
+    <div className="event-form-field event-form-full">
+      <span>Repeat</span>
+
+      <label className="task-repeat-toggle">
+        <input
+          type="checkbox"
+          checked={isRecurring}
+          onChange={(event) =>
+            setIsRecurring(
+              event.target.checked
+            )
+          }
+        />
+
+        <span>
+          Repeat this task
+        </span>
+      </label>
+    </div>
+
+    {isRecurring && (
+      <>
+        <label className="event-form-field">
+          <span>Repeat</span>
+
+          <select
+            value={recurrenceRule}
+            onChange={(event) =>
+              setRecurrenceRule(
+                event.target.value
+              )
+            }
+          >
+            <option value="daily">
+              Every day
+            </option>
+
+            <option value="weekly">
+              Every week
+            </option>
+
+            <option value="monthly">
+              Every month
+            </option>
+          </select>
+        </label>
+
+        <label className="event-form-field">
+          <span>Repeat until</span>
+
+          <input
+            type="date"
+            value={recurrenceEndDate}
+            min={dueDate || undefined}
+            onChange={(event) =>
+              setRecurrenceEndDate(
+                event.target.value
+              )
+            }
+          />
+
+          <small className="task-repeat-hint">
+            Leave blank to keep repeating.
+          </small>
+        </label>
+      </>
+    )}
+  </>
+)}
 
           <label className="event-form-field">
             <span>Due time</span>
