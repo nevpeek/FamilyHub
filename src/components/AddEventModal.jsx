@@ -729,41 +729,40 @@ recurrenceCount:
             </p>
           )}
 
-          <div className="event-form-actions">
-            {eventToEdit &&
-              !occurrenceEditMode && (
-                <button
-                  type="button"
-                  className="event-delete-button"
-                  onClick={handleDelete}
-                  disabled={
-                    saving || deleting
-                  }
-                >
-                  <Trash2 size={18} />
+<div className="event-modal-actions event-form-full">
+  <div>
+    {eventToEdit && !occurrenceEditMode && (
+      <button
+        type="button"
+        className="event-delete-button"
+        onClick={handleDelete}
+        disabled={saving || deleting}
+      >
+        <Trash2 size={18} />
 
-                  {deleting
-                    ? "Deleting..."
-                    : "Delete"}
-                </button>
-              )}
+        {deleting
+          ? "Deleting..."
+          : "Delete"}
+      </button>
+    )}
+  </div>
 
-            <div className="event-form-actions-right">
-              <button
-                type="button"
-                className="event-secondary-button"
-                onClick={onClose}
-                disabled={saving || deleting}
-              >
-                Cancel
-              </button>
+  <div className="event-modal-action-right">
+    <button
+      type="button"
+      className="event-cancel-button"
+      onClick={onClose}
+      disabled={saving || deleting}
+    >
+      Cancel
+    </button>
 
-              <button
-                type="submit"
-                className="add-event-button"
-                disabled={saving || deleting}
-              >
-                {saving
+    <button
+      type="submit"
+      className="event-save-button"
+      disabled={saving || deleting}
+    >
+      {saving
   ? "Saving..."
   : occurrenceEditMode
     ? "Save This Occurrence"
@@ -771,10 +770,10 @@ recurrenceCount:
       ? "Save This and Future"
       : eventToEdit
         ? "Save Changes"
-        : "Save Event"}
-              </button>
-            </div>
-          </div>
+        : "Add Event"}
+    </button>
+  </div>
+</div>
         </form>
       </div>
     </div>

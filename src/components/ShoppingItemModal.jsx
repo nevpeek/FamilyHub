@@ -185,20 +185,23 @@ function ShoppingItemModal({
 
   return (
     <div
-      className="modal-backdrop"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) {
-          onClose?.();
-        }
-      }}
-    >
-      <div
-        className="modal-card shopping-item-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="shopping-modal-title"
-      >
-        <div className="modal-header">
+  className="event-modal-backdrop"
+  onMouseDown={(event) => {
+    if (
+      event.target ===
+      event.currentTarget
+    ) {
+      onClose?.();
+    }
+  }}
+>
+  <div
+    className="event-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="shopping-modal-title"
+  >
+        <div className="event-modal-header">
           <div>
             <p className="section-kicker">
               Shopping
@@ -213,7 +216,7 @@ function ShoppingItemModal({
 
           <button
             type="button"
-            className="modal-close-button"
+            className="event-modal-close"
             onClick={onClose}
             aria-label="Close"
           >
@@ -221,205 +224,161 @@ function ShoppingItemModal({
           </button>
         </div>
 
-        <form
-          className="shopping-item-form"
-          onSubmit={handleSubmit}
-        >
-          <div className="form-field">
-            <label htmlFor="shopping-name">
-              Item name
-            </label>
+<form
+  className="event-form"
+  onSubmit={handleSubmit}
+>
+  <label className="event-form-field event-form-full">
+    <span>Item name</span>
 
-            <div className="shopping-name-input">
-              <ShoppingCart size={19} />
+    <div className="shopping-name-input">
+      <ShoppingCart size={19} />
 
-              <input
-                id="shopping-name"
-                type="text"
-                value={name}
-                onChange={(event) =>
-                  setName(event.target.value)
-                }
-                placeholder="e.g. Milk"
-                autoFocus
-              />
-            </div>
-          </div>
+      <input
+        id="shopping-name"
+        type="text"
+        value={name}
+        onChange={(event) =>
+          setName(event.target.value)
+        }
+        placeholder="e.g. Milk"
+        autoFocus
+      />
+    </div>
+  </label>
 
-          <div className="shopping-form-row">
-            <div className="form-field">
-              <label htmlFor="shopping-quantity">
-                Quantity
-              </label>
+  <div className="event-form-grid event-form-full">
+    <label className="event-form-field">
+      <span>Quantity</span>
 
-              <input
-                id="shopping-quantity"
-                type="text"
-                value={quantity}
-                onChange={(event) =>
-                  setQuantity(
-                    event.target.value
-                  )
-                }
-                placeholder="e.g. 2 bottles"
-              />
-            </div>
+      <input
+        id="shopping-quantity"
+        type="text"
+        value={quantity}
+        onChange={(event) =>
+          setQuantity(event.target.value)
+        }
+        placeholder="e.g. 2 bottles"
+      />
+    </label>
 
-            <div className="form-field">
-              <label htmlFor="shopping-category">
-                Category
-              </label>
+    <label className="event-form-field">
+      <span>Category</span>
 
-              <select
-                id="shopping-category"
-                value={category}
-                onChange={(event) =>
-                  setCategory(
-                    event.target.value
-                  )
-                }
-              >
-                <option value="produce">
-                  Produce
-                </option>
+      <select
+        id="shopping-category"
+        value={category}
+        onChange={(event) =>
+          setCategory(event.target.value)
+        }
+      >
+        <option value="produce">Produce</option>
+        <option value="meat">Meat</option>
+        <option value="dairy">Dairy</option>
+        <option value="bakery">Bakery</option>
+        <option value="pantry">Pantry</option>
+        <option value="frozen">Frozen</option>
+        <option value="household">Household</option>
+        <option value="other">Other</option>
+      </select>
+    </label>
+  </div>
 
-                <option value="meat">
-                  Meat
-                </option>
+  <div className="event-form-field event-form-full">
+    <span>Family members</span>
 
-                <option value="dairy">
-                  Dairy
-                </option>
+    <div className="event-member-picker">
+      {members.map((member) => {
+        const selected =
+          memberIds.includes(member.id);
 
-                <option value="bakery">
-                  Bakery
-                </option>
-
-                <option value="pantry">
-                  Pantry
-                </option>
-
-                <option value="frozen">
-                  Frozen
-                </option>
-
-                <option value="household">
-                  Household
-                </option>
-
-                <option value="other">
-                  Other
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div className="form-field">
-            <label>Family members</label>
-
-            <div className="modal-member-buttons">
-              {members.map((member) => {
-                const selected =
-                  memberIds.includes(member.id);
-
-                return (
-                  <button
-                    key={member.id}
-                    type="button"
-                    className={`modal-member-button ${
-                      selected
-                        ? "selected"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      toggleMember(member.id)
-                    }
-                  >
-                    <span
-                      className="modal-member-dot"
-                      style={{
-                        backgroundColor:
-                          member.colour,
-                      }}
-                    />
-
-                    {member.name}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="shopping-notes">
-              Notes
-            </label>
-
-            <textarea
-              id="shopping-notes"
-              value={notes}
-              onChange={(event) =>
-                setNotes(event.target.value)
-              }
-              placeholder="Optional notes"
-              rows={4}
+        return (
+          <button
+            key={member.id}
+            type="button"
+            className={`event-member-option ${
+              selected ? "selected" : ""
+            }`}
+            onClick={() =>
+              toggleMember(member.id)
+            }
+          >
+            <span
+              className="event-member-option-dot"
+              style={{
+                backgroundColor: member.colour,
+              }}
             />
-          </div>
 
-          {error && (
-            <div className="modal-form-error">
-              {error}
-            </div>
-          )}
+            {member.name}
+          </button>
+        );
+      })}
+    </div>
+  </div>
 
-          <div className="modal-footer">
-            <div>
-              {isEditing && (
-                <button
-                  type="button"
-                  className="modal-delete-button"
-                  onClick={handleDelete}
-                  disabled={
-                    saving || deleting
-                  }
-                >
-                  <Trash2 size={18} />
+  <label className="event-form-field event-form-full">
+    <span>Notes</span>
 
-                  {deleting
-                    ? "Deleting..."
-                    : "Delete"}
-                </button>
-              )}
-            </div>
+    <textarea
+      id="shopping-notes"
+      value={notes}
+      onChange={(event) =>
+        setNotes(event.target.value)
+      }
+      placeholder="Optional notes"
+      rows={4}
+    />
+  </label>
 
-            <div className="modal-footer-actions">
-              <button
-                type="button"
-                className="modal-cancel-button"
-                onClick={onClose}
-                disabled={
-                  saving || deleting
-                }
-              >
-                Cancel
-              </button>
+  {error && (
+    <div className="event-form-error event-form-full">
+      {error}
+    </div>
+  )}
 
-              <button
-                type="submit"
-                className="modal-save-button"
-                disabled={
-                  saving || deleting
-                }
-              >
-                {saving
-                  ? "Saving..."
-                  : isEditing
-                    ? "Save Changes"
-                    : "Add Item"}
-              </button>
-            </div>
-          </div>
-        </form>
+  <div className="event-modal-actions event-form-full">
+    <div>
+      {isEditing && (
+        <button
+          type="button"
+          className="event-delete-button"
+          onClick={handleDelete}
+          disabled={saving || deleting}
+        >
+          <Trash2 size={18} />
+
+          {deleting
+            ? "Deleting..."
+            : "Delete"}
+        </button>
+      )}
+    </div>
+
+    <div className="event-modal-action-right">
+      <button
+        type="button"
+        className="event-cancel-button"
+        onClick={onClose}
+        disabled={saving || deleting}
+      >
+        Cancel
+      </button>
+
+      <button
+        type="submit"
+        className="event-save-button"
+        disabled={saving || deleting}
+      >
+        {saving
+          ? "Saving..."
+          : isEditing
+            ? "Save Changes"
+            : "Add Item"}
+      </button>
+    </div>
+  </div>
+</form>
       </div>
     </div>
   );
