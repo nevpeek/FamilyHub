@@ -6,6 +6,7 @@ import {
   ChevronRight,
   Home,
   Plus,
+  Settings,
   ShoppingCart,
   Soup,
   Users,
@@ -15,12 +16,14 @@ import CalendarPage from "./pages/CalendarPage";
 import TasksPage from "./pages/TasksPage";
 import MealsPage from "./pages/MealsPage";
 import ShoppingPage from "./pages/ShoppingPage";
+import SettingsPage from "./pages/SettingsPage";
 import AddEventModal from "./components/AddEventModal";
 import RecurringEventChoiceModal from "./components/RecurringEventChoiceModal";
 import OccurrenceActionModal from "./components/OccurrenceActionModal";
 import TaskModal from "./components/TaskModal";
 import MealModal from "./components/MealModal";
 import ShoppingItemModal from "./components/ShoppingItemModal";
+import FamilyMemberModal from "./components/FamilyMemberModal";
 
 const API_BASE_URL = "http://localhost:3001";
 
@@ -50,6 +53,12 @@ const navigationItems = [
     label: "Shopping",
     icon: ShoppingCart,
   },
+
+  {
+  id: "settings",
+  label: "Settings",
+  icon: Settings,
+},
 ];
 
 function formatLongDate(date) {
@@ -123,6 +132,7 @@ const [selectedMeal, setSelectedMeal] = useState(null);
 const [shoppingRefreshKey, setShoppingRefreshKey] = useState(0);
 const [shoppingModalOpen, setShoppingModalOpen] = useState(false);
 const [selectedShoppingItem, setSelectedShoppingItem] = useState(null);
+const [selectedFamilyMember, setSelectedFamilyMember] = useState(null);
 const [quickAddOpen, setQuickAddOpen] = useState(false);
 const quickAddRef = useRef(null);
 const [homeEvents, setHomeEvents] = useState([]);
@@ -1202,6 +1212,23 @@ const upcomingDays = Array.from(
     }}
   />
 )}
+
+{activePage === "settings" && (
+  <SettingsPage
+    members={members}
+    onEditMember={(member) =>
+      setSelectedFamilyMember(member)
+    }
+    onAddMember={() =>
+      setSelectedFamilyMember({
+        id: null,
+        name: "",
+        initials: "",
+        colour: "#3B82F6",
+      })
+    }
+  />
+)}
       </main>
 
       <nav className="bottom-navigation" aria-label="Primary navigation">
@@ -1354,6 +1381,48 @@ const upcomingDays = Array.from(
     setShoppingRefreshKey((current) => current + 1);
     setShoppingModalOpen(false);
     setSelectedShoppingItem(null);
+  }}
+/>
+
+<FamilyMemberModal
+  open={Boolean(selectedFamilyMember)}
+  member={selectedFamilyMember}
+  onClose={() => {
+    setSelectedFamilyMember(null);
+  }}
+  onSaved={(savedMember) => {
+    setMembers((current) => {
+      const exists = current.some(
+        (member) =>
+          member.id === savedMember.id
+      );
+
+      if (exists) {
+        return current.map((member) =>
+          member.id === savedMember.id
+            ? savedMember
+            : member
+        );
+      }
+
+      return [...current, savedMember];
+    });
+
+    setSelectedFamilyMember(null);
+  }}
+  onDeleted={(memberId) => {
+    setMembers((current) =>
+      current.filter(
+        (member) =>
+          member.id !== memberId
+      )
+    );
+
+    if (selectedMemberId === memberId) {
+      setSelectedMemberId("all");
+    }
+
+    setSelectedFamilyMember(null);
   }}
 />
 
