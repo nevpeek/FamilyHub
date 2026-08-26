@@ -1,12 +1,19 @@
-import { CalendarDays, Layers3, X } from "lucide-react";
+import {
+  CalendarDays,
+  CalendarRange,
+  Layers3,
+  X,
+} from "lucide-react";
 
 function RecurringEventChoiceModal({
   isOpen,
   event,
   onClose,
   onThisEvent,
+  onThisAndFuture,
   onEntireSeries,
 }) {
+
   if (!isOpen || !event) {
     return null;
   }
@@ -53,6 +60,23 @@ function RecurringEventChoiceModal({
               <strong>This event only</strong>
               <span>
                 Change or remove only this occurrence.
+              </span>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            className="recurring-choice-button"
+            onClick={onThisAndFuture}
+          >
+            <div className="recurring-choice-icon">
+              <CalendarRange size={24} />
+            </div>
+
+            <div>
+              <strong>This and future events</strong>
+              <span>
+                Change this occurrence and every one after it.
               </span>
             </div>
           </button>

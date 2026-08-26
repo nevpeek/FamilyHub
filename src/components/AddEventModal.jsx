@@ -18,6 +18,7 @@ function AddEventModal({
   initialDate,
   eventToEdit,
   occurrenceEditMode = false,
+  futureEditMode = false,
   onEventSaved,
   onEventDeleted,
 }) {
@@ -212,27 +213,25 @@ function AddEventModal({
       let url = `${API_BASE_URL}/api/events`;
       let method = "POST";
 
-      if (occurrenceEditMode && eventToEdit) {
-        const seriesEventId =
-          eventToEdit.series_event_id ||
-          eventToEdit.series_id ||
-          eventToEdit.id;
+if ((occurrenceEditMode || futureEditMode) && eventToEdit) {
+  const seriesEventId =
+    eventToEdit.series_event_id ||
+    eventToEdit.series_id ||
+    eventToEdit.id;
 
-        const occurrenceDate =
-          eventToEdit.occurrence_date ||
-          eventToEdit.recurrence_parent_date ||
-          eventToEdit.start_date;
+  const occurrenceDate =
+    eventToEdit.occurrence_date ||
+    eventToEdit.recurrence_parent_date ||
+    eventToEdit.start_date;
 
-        url =
-          `${API_BASE_URL}/api/events/` +
-          `${seriesEventId}/occurrences/` +
-          `${occurrenceDate}`;
+  url =
+    `${API_BASE_URL}/api/events/` +
+    `${seriesEventId}/occurrences/` +
+    `${occurrenceDate}` +
+    `${futureEditMode ? "/future" : ""}`;
 
-        method = "PUT";
-      } else if (eventToEdit) {
-        url =
-          `${API_BASE_URL}/api/events/` +
-          `${eventToEdit.id}`;
+  method = "PUT";
+} else if (eventToEdit) {
 
         method = "PUT";
       }
@@ -265,9 +264,25 @@ function AddEventModal({
           category,
 
           recurrenceRule:
-            occurrenceEditMode
-              ? null
-              : recurrenceRule || null,
+  occurrenceEditMode || futureEditMode
+    ? null
+    : recurrenceRule || null,
+
+recurrenceEndDate:
+  occurrenceEditMode || futureEditMode
+    ? null
+    : recurrenceRule &&
+        recurrenceEndType === "date"
+      ? recurrenceEndDate || null
+      : null,
+
+recurrenceCount:
+  occurrenceEditMode || futureEditMode
+    ? null
+    : recurrenceRule &&
+        recurrenceEndType === "count"
+      ? Number(recurrenceCount) || null
+      : null,
 
           recurrenceEndDate:
             occurrenceEditMode
@@ -370,10 +385,12 @@ function AddEventModal({
 
             <h2>
               {occurrenceEditMode
-                ? "Edit This Occurrence"
-                : eventToEdit
-                  ? "Edit Event"
-                  : "Add Event"}
+  ? "Edit This Occurrence"
+  : futureEditMode
+    ? "Edit This and Future Events"
+    : eventToEdit
+      ? "Edit Event"
+      : "Add Event"}
             </h2>
           </div>
 
@@ -519,7 +536,7 @@ function AddEventModal({
             )}
           </div>
 
-          {!occurrenceEditMode && (
+          {!occurrenceEditMode && !futureEditMode && (
             <>
               <div className="event-form-grid">
                 <label className="event-form-field">
@@ -747,12 +764,14 @@ function AddEventModal({
                 disabled={saving || deleting}
               >
                 {saving
-                  ? "Saving..."
-                  : occurrenceEditMode
-                    ? "Save This Occurrence"
-                    : eventToEdit
-                      ? "Save Changes"
-                      : "Save Event"}
+  ? "Saving..."
+  : occurrenceEditMode
+    ? "Save This Occurrence"
+    : futureEditMode
+      ? "Save This and Future"
+      : eventToEdit
+        ? "Save Changes"
+        : "Save Event"}
               </button>
             </div>
           </div>

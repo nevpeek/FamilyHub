@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
   CheckSquare,
+  Circle,
   ChevronRight,
   Home,
   Plus,
@@ -11,9 +12,11 @@ import {
 } from "lucide-react";
 import "./App.css";
 import CalendarPage from "./pages/CalendarPage";
+import TasksPage from "./pages/TasksPage";
 import AddEventModal from "./components/AddEventModal";
 import RecurringEventChoiceModal from "./components/RecurringEventChoiceModal";
 import OccurrenceActionModal from "./components/OccurrenceActionModal";
+import TaskModal from "./components/TaskModal";
 
 const API_BASE_URL = "http://localhost:3001";
 
@@ -61,6 +64,35 @@ function formatClock(date) {
   }).format(date);
 }
 
+function formatDateKey(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function formatEventTime(time) {
+  if (!time) {
+    return "";
+  }
+
+  const [hours, minutes] = time.split(":");
+
+  const date = new Date();
+  date.setHours(
+    Number(hours),
+    Number(minutes),
+    0,
+    0
+  );
+
+  return new Intl.DateTimeFormat("en-AU", {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+}
+
 function App() {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -75,8 +107,22 @@ const [selectedEventDate, setSelectedEventDate] = useState(null);
 const [recurringChoiceEvent, setRecurringChoiceEvent] = useState(null);
 const [occurrenceActionEvent, setOccurrenceActionEvent] = useState(null);
 const [occurrenceEditEvent, setOccurrenceEditEvent] = useState(null);
+const [futureEditEvent, setFutureEditEvent] = useState(null);
 
 const [eventRefreshKey, setEventRefreshKey] = useState(0);
+const [taskRefreshKey, setTaskRefreshKey] = useState(0);
+const [taskModalOpen, setTaskModalOpen] = useState(false);
+const [selectedTask, setSelectedTask] = useState(null);
+const [homeEvents, setHomeEvents] = useState([]);
+const [homeEventsLoading, setHomeEventsLoading] = useState(true);
+const [homeEventsError, setHomeEventsError] = useState("");
+
+const [homeTasks, setHomeTasks] = useState([]);
+const [homeTasksLoading, setHomeTasksLoading] = useState(true);
+const [homeTasksError, setHomeTasksError] = useState("");
+const [homeMeals, setHomeMeals] = useState([]);
+const [homeMealsLoading, setHomeMealsLoading] = useState(true);
+const [homeMealsError, setHomeMealsError] = useState("");
 
   useEffect(() => {
     async function loadFamilyMembers() {
@@ -109,11 +155,189 @@ const [eventRefreshKey, setEventRefreshKey] = useState(0);
     return () => clearInterval(interval);
   }, []);
 
+  const todayKey = formatDateKey(currentTime);
+
+useEffect(() => {
+  async function loadHomeEvents() {
+    setHomeEventsLoading(true);
+    setHomeEventsError("");
+
+    try {
+      const startDate = new Date();
+      startDate.setHours(0, 0, 0, 0);
+
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 3);
+
+      const params = new URLSearchParams({
+        start: formatDateKey(startDate),
+        end: formatDateKey(endDate),
+      });
+
+      if (selectedMemberId !== "all") {
+        params.set(
+          "memberId",
+          String(selectedMemberId)
+        );
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/events?${params.toString()}`
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Failed to load home events"
+        );
+      }
+
+      const data = await response.json();
+
+      setHomeEvents(data.events || []);
+    } catch (err) {
+      console.error(err);
+      setHomeEventsError(
+        "Unable to load calendar events"
+      );
+    } finally {
+      setHomeEventsLoading(false);
+    }
+  }
+
+  loadHomeEvents();
+}, [
+  todayKey,
+  selectedMemberId,
+  eventRefreshKey,
+]);
+
+useEffect(() => {
+  async function loadHomeMeals() {
+    setHomeMealsLoading(true);
+    setHomeMealsError("");
+
+    try {
+      const params = new URLSearchParams({
+        start: todayKey,
+        end: todayKey,
+        mealType: "dinner",
+      });
+
+      if (selectedMemberId !== "all") {
+        params.set(
+          "memberId",
+          String(selectedMemberId)
+        );
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/meals?${params.toString()}`
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Failed to load tonight's meal"
+        );
+      }
+
+      const data = await response.json();
+
+      setHomeMeals(data.meals || []);
+    } catch (err) {
+      console.error(err);
+
+      setHomeMealsError(
+        "Unable to load tonight's meal"
+      );
+    } finally {
+      setHomeMealsLoading(false);
+    }
+  }
+
+  loadHomeMeals();
+}, [
+  todayKey,
+  selectedMemberId,
+]);
+
+useEffect(() => {
+  async function loadHomeTasks() {
+    setHomeTasksLoading(true);
+    setHomeTasksError("");
+
+    try {
+      const params = new URLSearchParams({
+        start: todayKey,
+        end: todayKey,
+        completed: "false",
+      });
+
+      if (selectedMemberId !== "all") {
+        params.set(
+          "memberId",
+          String(selectedMemberId)
+        );
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/tasks?${params.toString()}`
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Failed to load home tasks"
+        );
+      }
+
+      const data = await response.json();
+
+      setHomeTasks(data.tasks || []);
+    } catch (err) {
+      console.error(err);
+
+      setHomeTasksError(
+        "Unable to load today's tasks"
+      );
+    } finally {
+      setHomeTasksLoading(false);
+    }
+  }
+
+  loadHomeTasks();
+}, [
+  todayKey,
+  selectedMemberId,
+  taskRefreshKey,
+]);
+
   const activePageLabel = useMemo(() => {
     return (
       navigationItems.find((item) => item.id === activePage)?.label || "Home"
     );
   }, [activePage]);
+
+  const todayEvents = homeEvents.filter(
+  (event) => event.start_date === todayKey
+);
+
+const upcomingDays = Array.from(
+  { length: 3 },
+  (_, index) => {
+    const date = new Date(currentTime);
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() + index + 1);
+
+    const dateKey = formatDateKey(date);
+
+    return {
+      date,
+      dateKey,
+      events: homeEvents.filter(
+        (event) => event.start_date === dateKey
+      ),
+    };
+  }
+);
 
   function renderHomePage() {
     return (
@@ -221,18 +445,83 @@ const [eventRefreshKey, setEventRefreshKey] = useState(0);
                 </button>
               </div>
 
-              <div className="empty-state">
-                <div className="empty-icon">
-                  <CalendarDays size={28} />
-                </div>
+             {homeEventsLoading ? (
+  <div className="empty-state">
+    <div>
+      <h4>Loading events...</h4>
+    </div>
+  </div>
+) : homeEventsError ? (
+  <div className="empty-state">
+    <div>
+      <h4>{homeEventsError}</h4>
+    </div>
+  </div>
+) : todayEvents.length === 0 ? (
+  <div className="empty-state">
+    <div className="empty-icon">
+      <CalendarDays size={28} />
+    </div>
 
-                <div>
-                  <h4>No events today</h4>
-                  <p>
-                    Events for the selected family members will appear here.
-                  </p>
-                </div>
-              </div>
+    <div>
+      <h4>No events today</h4>
+      <p>
+        Nothing scheduled for the selected family members.
+      </p>
+    </div>
+  </div>
+) : (
+  <div className="home-event-list">
+    {todayEvents.map((event) => {
+      const primaryMember =
+        event.members?.[0];
+
+      return (
+        <div
+          key={event.occurrence_key || event.id}
+          className="home-event-card"
+          style={{
+            borderLeftColor:
+              primaryMember?.colour ||
+              "#64748b",
+          }}
+        >
+          <div className="home-event-main">
+            <strong>{event.title}</strong>
+
+            <span>
+              {event.all_day
+                ? "All day"
+                : formatEventTime(
+                    event.start_time
+                  )}
+            </span>
+          </div>
+
+          <div className="home-event-members">
+            {(event.members || []).map(
+              (member) => (
+                <span
+                  key={member.id}
+                  className="home-event-member"
+                >
+                  <span
+                    className="home-event-dot"
+                    style={{
+                      backgroundColor:
+                        member.colour,
+                    }}
+                  />
+                  {member.name}
+                </span>
+              )
+            )}
+          </div>
+        </div>
+      );
+    })}
+  </div>
+)}
             </article>
 
             <article className="panel upcoming-panel">
@@ -244,52 +533,264 @@ const [eventRefreshKey, setEventRefreshKey] = useState(0);
               </div>
 
               <div className="upcoming-placeholder">
-                <div>
-                  <span>Tomorrow</span>
-                  <strong>No events planned</strong>
-                </div>
+  {upcomingDays.map(
+    ({ date, dateKey, events }, index) => {
+      const dayLabel =
+        index === 0
+          ? "Tomorrow"
+          : new Intl.DateTimeFormat(
+              "en-AU",
+              {
+                weekday: "long",
+              }
+            ).format(date);
 
-                <div>
-                  <span>Friday</span>
-                  <strong>No events planned</strong>
-                </div>
+      return (
+        <div key={dateKey}>
+          <span>{dayLabel}</span>
 
-                <div>
-                  <span>Saturday</span>
-                  <strong>No events planned</strong>
+          {events.length === 0 ? (
+            <strong>
+              No events planned
+            </strong>
+          ) : (
+            <div className="upcoming-event-list">
+              {events.map((event) => (
+                <div
+                  key={
+                    event.occurrence_key ||
+                    event.id
+                  }
+                  className="upcoming-event"
+                >
+                  <strong>
+                    {event.title}
+                  </strong>
+
+                  <small>
+                    {event.all_day
+                      ? "All day"
+                      : formatEventTime(
+                          event.start_time
+                        )}
+                  </small>
                 </div>
-              </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+  )}
+</div>
             </article>
           </div>
 
           <aside className="dashboard-side-column">
+           <article className="panel quick-panel">
+  <div className="panel-heading">
+    <div>
+      <p className="section-kicker">Tasks</p>
+      <h3>Today&apos;s chores</h3>
+    </div>
+
+    <button
+      type="button"
+      className="text-button"
+      onClick={() => setActivePage("tasks")}
+    >
+      View tasks
+      <ChevronRight size={18} />
+    </button>
+  </div>
+
+  {homeTasksLoading ? (
+    <div className="small-empty-state">
+      <CheckSquare size={24} />
+      <span>Loading tasks...</span>
+    </div>
+  ) : homeTasksError ? (
+    <div className="small-empty-state">
+      <CheckSquare size={24} />
+      <span>{homeTasksError}</span>
+    </div>
+  ) : homeTasks.length === 0 ? (
+    <div className="small-empty-state">
+      <CheckSquare size={24} />
+      <span>No tasks due today</span>
+    </div>
+  ) : (
+    <div className="home-task-list">
+      {homeTasks.map((task) => (
+        <div
+          key={task.id}
+          className="home-task-item"
+        >
+          <button
+            type="button"
+            className="home-task-check"
+            onClick={async () => {
+              try {
+                const response = await fetch(
+                  `${API_BASE_URL}/api/tasks/${task.id}/completion`,
+                  {
+                    method: "PATCH",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      completed: true,
+                    }),
+                  }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                  throw new Error(
+                    data.error ||
+                      "Unable to complete task"
+                  );
+                }
+
+                setTaskRefreshKey(
+                  (current) => current + 1
+                );
+              } catch (err) {
+                console.error(err);
+
+                window.alert(
+                  err.message ||
+                    "Unable to complete task"
+                );
+              }
+            }}
+            aria-label={`Complete ${task.title}`}
+          >
+           <Circle size={20} />
+          </button>
+
+          <button
+            type="button"
+            className="home-task-content"
+            onClick={() => {
+              setSelectedTask(task);
+              setTaskModalOpen(true);
+            }}
+          >
+            <div className="home-task-main">
+              <strong>{task.title}</strong>
+
+              <span>
+                {task.due_time
+                  ? formatEventTime(
+                      task.due_time
+                    )
+                  : "Today"}
+              </span>
+            </div>
+
+            <div className="home-task-members">
+              {(task.members || []).map(
+                (member) => (
+                  <span
+                    key={member.id}
+                    className="home-task-member"
+                  >
+                    <span
+                      className="home-task-dot"
+                      style={{
+                        backgroundColor:
+                          member.colour,
+                      }}
+                    />
+                    {member.name}
+                  </span>
+                )
+              )}
+            </div>
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+</article>
+
             <article className="panel quick-panel">
-              <div className="panel-heading">
-                <div>
-                  <p className="section-kicker">Tasks</p>
-                  <h3>Today&apos;s chores</h3>
-                </div>
-              </div>
+  <div className="panel-heading">
+    <div>
+      <p className="section-kicker">Dinner</p>
+      <h3>Tonight&apos;s meal</h3>
+    </div>
 
-              <div className="small-empty-state">
-                <CheckSquare size={24} />
-                <span>No tasks due today</span>
-              </div>
-            </article>
+    <button
+      type="button"
+      className="text-button"
+      onClick={() => setActivePage("meals")}
+    >
+      View meals
+      <ChevronRight size={18} />
+    </button>
+  </div>
 
-            <article className="panel quick-panel">
-              <div className="panel-heading">
-                <div>
-                  <p className="section-kicker">Dinner</p>
-                  <h3>Tonight&apos;s meal</h3>
-                </div>
-              </div>
+  {homeMealsLoading ? (
+    <div className="small-empty-state">
+      <Soup size={24} />
+      <span>Loading dinner...</span>
+    </div>
+  ) : homeMealsError ? (
+    <div className="small-empty-state">
+      <Soup size={24} />
+      <span>{homeMealsError}</span>
+    </div>
+  ) : homeMeals.length === 0 ? (
+    <div className="small-empty-state">
+      <Soup size={24} />
+      <span>Nothing planned yet</span>
+    </div>
+  ) : (
+    <div className="home-meal-list">
+      {homeMeals.map((meal) => (
+        <div
+          key={meal.id}
+          className="home-meal-card"
+        >
+          <div className="home-meal-icon">
+            <Soup size={22} />
+          </div>
 
-              <div className="small-empty-state">
-                <Soup size={24} />
-                <span>Nothing planned yet</span>
-              </div>
-            </article>
+          <div className="home-meal-content">
+            <strong>{meal.title}</strong>
+
+            {meal.description && (
+              <span>{meal.description}</span>
+            )}
+
+            <div className="home-meal-members">
+              {(meal.members || []).map(
+                (member) => (
+                  <span
+                    key={member.id}
+                    className="home-meal-member"
+                  >
+                    <span
+                      className="home-meal-dot"
+                      style={{
+                        backgroundColor:
+                          member.colour,
+                      }}
+                    />
+                    {member.name}
+                  </span>
+                )
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</article>
 
             <article className="panel quick-panel">
               <div className="panel-heading">
@@ -359,11 +860,25 @@ const [eventRefreshKey, setEventRefreshKey] = useState(0);
         )}
 
         {activePage === "tasks" && (
-          <div className="placeholder-page">
-            <p className="section-kicker">Tasks</p>
-            <h2>Tasks are coming next</h2>
-          </div>
-        )}
+  
+  <TasksPage
+  members={members}
+  selectedMemberId={selectedMemberId}
+  setSelectedMemberId={setSelectedMemberId}
+  taskRefreshKey={taskRefreshKey}
+  onAddTask={() => {
+    setSelectedTask(null);
+    setTaskModalOpen(true);
+  }}
+  onEditTask={(task) => {
+    setSelectedTask(task);
+    setTaskModalOpen(true);
+  }}
+  onTaskChanged={() => {
+    setTaskRefreshKey((current) => current + 1);
+  }}
+/>
+)}
 
         {activePage === "meals" && (
           <div className="placeholder-page">
@@ -423,8 +938,12 @@ const [eventRefreshKey, setEventRefreshKey] = useState(0);
   onClose={() => {
     setRecurringChoiceEvent(null);
   }}
-  onThisEvent={() => {
+    onThisEvent={() => {
     setOccurrenceActionEvent(recurringChoiceEvent);
+    setRecurringChoiceEvent(null);
+  }}
+  onThisAndFuture={() => {
+    setFutureEditEvent(recurringChoiceEvent);
     setRecurringChoiceEvent(null);
   }}
   onEntireSeries={() => {
@@ -461,6 +980,35 @@ const [eventRefreshKey, setEventRefreshKey] = useState(0);
   onEventSaved={() => {
     setEventRefreshKey((current) => current + 1);
     setOccurrenceEditEvent(null);
+  }}
+/>
+
+<AddEventModal
+  isOpen={Boolean(futureEditEvent)}
+  onClose={() => {
+    setFutureEditEvent(null);
+  }}
+  members={members}
+  eventToEdit={futureEditEvent}
+  futureEditMode
+  onEventSaved={() => {
+    setEventRefreshKey((current) => current + 1);
+    setFutureEditEvent(null);
+  }}
+/>
+
+<TaskModal
+  open={taskModalOpen}
+  task={selectedTask}
+  members={members}
+  onClose={() => {
+    setTaskModalOpen(false);
+    setSelectedTask(null);
+  }}
+  onSaved={() => {
+    setTaskRefreshKey((current) => current + 1);
+    setTaskModalOpen(false);
+    setSelectedTask(null);
   }}
 />
 
