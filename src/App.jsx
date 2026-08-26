@@ -14,11 +14,13 @@ import "./App.css";
 import CalendarPage from "./pages/CalendarPage";
 import TasksPage from "./pages/TasksPage";
 import MealsPage from "./pages/MealsPage";
+import ShoppingPage from "./pages/ShoppingPage";
 import AddEventModal from "./components/AddEventModal";
 import RecurringEventChoiceModal from "./components/RecurringEventChoiceModal";
 import OccurrenceActionModal from "./components/OccurrenceActionModal";
 import TaskModal from "./components/TaskModal";
 import MealModal from "./components/MealModal";
+import ShoppingItemModal from "./components/ShoppingItemModal";
 
 const API_BASE_URL = "http://localhost:3001";
 
@@ -118,6 +120,9 @@ const [selectedTask, setSelectedTask] = useState(null);
 const [mealRefreshKey, setMealRefreshKey] = useState(0);
 const [mealModalOpen, setMealModalOpen] = useState(false);
 const [selectedMeal, setSelectedMeal] = useState(null);
+const [shoppingRefreshKey, setShoppingRefreshKey] = useState(0);
+const [shoppingModalOpen, setShoppingModalOpen] = useState(false);
+const [selectedShoppingItem, setSelectedShoppingItem] = useState(null);
 const [homeEvents, setHomeEvents] = useState([]);
 const [homeEventsLoading, setHomeEventsLoading] = useState(true);
 const [homeEventsError, setHomeEventsError] = useState("");
@@ -128,6 +133,9 @@ const [homeTasksError, setHomeTasksError] = useState("");
 const [homeMeals, setHomeMeals] = useState([]);
 const [homeMealsLoading, setHomeMealsLoading] = useState(true);
 const [homeMealsError, setHomeMealsError] = useState("");
+const [homeShoppingItems, setHomeShoppingItems] = useState([]);
+const [homeShoppingLoading, setHomeShoppingLoading] = useState(true);
+const [homeShoppingError, setHomeShoppingError] = useState("");
 
   useEffect(() => {
     async function loadFamilyMembers() {
@@ -264,6 +272,55 @@ useEffect(() => {
   todayKey,
   selectedMemberId,
   mealRefreshKey,
+]);
+
+useEffect(() => {
+  async function loadHomeShopping() {
+    setHomeShoppingLoading(true);
+    setHomeShoppingError("");
+
+    try {
+      const params = new URLSearchParams({
+        completed: "false",
+      });
+
+      if (selectedMemberId !== "all") {
+        params.set(
+          "memberId",
+          String(selectedMemberId)
+        );
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/shopping?${params.toString()}`
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Failed to load shopping list"
+        );
+      }
+
+      const data = await response.json();
+
+      setHomeShoppingItems(
+        data.items || []
+      );
+    } catch (err) {
+      console.error(err);
+
+      setHomeShoppingError(
+        "Unable to load shopping list"
+      );
+    } finally {
+      setHomeShoppingLoading(false);
+    }
+  }
+
+  loadHomeShopping();
+}, [
+  selectedMemberId,
+  shoppingRefreshKey,
 ]);
 
 useEffect(() => {
@@ -799,18 +856,130 @@ const upcomingDays = Array.from(
 </article>
 
             <article className="panel quick-panel">
-              <div className="panel-heading">
-                <div>
-                  <p className="section-kicker">Shopping</p>
-                  <h3>Shared list</h3>
-                </div>
-              </div>
+  <div className="panel-heading">
+    <div>
+      <p className="section-kicker">Shopping</p>
+      <h3>Shared list</h3>
+    </div>
 
-              <div className="small-empty-state">
-                <ShoppingCart size={24} />
-                <span>Your shopping list is empty</span>
-              </div>
-            </article>
+    <button
+      type="button"
+      className="text-button"
+      onClick={() => setActivePage("shopping")}
+    >
+      View list
+      <ChevronRight size={18} />
+    </button>
+  </div>
+
+  {homeShoppingLoading ? (
+    <div className="small-empty-state">
+      <ShoppingCart size={24} />
+      <span>Loading shopping list...</span>
+    </div>
+  ) : homeShoppingError ? (
+    <div className="small-empty-state">
+      <ShoppingCart size={24} />
+      <span>{homeShoppingError}</span>
+    </div>
+  ) : homeShoppingItems.length === 0 ? (
+    <div className="small-empty-state">
+      <ShoppingCart size={24} />
+      <span>Your shopping list is empty</span>
+    </div>
+  ) : (
+    <div className="home-shopping-list">
+      {homeShoppingItems.map((item) => (
+        <div
+          key={item.id}
+          className="home-shopping-item"
+        >
+          <button
+            type="button"
+            className="home-shopping-check"
+            onClick={async () => {
+              try {
+                const response = await fetch(
+                  `${API_BASE_URL}/api/shopping/${item.id}/completion`,
+                  {
+                    method: "PATCH",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      completed: true,
+                    }),
+                  }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                  throw new Error(
+                    data.error ||
+                      "Unable to complete shopping item"
+                  );
+                }
+
+                setShoppingRefreshKey(
+                  (current) => current + 1
+                );
+              } catch (err) {
+                console.error(err);
+
+                window.alert(
+                  err.message ||
+                    "Unable to update shopping item"
+                );
+              }
+            }}
+            aria-label={`Complete ${item.name}`}
+          >
+            <Circle size={20} />
+          </button>
+
+          <button
+            type="button"
+            className="home-shopping-content"
+            onClick={() => {
+              setSelectedShoppingItem(item);
+              setShoppingModalOpen(true);
+            }}
+          >
+            <div className="home-shopping-main">
+              <strong>{item.name}</strong>
+
+              <span>
+                {item.quantity || item.category}
+              </span>
+            </div>
+
+            <div className="home-shopping-members">
+              {(item.members || []).map(
+                (member) => (
+                  <span
+                    key={member.id}
+                    className="home-shopping-member"
+                  >
+                    <span
+                      className="home-shopping-dot"
+                      style={{
+                        backgroundColor:
+                          member.colour,
+                      }}
+                    />
+
+                    {member.name}
+                  </span>
+                )
+              )}
+            </div>
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+</article>
           </aside>
         </section>
       </>
@@ -903,12 +1072,25 @@ const upcomingDays = Array.from(
   />
 )}
 
-        {activePage === "shopping" && (
-          <div className="placeholder-page">
-            <p className="section-kicker">Shopping</p>
-            <h2>Shopping lists are coming soon</h2>
-          </div>
-        )}
+       {activePage === "shopping" && (
+  <ShoppingPage
+    members={members}
+    selectedMemberId={selectedMemberId}
+    setSelectedMemberId={setSelectedMemberId}
+    shoppingRefreshKey={shoppingRefreshKey}
+    onAddItem={() => {
+      setSelectedShoppingItem(null);
+      setShoppingModalOpen(true);
+    }}
+    onEditItem={(item) => {
+      setSelectedShoppingItem(item);
+      setShoppingModalOpen(true);
+    }}
+    onItemChanged={() => {
+      setShoppingRefreshKey((current) => current + 1);
+    }}
+  />
+)}
       </main>
 
       <nav className="bottom-navigation" aria-label="Primary navigation">
@@ -1041,6 +1223,26 @@ const upcomingDays = Array.from(
     setMealRefreshKey((current) => current + 1);
     setMealModalOpen(false);
     setSelectedMeal(null);
+  }}
+/>
+
+<ShoppingItemModal
+  open={shoppingModalOpen}
+  item={selectedShoppingItem}
+  members={members}
+  onClose={() => {
+    setShoppingModalOpen(false);
+    setSelectedShoppingItem(null);
+  }}
+  onSaved={() => {
+    setShoppingRefreshKey((current) => current + 1);
+    setShoppingModalOpen(false);
+    setSelectedShoppingItem(null);
+  }}
+  onDeleted={() => {
+    setShoppingRefreshKey((current) => current + 1);
+    setShoppingModalOpen(false);
+    setSelectedShoppingItem(null);
   }}
 />
 
