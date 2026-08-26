@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarDays,
   CheckSquare,
@@ -123,6 +123,8 @@ const [selectedMeal, setSelectedMeal] = useState(null);
 const [shoppingRefreshKey, setShoppingRefreshKey] = useState(0);
 const [shoppingModalOpen, setShoppingModalOpen] = useState(false);
 const [selectedShoppingItem, setSelectedShoppingItem] = useState(null);
+const [quickAddOpen, setQuickAddOpen] = useState(false);
+const quickAddRef = useRef(null);
 const [homeEvents, setHomeEvents] = useState([]);
 const [homeEventsLoading, setHomeEventsLoading] = useState(true);
 const [homeEventsError, setHomeEventsError] = useState("");
@@ -136,6 +138,29 @@ const [homeMealsError, setHomeMealsError] = useState("");
 const [homeShoppingItems, setHomeShoppingItems] = useState([]);
 const [homeShoppingLoading, setHomeShoppingLoading] = useState(true);
 const [homeShoppingError, setHomeShoppingError] = useState("");
+
+useEffect(() => {
+  function handleOutsideClick(event) {
+    if (
+      quickAddRef.current &&
+      !quickAddRef.current.contains(event.target)
+    ) {
+      setQuickAddOpen(false);
+    }
+  }
+
+  document.addEventListener(
+    "mousedown",
+    handleOutsideClick
+  );
+
+  return () => {
+    document.removeEventListener(
+      "mousedown",
+      handleOutsideClick
+    );
+  };
+}, []);
 
   useEffect(() => {
     async function loadFamilyMembers() {
@@ -414,18 +439,104 @@ const upcomingDays = Array.from(
             </p>
           </div>
 
-          <button
-  type="button"
-  className="add-event-button"
-  onClick={() => {
-  setSelectedEvent(null);
-  setSelectedEventDate(null);
-  setAddEventOpen(true);
-}}
+<div
+  className="quick-add-wrapper"
+  ref={quickAddRef}
 >
-  <Plus size={22} />
-  <span>Add Event</span>
-</button>
+  <button
+    type="button"
+    className="add-event-button"
+    onClick={() =>
+      setQuickAddOpen(
+        (current) => !current
+      )
+    }
+  >
+    <Plus size={22} />
+    <span>Add</span>
+  </button>
+
+  {quickAddOpen && (
+    <div className="quick-add-menu">
+      <button
+        type="button"
+        onClick={() => {
+          setQuickAddOpen(false);
+
+          setSelectedEvent(null);
+          setSelectedEventDate(null);
+          setAddEventOpen(true);
+        }}
+      >
+        <CalendarDays size={19} />
+
+        <div>
+          <strong>Event</strong>
+          <span>
+            Add something to the calendar
+          </span>
+        </div>
+      </button>
+
+      <button
+        type="button"
+        onClick={() => {
+          setQuickAddOpen(false);
+
+          setSelectedTask(null);
+          setTaskModalOpen(true);
+        }}
+      >
+        <CheckSquare size={19} />
+
+        <div>
+          <strong>Task</strong>
+          <span>
+            Add a chore or family job
+          </span>
+        </div>
+      </button>
+
+      <button
+        type="button"
+        onClick={() => {
+          setQuickAddOpen(false);
+
+          setSelectedMeal(null);
+          setMealModalOpen(true);
+        }}
+      >
+        <Soup size={19} />
+
+        <div>
+          <strong>Meal</strong>
+          <span>
+            Plan a meal
+          </span>
+        </div>
+      </button>
+
+      <button
+        type="button"
+        onClick={() => {
+          setQuickAddOpen(false);
+
+          setSelectedShoppingItem(null);
+          setShoppingModalOpen(true);
+        }}
+      >
+        <ShoppingCart size={19} />
+
+        <div>
+          <strong>Shopping item</strong>
+          <span>
+            Add something to the shared list
+          </span>
+        </div>
+      </button>
+    </div>
+  )}
+</div>
         </section>
 
         <section className="family-filter-section">

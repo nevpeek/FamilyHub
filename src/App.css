@@ -2497,3 +2497,72 @@
     flex: 1;
   }
 }
+
+/* ========================================
+   Home Quick Add
+======================================== */
+
+.quick-add-wrapper {
+  position: relative;
+  z-index: 50;
+}
+
+.quick-add-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 60;
+  width: 290px;
+  overflow: hidden;
+  border: 1px solid #dbe3ee;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow:
+    0 18px 50px rgba(15, 23, 42, 0.16),
+    0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+.quick-add-menu button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid #edf1f5;
+  background: #ffffff;
+  color: #334155;
+  text-align: left;
+  cursor: pointer;
+}
+
+.quick-add-menu button:last-child {
+  border-bottom: 0;
+}
+
+.quick-add-menu button:hover {
+  background: #f8fafc;
+}
+
+.quick-add-menu button > svg {
+  flex: 0 0 auto;
+  color: #2563eb;
+}
+
+.quick-add-menu button > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.quick-add-menu strong {
+  color: #172033;
+  font-size: 0.88rem;
+}
+
+.quick-add-menu span {
+  color: #64748b;
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
