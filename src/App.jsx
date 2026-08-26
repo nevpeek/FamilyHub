@@ -13,10 +13,12 @@ import {
 import "./App.css";
 import CalendarPage from "./pages/CalendarPage";
 import TasksPage from "./pages/TasksPage";
+import MealsPage from "./pages/MealsPage";
 import AddEventModal from "./components/AddEventModal";
 import RecurringEventChoiceModal from "./components/RecurringEventChoiceModal";
 import OccurrenceActionModal from "./components/OccurrenceActionModal";
 import TaskModal from "./components/TaskModal";
+import MealModal from "./components/MealModal";
 
 const API_BASE_URL = "http://localhost:3001";
 
@@ -113,6 +115,9 @@ const [eventRefreshKey, setEventRefreshKey] = useState(0);
 const [taskRefreshKey, setTaskRefreshKey] = useState(0);
 const [taskModalOpen, setTaskModalOpen] = useState(false);
 const [selectedTask, setSelectedTask] = useState(null);
+const [mealRefreshKey, setMealRefreshKey] = useState(0);
+const [mealModalOpen, setMealModalOpen] = useState(false);
+const [selectedMeal, setSelectedMeal] = useState(null);
 const [homeEvents, setHomeEvents] = useState([]);
 const [homeEventsLoading, setHomeEventsLoading] = useState(true);
 const [homeEventsError, setHomeEventsError] = useState("");
@@ -258,6 +263,7 @@ useEffect(() => {
 }, [
   todayKey,
   selectedMemberId,
+  mealRefreshKey,
 ]);
 
 useEffect(() => {
@@ -880,12 +886,22 @@ const upcomingDays = Array.from(
 />
 )}
 
-        {activePage === "meals" && (
-          <div className="placeholder-page">
-            <p className="section-kicker">Meals</p>
-            <h2>Meal planning is coming soon</h2>
-          </div>
-        )}
+       {activePage === "meals" && (
+  <MealsPage
+    members={members}
+    selectedMemberId={selectedMemberId}
+    setSelectedMemberId={setSelectedMemberId}
+    mealRefreshKey={mealRefreshKey}
+    onAddMeal={() => {
+      setSelectedMeal(null);
+      setMealModalOpen(true);
+    }}
+    onEditMeal={(meal) => {
+      setSelectedMeal(meal);
+      setMealModalOpen(true);
+    }}
+  />
+)}
 
         {activePage === "shopping" && (
           <div className="placeholder-page">
@@ -1009,6 +1025,22 @@ const upcomingDays = Array.from(
     setTaskRefreshKey((current) => current + 1);
     setTaskModalOpen(false);
     setSelectedTask(null);
+  }}
+/>
+
+<MealModal
+  isOpen={mealModalOpen}
+  meal={selectedMeal}
+  members={members}
+  todayKey={todayKey}
+  onClose={() => {
+    setMealModalOpen(false);
+    setSelectedMeal(null);
+  }}
+  onSaved={() => {
+    setMealRefreshKey((current) => current + 1);
+    setMealModalOpen(false);
+    setSelectedMeal(null);
   }}
 />
 
