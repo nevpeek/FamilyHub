@@ -1,6 +1,5 @@
 :root {
   font-family:
-    Inter,
     ui-sans-serif,
     system-ui,
     -apple-system,
@@ -8,8 +7,8 @@
     "Segoe UI",
     sans-serif;
 
-  color: #172033;
-  background: #f4f7fb;
+  color: #241b3d;
+  background: #fffafd;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -24,7 +23,7 @@
 html {
   min-width: 320px;
   min-height: 100%;
-  background: #f4f7fb;
+  background: #fffafd;
 }
 
 body {

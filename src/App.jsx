@@ -32,6 +32,7 @@ import "./pantry-polish.css";
 import "./settings-polish.css";
 import "./home-polish.css";
 import "./responsive-polish.css";
+import "./bold-playful.css";
 import HomePage from "./pages/HomePage";
 import CalendarPage from "./pages/CalendarPage";
 import TasksPage from "./pages/TasksPage";
@@ -356,7 +357,7 @@ useEffect(() => {
   window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 }, [activePage]);
   const [accentColour, setAccentColour] = useState(() => {
-  return localStorage.getItem("familyhub-accent") || "#2563eb";
+  return localStorage.getItem("familyhub-accent") || "#7137ff";
 });
 const [theme, setTheme] = useState(() => {
   return localStorage.getItem("familyhub-theme") || "light";
