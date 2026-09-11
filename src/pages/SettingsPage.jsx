@@ -17,6 +17,8 @@ function SettingsPage({
   setAccentColour,
   theme,
   setTheme,
+  designTheme,
+  setDesignTheme,
 }) {
 
   const [
@@ -1465,6 +1467,73 @@ syncIntervalMinutes:
   </div>
 
   <div className="settings-appearance-block">
+    <div className="settings-appearance-copy">
+      <strong>Design Theme</strong>
+      <span>
+        Choose the overall look and feel of FamilyHub.
+      </span>
+    </div>
+
+    <div className="design-theme-grid">
+      {[
+        {
+          id: "classic",
+          label: "Classic",
+          desc: "Clean blue, original design",
+          colors: ["#2563eb", "#f4f7fb", "#ffffff"],
+        },
+        {
+          id: "bold-playful",
+          label: "Bold & Playful",
+          desc: "Purple-pink gradients, bouncy",
+          colors: ["#7137ff", "#ed3f9d", "#fffafd"],
+        },
+        {
+          id: "warm-cozy",
+          label: "Warm & Cozy",
+          desc: "Amber-terracotta, inviting",
+          colors: ["#d97706", "#dc2626", "#fffbeb"],
+        },
+        {
+          id: "midnight",
+          label: "Midnight",
+          desc: "Dark indigo-cyan, sleek",
+          colors: ["#6366f1", "#06b6d4", "#0f172a"],
+        },
+        {
+          id: "forest",
+          label: "Forest",
+          desc: "Green-lime, fresh natural",
+          colors: ["#059669", "#84cc16", "#f0fdf4"],
+        },
+      ].map((option) => (
+        <button
+          key={option.id}
+          type="button"
+          className={`design-theme-card ${
+            designTheme === option.id
+              ? "selected"
+              : ""
+          }`}
+          onClick={() => setDesignTheme(option.id)}
+          aria-pressed={designTheme === option.id}
+        >
+          <div className="design-theme-preview">
+            {option.colors.map((color, i) => (
+              <span
+                key={i}
+                style={{ backgroundColor: color }}
+              />
+            ))}
+          </div>
+          <strong>{option.label}</strong>
+          <small>{option.desc}</small>
+        </button>
+      ))}
+    </div>
+
+<div className="settings-theme-divider" />
+
     <div className="settings-appearance-copy">
       <strong>Accent Colour</strong>
       <span>

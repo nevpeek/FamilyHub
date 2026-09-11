@@ -32,7 +32,7 @@ import "./pantry-polish.css";
 import "./settings-polish.css";
 import "./home-polish.css";
 import "./responsive-polish.css";
-import "./bold-playful.css";
+import "./design-themes.css";
 import HomePage from "./pages/HomePage";
 import CalendarPage from "./pages/CalendarPage";
 import TasksPage from "./pages/TasksPage";
@@ -359,6 +359,9 @@ useEffect(() => {
   const [accentColour, setAccentColour] = useState(() => {
   return localStorage.getItem("familyhub-accent") || "#7137ff";
 });
+const [designTheme, setDesignTheme] = useState(() => {
+  return localStorage.getItem("familyhub-design-theme") || "bold-playful";
+});
 const [theme, setTheme] = useState(() => {
   return localStorage.getItem("familyhub-theme") || "light";
 });
@@ -523,6 +526,18 @@ const notification = new Notification(
     accentColour
   );
 }, [accentColour]);
+
+useEffect(() => {
+  localStorage.setItem(
+    "familyhub-design-theme",
+    designTheme
+  );
+
+  document.documentElement.setAttribute(
+    "data-design-theme",
+    designTheme
+  );
+}, [designTheme]);
 
 useEffect(() => {
   localStorage.setItem(
@@ -1919,6 +1934,8 @@ onPlanRecipe={async (
   setAccentColour={setAccentColour}
   theme={theme}
   setTheme={setTheme}
+  designTheme={designTheme}
+  setDesignTheme={setDesignTheme}
     onEditMember={(member) =>
       setSelectedFamilyMember(member)
     }
