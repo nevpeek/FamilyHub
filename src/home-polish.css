@@ -1,0 +1,66 @@
+/* Complete Home's theme coverage, including nested cards and context links. */
+.familyhub-shell .apple-home {
+  --home-inset: #f5f5f7;
+  --home-link: var(--familyhub-accent, #007aff);
+  --apple-muted: #636366;
+}
+html[data-theme="dark"] .familyhub-shell .apple-home {
+  --home-inset: #2c2c2e;
+  --home-link: color-mix(in srgb, var(--familyhub-accent, #007aff) 60%, white);
+  --apple-muted: #aeaeb2;
+  color-scheme: dark;
+}
+html .familyhub-shell:has(.apple-home) { background: #f5f5f7; }
+html[data-theme="dark"] .familyhub-shell:has(.apple-home) { background: #141416; }
+html .familyhub-shell .apple-home :is(.panel, .home-quick-action) { box-shadow: none; }
+html .familyhub-shell .apple-home :is(.home-event-card, .home-next-up, .home-task-item, .home-family-star-member, .home-tasks-clear, .home-countdown-card, .home-meal-card, .home-outlook-day, .home-family-list-card, .small-empty-state, .home-weather) {
+  background: var(--home-inset);
+  border-color: var(--apple-border);
+  box-shadow: none;
+}
+html .familyhub-shell .apple-home :is(.home-event-main strong, .home-next-up strong, .home-task-main strong, .home-family-star-name, .home-tasks-clear-copy strong, .home-countdown-copy strong, .home-meal-content strong, .home-outlook-date > strong, .home-family-list-copy strong, .today-status strong, .home-tonight-context strong, .home-shopping-context strong, .home-weather strong) {
+  color: var(--apple-text);
+  font-weight: 600;
+}
+html .familyhub-shell .apple-home :is(.home-summary-line, .home-summary-link, .home-event-member-name, .home-next-up-label, .home-next-up-member-name, .home-task-members, .home-tasks-clear-copy span, .home-countdown-copy span, .home-countdown-days span, .home-meal-meta, .home-meal-member, .home-outlook-date > span, .home-outlook-date > small, .home-outlook-empty, .home-outlook-preview > span, .home-family-list-copy small, .small-empty-state, .empty-state p, .home-tonight-context span, .home-shopping-context span, .home-weather span, .home-chore-progress-copy, .home-family-stars-heading > span) {
+  color: var(--apple-muted);
+  opacity: 1;
+}
+html .familyhub-shell .apple-home :is(.text-button, .home-quick-action svg, .home-family-stars-heading button, .home-tasks-add, .home-dinner-plan-button) { color: var(--home-link); }
+html .familyhub-shell .apple-home :is(.home-tasks-add, .home-dinner-plan-button, .home-meal-icon, .home-family-list-icon, .home-outlook-counts > span, .today-panel .section-kicker) {
+  background: color-mix(in srgb, var(--familyhub-accent) 10%, var(--apple-surface));
+  color: var(--home-link);
+  border-color: var(--apple-border);
+  box-shadow: none;
+}
+html .familyhub-shell .apple-home .home-countdown-card { border-left-color: var(--countdown-colour); }
+html[data-theme="light"] .familyhub-shell .apple-home .home-family-star-member strong { color: #8a5b00; }
+html[data-theme="light"] .familyhub-shell .apple-home .home-family-star-member strong svg { color: #8a5b00; fill: currentColor; }
+html[data-theme="dark"] .familyhub-shell .apple-home .home-countdown-days strong { color: color-mix(in srgb, var(--countdown-colour) 60%, white); }
+html .familyhub-shell .apple-home .home-event-time { background: var(--apple-surface); color: var(--apple-text); }
+html .familyhub-shell .apple-home :is(.home-family-stars, .today-status) { border-color: var(--apple-border); }
+html .familyhub-shell .apple-home .home-chore-progress-track { background: var(--home-inset); }
+html .familyhub-shell .apple-home .family-selector-button {
+  background: var(--apple-surface);
+  border-color: var(--apple-border);
+  color: var(--apple-text);
+  box-shadow: none;
+}
+html .familyhub-shell .apple-home .family-selector-button.selected {
+  border-color: var(--familyhub-accent);
+  background: color-mix(in srgb, var(--familyhub-accent) 14%, var(--apple-surface));
+  color: var(--apple-text);
+}
+.familyhub-shell .apple-home :is(.text-button, .home-tasks-add, .home-dinner-plan-button) { min-height: 44px; }
+.familyhub-shell .apple-home :is(button, [role="button"]):focus-visible { outline: 3px solid var(--home-link); outline-offset: 3px; }
+@media (hover: hover) {
+  html .familyhub-shell .apple-home :is(.home-next-up, .home-outlook-day, .home-family-list-card):hover { background: var(--apple-surface); border-color: var(--familyhub-accent); box-shadow: none; }
+}
+@media (max-width: 700px) {
+  .familyhub-shell .apple-home .dashboard-layout { grid-template-columns: minmax(0, 1fr); }
+  .familyhub-shell .apple-home :is(.dashboard-main-column, .dashboard-side-column, .panel, .home-event-main) { min-width: 0; }
+  .familyhub-shell .apple-home .panel-heading { flex-wrap: wrap; gap: 12px; }
+  .familyhub-shell .apple-home .home-next-up { gap: 8px; }
+  .familyhub-shell .apple-home .home-next-up strong { white-space: normal; }
+  .familyhub-shell .apple-home .home-family-stars-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

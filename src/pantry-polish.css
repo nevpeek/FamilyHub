@@ -1,0 +1,170 @@
+/* Pantry inventory and item editor share one set of theme colours. */
+.familyhub-shell .pantry-page {
+  --pantry-surface: #fff;
+  --pantry-inset: #f5f5f7;
+  --pantry-text: #1d1d1f;
+  --pantry-muted: #636366;
+  --pantry-border: rgba(60, 60, 67, 0.12);
+  --pantry-danger: #b42318;
+  color: var(--pantry-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  gap: 24px;
+}
+
+html[data-theme="dark"] .familyhub-shell .pantry-page {
+  --pantry-surface: #1c1c1e;
+  --pantry-inset: #2c2c2e;
+  --pantry-text: #f5f5f7;
+  --pantry-muted: #aeaeb2;
+  --pantry-border: rgba(255, 255, 255, 0.12);
+  --pantry-danger: #ff8a80;
+  color-scheme: dark;
+}
+
+html .familyhub-shell:has(.pantry-page) { background: #f5f5f7; }
+html[data-theme="dark"] .familyhub-shell:has(.pantry-page) { background: #141416; }
+
+html .familyhub-shell .pantry-page .page-title-row h2 {
+  color: var(--pantry-text);
+  font-family: inherit;
+  letter-spacing: -0.035em;
+}
+
+html .familyhub-shell .pantry-page :is(.section-kicker, .page-description, .pantry-count) {
+  color: var(--pantry-muted);
+  font-weight: 500;
+}
+
+.familyhub-shell .pantry-page :is(.pantry-toolbar, .pantry-toolbar-actions) { flex-wrap: wrap; }
+
+html .familyhub-shell .pantry-page :is(.pantry-search, .pantry-toolbar-actions select) {
+  min-height: 44px;
+  border: 1px solid var(--pantry-border);
+  border-radius: 12px;
+  background: var(--pantry-surface);
+  color: var(--pantry-muted);
+  box-shadow: none;
+}
+
+html .familyhub-shell .pantry-page :is(.pantry-search input, .pantry-toolbar-actions select) {
+  color: var(--pantry-text);
+  font-family: inherit;
+}
+
+html .familyhub-shell .pantry-page .pantry-search input { min-width: 0; min-height: 42px; background: transparent; }
+html .familyhub-shell .pantry-page input::placeholder { color: var(--pantry-muted); }
+
+.familyhub-shell .pantry-page .pantry-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 16px;
+}
+
+html .familyhub-shell .pantry-page :is(.pantry-card, .empty-state) {
+  min-width: 0;
+  padding: 20px;
+  background: var(--pantry-surface);
+  border: 1px solid var(--pantry-border);
+  border-radius: 18px;
+  box-shadow: none;
+}
+
+.familyhub-shell .pantry-page .pantry-card { min-height: 112px; gap: 16px; }
+.familyhub-shell .pantry-page .pantry-card-content { gap: 6px; }
+
+html .familyhub-shell .pantry-page :is(.pantry-card-content strong, .empty-state h4) {
+  color: var(--pantry-text);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+html .familyhub-shell .pantry-page :is(.pantry-card-content span, .pantry-card-content small, .empty-state p, .empty-icon) {
+  color: var(--pantry-muted);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+html .familyhub-shell .pantry-page .food-picture {
+  background: var(--pantry-inset);
+  border-color: var(--pantry-border);
+  box-shadow: none;
+}
+
+html .familyhub-shell .pantry-page .add-event-button {
+  min-height: 44px;
+  background: var(--familyhub-accent, #007aff);
+  border-radius: 12px;
+  font-family: inherit;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+html .familyhub-shell .pantry-page .pantry-item-modal {
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  padding: 28px;
+  border: 1px solid var(--pantry-border);
+  border-radius: 24px;
+  background: var(--pantry-surface);
+  color: var(--pantry-text);
+  font-family: inherit;
+}
+
+html .familyhub-shell .pantry-page .pantry-item-modal h2 {
+  color: var(--pantry-text);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+html .familyhub-shell .pantry-page .pantry-item-field > span { color: var(--pantry-muted); font-weight: 500; }
+
+html .familyhub-shell .pantry-page .pantry-item-field :is(input, select, textarea) {
+  min-height: 44px;
+  background: var(--pantry-inset);
+  color: var(--pantry-text);
+  border: 1px solid var(--pantry-border);
+  border-radius: 12px;
+  font-family: inherit;
+}
+
+html .familyhub-shell .pantry-page .pantry-item-field textarea { min-height: 100px; }
+html .familyhub-shell .pantry-page .pantry-item-field textarea::placeholder { color: var(--pantry-muted); }
+.familyhub-shell .pantry-page .pantry-item-actions { flex-wrap: wrap; }
+.familyhub-shell .pantry-page .pantry-item-actions button { min-height: 44px; border-radius: 12px; font-weight: 600; }
+
+html .familyhub-shell .pantry-page .pantry-item-cancel {
+  background: var(--pantry-inset);
+  color: var(--pantry-text);
+  border-color: var(--pantry-border);
+}
+
+html .familyhub-shell .pantry-page .pantry-item-delete {
+  background: transparent;
+  color: var(--pantry-danger);
+  border-color: var(--pantry-border);
+}
+
+.familyhub-shell .pantry-page :is(button, input, select, textarea, .pantry-card):focus-visible {
+  outline: 3px solid var(--familyhub-accent, #007aff);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  html .familyhub-shell .pantry-page .pantry-card:hover {
+    background: var(--pantry-inset);
+    border-color: var(--pantry-border);
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .familyhub-shell .pantry-page .pantry-search { width: 100%; }
+  .familyhub-shell .pantry-page .pantry-toolbar-actions { width: 100%; justify-content: space-between; }
+  .familyhub-shell .pantry-page .pantry-toolbar-actions select { min-width: 0; flex: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .familyhub-shell .pantry-page .pantry-card { transition: none; }
+}

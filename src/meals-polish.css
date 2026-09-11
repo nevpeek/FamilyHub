@@ -1,0 +1,241 @@
+/* Meal Planner and Recipe Library share the same appearance tokens. */
+.familyhub-shell .meals-page {
+  --meals-surface: #fff;
+  --meals-inset: #f5f5f7;
+  --meals-track: #eaeaed;
+  --meals-selected: #fff;
+  --meals-text: #1d1d1f;
+  --meals-muted: #636366;
+  --meals-border: rgba(60, 60, 67, 0.12);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--meals-text);
+}
+
+html[data-theme="dark"] .familyhub-shell .meals-page {
+  --meals-surface: #1c1c1e;
+  --meals-inset: #2c2c2e;
+  --meals-track: #2c2c2e;
+  --meals-selected: #636366;
+  --meals-text: #f5f5f7;
+  --meals-muted: #aeaeb2;
+  --meals-border: rgba(255, 255, 255, 0.12);
+  color-scheme: dark;
+}
+
+html .familyhub-shell:has(.meals-page) { background: #f5f5f7; }
+html[data-theme="dark"] .familyhub-shell:has(.meals-page) { background: #141416; }
+
+html .familyhub-shell .meals-page .calendar-page-heading h2 {
+  color: var(--meals-text);
+  font-family: inherit;
+  letter-spacing: -0.035em;
+}
+
+html .familyhub-shell .meals-page .family-selector-button {
+  min-height: 54px;
+  padding: 6px 16px 6px 7px;
+  border: 1px solid var(--meals-border);
+  border-radius: 999px;
+  background: var(--meals-inset);
+  color: var(--meals-text);
+  font-weight: 600;
+}
+
+html .familyhub-shell .meals-page .family-selector-everyone { padding-inline: 20px; }
+.familyhub-shell .meals-page .family-selector-avatar { border-radius: 50%; }
+
+html .familyhub-shell .meals-page .family-selector-button.selected {
+  border-color: var(--familyhub-accent, #007aff);
+  background: color-mix(in srgb, var(--familyhub-accent, #007aff) 18%, var(--meals-inset));
+  color: var(--meals-text);
+}
+
+html .familyhub-shell .meals-page .meals-toolbar {
+  padding: 0;
+  gap: 16px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+html .familyhub-shell .meals-page .meal-view-switcher {
+  padding: 5px;
+  border: 0;
+  border-radius: 13px;
+  background: var(--meals-track);
+}
+
+html .familyhub-shell .meals-page .meal-view-switcher button {
+  min-height: 38px;
+  border-radius: 9px;
+  color: var(--meals-text);
+  background: transparent;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+html .familyhub-shell .meals-page .meal-view-switcher button.selected {
+  background: var(--meals-selected);
+  font-weight: 600;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+}
+
+html .familyhub-shell .meals-page :is(
+  .meal-add-week-shopping, .meal-random-picker-button, .meal-type-filters button,
+  .meal-week-navigation button, .recipe-filter-button, .recipe-clear-filters,
+  .recipe-card-edit, .recipe-card-plan
+) {
+  min-height: 44px;
+  border: 1px solid var(--meals-border);
+  border-radius: 12px;
+  background: var(--meals-surface);
+  color: var(--meals-text);
+  font-family: inherit;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+html .familyhub-shell .meals-page :is(.meal-type-filters button.selected, .recipe-filter-button.active) {
+  border-color: var(--familyhub-accent, #007aff);
+  background: color-mix(in srgb, var(--familyhub-accent, #007aff) 14%, var(--meals-surface));
+  font-weight: 600;
+}
+
+html .familyhub-shell .meals-page .add-event-button {
+  min-height: 44px;
+  border-radius: 12px;
+  background: var(--familyhub-accent, #007aff);
+  font-family: inherit;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+html .familyhub-shell .meals-page :is(.meal-week-day, .recipe-card, .recipe-library-toolbar, .recipe-library-empty) {
+  background: var(--meals-surface);
+  border-color: var(--meals-border);
+  border-radius: 20px;
+  box-shadow: none;
+}
+
+html .familyhub-shell .meals-page .meal-week-day.today {
+  border-color: var(--familyhub-accent, #007aff);
+  box-shadow: none;
+}
+
+html .familyhub-shell .meals-page .meal-week-day-heading {
+  background: var(--meals-surface);
+  border-color: var(--meals-border);
+}
+
+html .familyhub-shell .meals-page .meal-week-day.today .meal-week-day-heading {
+  background: color-mix(in srgb, var(--familyhub-accent, #007aff) 10%, var(--meals-surface));
+}
+
+html .familyhub-shell .meals-page :is(.meal-week-title strong, .meal-week-day-heading strong, .meal-week-meal strong, .recipe-card-heading h3, .recipe-library-toolbar strong) {
+  color: var(--meals-text);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+html .familyhub-shell .meals-page .meal-week-day.today .meal-week-day-heading strong { color: #fff; }
+
+html .familyhub-shell .meals-page :is(.meal-week-day-heading span, .meal-week-slot-heading, .recipe-card-content p, .recipe-card-kicker, .recipe-library-toolbar span, .recipe-results-count, .recipe-card-photo-empty) {
+  color: var(--meals-muted);
+  font-weight: 500;
+}
+
+html .familyhub-shell .meals-page .meal-week-slot {
+  background: transparent;
+  border-color: var(--meals-border);
+}
+
+html .familyhub-shell .meals-page .meal-week-meal {
+  background: var(--meals-inset);
+  border-color: var(--meals-border);
+  box-shadow: none;
+}
+
+html .familyhub-shell .meals-page :is(.meal-week-add-slot, .meal-week-choose-recipe, .meal-week-meal .meal-week-copy, .meal-week-meal .meal-week-recipe) {
+  min-height: 44px;
+  color: var(--meals-text);
+  background: var(--meals-inset);
+  border: 1px solid var(--meals-border);
+  font-weight: 500;
+  box-shadow: none;
+}
+
+html .familyhub-shell .meals-page :is(.meal-week-meal .meal-week-copy, .meal-week-meal .meal-week-recipe, .recipe-card-edit) {
+  min-width: 44px;
+  width: 44px;
+  height: 44px;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-heading { flex-wrap: wrap; gap: 8px; }
+.familyhub-shell .meals-page .meal-week-meal-actions { margin-left: auto; }
+
+html .familyhub-shell .meals-page .meal-week-slot.drag-over {
+  background: color-mix(in srgb, var(--familyhub-accent, #007aff) 15%, var(--meals-surface));
+  outline: 2px solid var(--familyhub-accent, #007aff);
+  outline-offset: -2px;
+}
+
+.familyhub-shell .meals-page .recipe-card-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.familyhub-shell .meals-page .recipe-card-content { padding: 20px; gap: 14px; }
+.familyhub-shell .meals-page .recipe-card-photo { height: auto; aspect-ratio: 16 / 9; }
+
+html .familyhub-shell .meals-page :is(.recipe-card-photo, .recipe-card-meta span, .recipe-card-ingredient-count) {
+  background: var(--meals-inset);
+  color: var(--meals-muted);
+  border-color: var(--meals-border);
+  font-weight: 500;
+}
+
+html .familyhub-shell .meals-page .recipe-library-search {
+  min-height: 44px;
+  min-width: 0;
+  border-radius: 12px;
+  border-color: var(--meals-border);
+  background: var(--meals-surface);
+  color: var(--meals-text);
+  box-shadow: none;
+}
+
+.familyhub-shell .meals-page .recipe-library-search::placeholder { color: var(--meals-muted); }
+.familyhub-shell .meals-page :is(button, input):focus-visible {
+  outline: 3px solid var(--familyhub-accent, #007aff);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  html .familyhub-shell .meals-page :is(.meal-week-meal, .recipe-card):hover {
+    border-color: var(--meals-border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: none;
+  }
+  html .familyhub-shell .meals-page :is(.meal-week-add-slot, .meal-week-choose-recipe, .recipe-card-edit, .recipe-card-plan):hover {
+    background: color-mix(in srgb, var(--meals-text) 8%, var(--meals-surface));
+  }
+}
+
+@media (max-width: 1100px) {
+  .familyhub-shell .meals-page .recipe-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .familyhub-shell .meals-page .recipe-card-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .familyhub-shell .meals-page .meal-week-navigation { grid-template-columns: 1fr 1fr; }
+  .familyhub-shell .meals-page .meal-week-title { grid-column: 1 / -1; grid-row: 1; flex-wrap: wrap; }
+  .familyhub-shell .meals-page .meal-planner-toolbar-left { flex-wrap: wrap; }
+  .familyhub-shell .meals-page .recipe-library-search { width: 100%; flex-basis: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .familyhub-shell .meals-page :is(.recipe-card, .recipe-card-photo img, .meal-week-meal, .meal-view-switcher button) { transition: none; }
+}

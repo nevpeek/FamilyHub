@@ -24,25 +24,40 @@ function FamilyMemberModal({
   onSaved,
   onDeleted,
 }) {
-  const [name, setName] = useState("");
-  const [initials, setInitials] = useState("");
-  const [colour, setColour] = useState("#3B82F6");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const isEditing = Boolean(member?.id);
-  const [deleting, setDeleting] = useState(false);
+const [name, setName] = useState("");
+const [initials, setInitials] = useState("");
+const [colour, setColour] = useState("#3B82F6");
+const [birthday, setBirthday] = useState("");
+
+const [photoFile, setPhotoFile] = useState(null);
+const [photoPreview, setPhotoPreview] = useState("");
+
+const [saving, setSaving] = useState(false);
+const [error, setError] = useState("");
+const isEditing = Boolean(member?.id);
+const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!open || !member) {
       return;
     }
 
-    setName(member.name || "");
-    setInitials(member.initials || "");
-    setColour(member.colour || "#3B82F6");
-    setSaving(false);
-    setDeleting(false);
-    setError("");
+setName(member.name || "");
+setInitials(member.initials || "");
+setColour(member.colour || "#3B82F6");
+setBirthday(member.birthday || "");
+
+setPhotoFile(null);
+
+setPhotoPreview(
+  member.photo_url
+    ? `${API_BASE_URL}${member.photo_url}`
+    : ""
+);
+
+setSaving(false);
+setDeleting(false);
+setError("");
   }, [open, member]);
 
   if (!open || !member) {
@@ -72,11 +87,12 @@ function FamilyMemberModal({
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      name: name.trim(),
-      initials: initials.trim() || null,
-      colour,
-    }),
+body: JSON.stringify({
+  name: name.trim(),
+  initials: initials.trim() || null,
+  colour,
+  birthday: birthday || null,
+}),
   }
 );
 
@@ -89,8 +105,36 @@ function FamilyMemberModal({
         );
       }
 
-      onSaved?.(data.member);
-      onClose?.();
+let savedMember = data.member;
+
+if (photoFile && savedMember?.id) {
+  const formData = new FormData();
+
+  formData.append("photo", photoFile);
+
+  const photoResponse = await fetch(
+    `${API_BASE_URL}/api/family/${savedMember.id}/photo`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  const photoData =
+    await photoResponse.json();
+
+  if (!photoResponse.ok) {
+    throw new Error(
+      photoData.error ||
+        "Unable to upload family photo"
+    );
+  }
+
+  savedMember = photoData.member;
+}
+
+onSaved?.(savedMember);
+onClose?.();
     } catch (err) {
       console.error(err);
 
@@ -224,6 +268,83 @@ function FamilyMemberModal({
             />
           </label>
 
+          <label className="event-form-field">
+  <span>Birthday</span>
+
+  <input
+    type="date"
+    value={birthday}
+    onChange={(event) =>
+      setBirthday(event.target.value)
+    }
+  />
+</label>
+
+          <div className="event-form-field">
+  <span>Photo</span>
+
+  <div className="family-photo-picker">
+    <div
+      className="family-photo-preview"
+      style={{
+        backgroundColor: colour,
+      }}
+    >
+      {photoPreview ? (
+        <img
+          src={photoPreview}
+          alt={`${name || "Family member"} preview`}
+        />
+      ) : (
+        <span>
+          {initials ||
+            name.charAt(0).toUpperCase() ||
+            "?"}
+        </span>
+      )}
+    </div>
+
+    <div className="family-photo-actions">
+      <label className="family-photo-upload-button">
+        {photoPreview
+          ? "Change Photo"
+          : "Upload Photo"}
+
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(event) => {
+            const file =
+              event.target.files?.[0];
+
+            if (!file) {
+              return;
+            }
+
+            setPhotoFile(file);
+            setPhotoPreview(
+              URL.createObjectURL(file)
+            );
+          }}
+        />
+      </label>
+
+      {photoPreview && (
+        <button
+          type="button"
+          className="family-photo-remove-button"
+          onClick={() => {
+            setPhotoFile(null);
+            setPhotoPreview("");
+          }}
+        >
+          Remove
+        </button>
+      )}
+    </div>
+  </div>
+</div>
+
           <div className="event-form-field">
             <span>Colour</span>
 
@@ -256,15 +377,23 @@ function FamilyMemberModal({
           </div>
 
           <div className="family-member-preview">
-            <div
-              className="settings-member-avatar"
-              style={{
-                backgroundColor: colour,
-              }}
-            >
-              {initials ||
-                name.charAt(0).toUpperCase()}
-            </div>
+<div
+  className="settings-member-avatar"
+  style={{
+    backgroundColor: colour,
+  }}
+>
+  {photoPreview ? (
+    <img
+      src={photoPreview}
+      alt={name || "Family member"}
+      className="family-member-avatar-photo"
+    />
+  ) : (
+    initials ||
+    name.charAt(0).toUpperCase()
+  )}
+</div>
 
             <div>
               <strong>

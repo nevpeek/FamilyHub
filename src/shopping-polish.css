@@ -1,0 +1,208 @@
+/* Shared Shopping List appearance. */
+.familyhub-shell .shopping-page {
+  --shopping-surface: #fff;
+  --shopping-inset: #f5f5f7;
+  --shopping-text: #1d1d1f;
+  --shopping-muted: #636366;
+  --shopping-border: rgba(60, 60, 67, 0.12);
+  --shopping-success: #237a42;
+  --shopping-danger: #b42318;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--shopping-text);
+}
+
+html[data-theme="dark"] .familyhub-shell .shopping-page {
+  --shopping-surface: #1c1c1e;
+  --shopping-inset: #2c2c2e;
+  --shopping-text: #f5f5f7;
+  --shopping-muted: #aeaeb2;
+  --shopping-border: rgba(255, 255, 255, 0.12);
+  --shopping-success: #78d895;
+  --shopping-danger: #ff8a80;
+  color-scheme: dark;
+}
+
+html .familyhub-shell:has(.shopping-page) { background: #f5f5f7; }
+html[data-theme="dark"] .familyhub-shell:has(.shopping-page) { background: #141416; }
+
+html .familyhub-shell .shopping-page .calendar-page-heading h2 {
+  font-family: inherit;
+  color: var(--shopping-text);
+  letter-spacing: -0.035em;
+}
+
+html .familyhub-shell .shopping-page .family-selector-button {
+  min-height: 54px;
+  padding: 6px 16px 6px 7px;
+  border: 1px solid var(--shopping-border);
+  border-radius: 999px;
+  background: var(--shopping-inset);
+  color: var(--shopping-text);
+  font-weight: 600;
+}
+
+html .familyhub-shell .shopping-page .family-selector-everyone { padding-inline: 20px; }
+.familyhub-shell .shopping-page .family-selector-avatar { border-radius: 50%; }
+
+html .familyhub-shell .shopping-page .family-selector-button.selected {
+  border-color: var(--familyhub-accent, #007aff);
+  background: color-mix(in srgb, var(--familyhub-accent, #007aff) 18%, var(--shopping-inset));
+  color: var(--shopping-text);
+}
+
+html .familyhub-shell .shopping-page :is(.shopping-toolbar, .shopping-card, .shopping-empty-state, .shopping-status-panel) {
+  background: var(--shopping-surface);
+  border: 1px solid var(--shopping-border);
+  border-radius: 20px;
+  box-shadow: none;
+}
+
+.familyhub-shell .shopping-page .shopping-toolbar {
+  padding: 16px 20px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.familyhub-shell .shopping-page .shopping-toolbar-actions { flex-wrap: wrap; gap: 12px; }
+
+html .familyhub-shell .shopping-page :is(.shopping-toolbar strong, .shopping-empty-state h3, .shopping-completed-title strong) {
+  color: var(--shopping-text);
+  font-weight: 600;
+}
+
+html .familyhub-shell .shopping-page :is(.shopping-toolbar span, .shopping-empty-state p, .shopping-empty-state > svg, .shopping-section-count, .shopping-section-divider, .shopping-completed-title > span) {
+  color: var(--shopping-muted);
+}
+
+html .familyhub-shell .shopping-page :is(.shopping-toolbar select, .shopping-move-pantry, .shopping-clear-completed, .shopping-delete-all-button) {
+  min-height: 44px;
+  border: 1px solid var(--shopping-border);
+  border-radius: 12px;
+  background: var(--shopping-inset);
+  color: var(--shopping-text);
+  font-family: inherit;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+html .familyhub-shell .shopping-page :is(.shopping-clear-completed, .shopping-delete-all-button) {
+  color: var(--shopping-danger);
+  background: transparent;
+}
+
+.familyhub-shell .shopping-page .shopping-show-completed { min-height: 44px; }
+.familyhub-shell .shopping-page .shopping-show-completed input { accent-color: var(--familyhub-accent, #007aff); }
+
+html .familyhub-shell .shopping-page .add-event-button {
+  min-height: 44px;
+  border-radius: 12px;
+  background: var(--familyhub-accent, #007aff);
+  font-family: inherit;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.familyhub-shell .shopping-page .shopping-empty-state { min-height: 160px; padding: 28px; gap: 18px; }
+
+.familyhub-shell .shopping-page .shopping-checklist-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+html .familyhub-shell .shopping-page .shopping-card {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 0;
+  min-height: 100px;
+  border-radius: 16px;
+}
+
+html .familyhub-shell .shopping-page .shopping-complete-button {
+  width: 56px;
+  min-height: 56px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--shopping-muted);
+}
+
+html .familyhub-shell .shopping-page .shopping-card-content {
+  padding: 16px 18px 16px 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  opacity: 1;
+}
+
+.familyhub-shell .shopping-page .shopping-card-main { align-items: center; flex-wrap: wrap; }
+.familyhub-shell .shopping-page .shopping-item-with-picture { flex: 1 1 180px; }
+
+html .familyhub-shell .shopping-page .shopping-card-main h3 {
+  color: var(--shopping-text);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+html .familyhub-shell .shopping-page .shopping-card-main p {
+  color: var(--shopping-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+html .familyhub-shell .shopping-page .shopping-quantity {
+  background: var(--shopping-inset);
+  color: var(--shopping-text);
+  font-weight: 500;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+html .familyhub-shell .shopping-page .shopping-section-name {
+  color: var(--shopping-muted);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+html .familyhub-shell .shopping-page .shopping-section-line { background: var(--shopping-border); }
+html .familyhub-shell .shopping-page .shopping-completed-block { border-color: var(--shopping-border); }
+html .familyhub-shell .shopping-page .shopping-card.completed .shopping-complete-button { color: var(--shopping-success); }
+html .familyhub-shell .shopping-page .shopping-card.completed h3 { color: var(--shopping-muted); text-decoration: line-through; }
+
+.familyhub-shell .shopping-page .shopping-move-pantry {
+  grid-column: 2;
+  justify-self: start;
+  margin: 0 16px 14px 0;
+  padding: 8px 12px;
+}
+
+.familyhub-shell .shopping-page :is(button, select, input):focus-visible {
+  outline: 3px solid var(--familyhub-accent, #007aff);
+  outline-offset: -3px;
+}
+
+@media (hover: hover) {
+  html .familyhub-shell .shopping-page .shopping-card:hover {
+    border-color: var(--shopping-border);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+  }
+  html .familyhub-shell .shopping-page :is(.shopping-card-content, .shopping-complete-button, .shopping-move-pantry):hover {
+    background: var(--shopping-inset);
+  }
+}
+
+@media (max-width: 800px) {
+  .familyhub-shell .shopping-page .shopping-checklist-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .familyhub-shell .shopping-page .shopping-toolbar-actions { width: 100%; }
+  .familyhub-shell .shopping-page .shopping-toolbar select { width: 100%; }
+  .familyhub-shell .shopping-page .shopping-heading-actions { flex-wrap: wrap; gap: 10px; }
+}

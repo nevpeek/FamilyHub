@@ -1,12 +1,52 @@
 import { useEffect, useMemo, useState } from "react";
+
 import {
   CheckCircle2,
   Circle,
+  PackageOpen,
   Plus,
   ShoppingCart,
+  Trash2,
 } from "lucide-react";
 
+import FoodPicture from "../components/FoodPicture";
+
 const API_BASE_URL = "http://localhost:3001";
+
+const SHOPPING_CATEGORIES = [
+  {
+    id: "produce",
+    label: "Produce",
+  },
+  {
+    id: "meat",
+    label: "Meat",
+  },
+  {
+    id: "dairy",
+    label: "Dairy",
+  },
+  {
+    id: "bakery",
+    label: "Bakery",
+  },
+  {
+    id: "pantry",
+    label: "Pantry",
+  },
+  {
+    id: "frozen",
+    label: "Frozen",
+  },
+  {
+    id: "household",
+    label: "Household",
+  },
+  {
+    id: "other",
+    label: "Other",
+  },
+];
 
 function ShoppingPage({
   members,
@@ -24,6 +64,18 @@ function ShoppingPage({
     useState(false);
   const [categoryFilter, setCategoryFilter] =
     useState("all");
+
+    const [deleteAllConfirmOpen, setDeleteAllConfirmOpen] =
+  useState(false);
+
+const [clearCompletedConfirmOpen, setClearCompletedConfirmOpen] =
+  useState(false);
+
+const [deletingAll, setDeletingAll] =
+  useState(false);
+
+const [clearingCompleted, setClearingCompleted] =
+  useState(false);
 
   useEffect(() => {
     async function loadItems() {
@@ -105,6 +157,24 @@ function ShoppingPage({
     [items]
   );
 
+  const groupedActiveItems =
+    useMemo(() => {
+      return SHOPPING_CATEGORIES
+        .map((category) => ({
+          ...category,
+          items: activeItems.filter(
+            (item) =>
+              (item.category ||
+                "other") ===
+              category.id
+          ),
+        }))
+        .filter(
+          (category) =>
+            category.items.length > 0
+        );
+    }, [activeItems]);
+
   async function toggleItemCompletion(item) {
     try {
       const response = await fetch(
@@ -156,6 +226,160 @@ function ShoppingPage({
     }
   }
 
+    async function deleteAllItems() {
+setDeletingAll(true);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/shopping/all`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            "Unable to delete shopping list"
+        );
+      }
+
+      setItems([]);
+
+      onItemChanged?.();
+
+
+} catch (err) {
+  console.error(err);
+
+  window.alert(
+    err.message ||
+      "Unable to delete shopping list"
+  );
+} finally {
+  setDeletingAll(false);
+}
+  }
+
+    async function moveItemToPantry(item) {
+    try {
+      const pantryResponse =
+        await fetch(
+          `${API_BASE_URL}/api/pantry`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              name: item.name,
+              quantity:
+                item.quantity || null,
+              category:
+                item.category || "other",
+              notes: null,
+            }),
+          }
+        );
+
+      const pantryData =
+        await pantryResponse.json();
+
+      if (
+        !pantryResponse.ok &&
+        pantryResponse.status !== 409
+      ) {
+        throw new Error(
+          pantryData.error ||
+            "Unable to add item to Pantry"
+        );
+      }
+
+      const deleteResponse =
+        await fetch(
+          `${API_BASE_URL}/api/shopping/${item.id}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+      const deleteData =
+        await deleteResponse.json();
+
+      if (!deleteResponse.ok) {
+        throw new Error(
+          deleteData.error ||
+            "Unable to remove shopping item"
+        );
+      }
+
+      setItems((current) =>
+        current.filter(
+          (entry) =>
+            entry.id !== item.id
+        )
+      );
+
+      onItemChanged?.();
+    } catch (err) {
+      console.error(err);
+
+      window.alert(
+        err.message ||
+          "Unable to move item to Pantry"
+      );
+    }
+  }
+
+
+  async function clearCompletedItems() {
+    if (completedItems.length === 0) {
+      return;
+    }
+
+    setClearingCompleted(true);
+
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/shopping/completed/all`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            "Unable to clear completed items"
+        );
+      }
+
+      setItems((current) =>
+        current.filter(
+          (item) =>
+            !item.is_completed
+        )
+      );
+
+      onItemChanged?.();
+} catch (err) {
+  console.error(err);
+
+  window.alert(
+    err.message ||
+      "Unable to clear completed items"
+  );
+} finally {
+  setClearingCompleted(false);
+}
+  }
+
   function renderItem(item) {
     return (
       <article
@@ -192,47 +416,62 @@ function ShoppingPage({
             onEditItem?.(item)
           }
         >
-          <div className="shopping-card-main">
-            <div>
-              <span className="shopping-category">
-                {item.category}
-              </span>
+<div className="shopping-card-main">
+  <div className="shopping-item-with-picture">
+    <FoodPicture
+      name={item.name}
+      category={item.category}
+      size="large"
+    />
 
-              <h3>{item.name}</h3>
+    <div className="shopping-item-details">
+      <span className="shopping-category">
+        {item.category}
+      </span>
 
-              {item.notes && (
-                <p>{item.notes}</p>
+      <h3>{item.name}</h3>
+
+      {item.notes && (
+                <p>
+                  {item.notes
+                    .replace(
+                      /From recipe:\s*/gi,
+                      ""
+                    )
+                    .replace(
+                      /Meal plan:\s*/gi,
+                      ""
+                    )
+                    .replace(
+                      /;\s*/g,
+                      " · "
+                    )}
+                </p>
               )}
             </div>
+          </div>
 
-            {item.quantity && (
+          {item.quantity && (
               <span className="shopping-quantity">
                 {item.quantity}
               </span>
             )}
           </div>
-
-          <div className="shopping-card-members">
-            {(item.members || []).map(
-              (member) => (
-                <span
-                  key={member.id}
-                  className="shopping-member"
-                >
-                  <span
-                    className="shopping-member-dot"
-                    style={{
-                      backgroundColor:
-                        member.colour,
-                    }}
-                  />
-
-                  {member.name}
-                </span>
-              )
-            )}
-          </div>
         </button>
+
+        {item.is_completed && (
+          <button
+            type="button"
+            className="shopping-move-pantry"
+            onClick={() =>
+              moveItemToPantry(item)
+            }
+            title="Move to Pantry"
+          >
+            <PackageOpen size={16} />
+            <span>Move to Pantry</span>
+          </button>
+        )}
       </article>
     );
   }
@@ -253,56 +492,78 @@ function ShoppingPage({
           </p>
         </div>
 
-        <button
-          type="button"
-          className="add-event-button"
-          onClick={onAddItem}
-        >
-          <Plus size={22} />
-          <span>Add Item</span>
-        </button>
-      </section>
-
-      <section className="calendar-family-filters">
-        <button
-          type="button"
-          className={`calendar-person-filter ${
-            selectedMemberId === "all"
-              ? "selected"
-              : ""
-          }`}
-          onClick={() =>
-            setSelectedMemberId("all")
-          }
-        >
-          Everyone
-        </button>
-
-        {members.map((member) => (
+        <div className="shopping-heading-actions">
           <button
             type="button"
-            key={member.id}
-            className={`calendar-person-filter ${
-              selectedMemberId === member.id
-                ? "selected"
-                : ""
-            }`}
-            onClick={() =>
-              setSelectedMemberId(member.id)
-            }
+            className="shopping-delete-all-button"
+onClick={() =>
+  setDeleteAllConfirmOpen(true)
+}
+            disabled={items.length === 0}
           >
-            <span
-              className="calendar-person-dot"
-              style={{
-                backgroundColor:
-                  member.colour,
-              }}
-            />
-
-            {member.name}
+            <Trash2 size={18} />
+            <span>Delete All</span>
           </button>
-        ))}
+
+          <button
+            type="button"
+            className="add-event-button"
+            onClick={onAddItem}
+          >
+            <Plus size={22} />
+            <span>Add Item</span>
+          </button>
+        </div>
       </section>
+<section className="family-selector family-selector-section">
+  <button
+    type="button"
+    className={`family-selector-button family-selector-everyone ${
+      selectedMemberId === "all"
+        ? "selected"
+        : ""
+    }`}
+    onClick={() =>
+      setSelectedMemberId("all")
+    }
+  >
+    Everyone
+  </button>
+
+  {members.map((member) => (
+    <button
+      type="button"
+      key={member.id}
+      className={`family-selector-button ${
+        selectedMemberId === member.id
+          ? "selected"
+          : ""
+      }`}
+      onClick={() =>
+        setSelectedMemberId(member.id)
+      }
+    >
+      <span
+        className="family-selector-avatar"
+        style={{
+          backgroundColor: member.colour,
+        }}
+      >
+        {member.photo_url ? (
+          <img
+            src={`${API_BASE_URL}${member.photo_url}`}
+            alt={member.name}
+          />
+        ) : (
+          member.initials ||
+          member.name.charAt(0).toUpperCase()
+        )}
+      </span>
+
+      {member.name}
+    </button>
+  ))}
+</section>
 
       <section className="shopping-toolbar">
         <div>
@@ -319,6 +580,7 @@ function ShoppingPage({
 
         <div className="shopping-toolbar-actions">
           <select
+            aria-label="Filter shopping by category"
             value={categoryFilter}
             onChange={(event) =>
               setCategoryFilter(
@@ -378,6 +640,20 @@ function ShoppingPage({
               Show completed
             </span>
           </label>
+
+          {completedItems.length > 0 && (
+            <button
+              type="button"
+              className="shopping-clear-completed"
+onClick={() =>
+  setClearCompletedConfirmOpen(true)
+}
+            >
+              <Trash2 size={15} />
+              Clear Completed
+            </button>
+          )}
+
         </div>
       </section>
 
@@ -401,9 +677,198 @@ function ShoppingPage({
             </p>
           </div>
         </div>
-      ) : (
-        <div className="shopping-list">
-          {items.map(renderItem)}
+           ) : (
+        <>
+          {groupedActiveItems.map(
+            (category) => (
+              <section
+                key={category.id}
+                className={`shopping-section shopping-section-${category.id}`}
+              >
+                <div className="shopping-section-heading">
+                  <div>
+                    <span className="shopping-section-name">
+                      {category.label}
+                    </span>
+
+                    <span className="shopping-section-divider">
+                      ·
+                    </span>
+
+                    <span className="shopping-section-count">
+                      {category.items.length}
+                    </span>
+                  </div>
+
+                  <span className="shopping-section-line" />
+                </div>
+
+                <div className="shopping-checklist-grid">
+                  {category.items.map(
+                    renderItem
+                  )}
+                </div>
+              </section>
+            )
+          )}
+
+          {showCompleted &&
+            completedItems.length > 0 && (
+              <section className="shopping-completed-block">
+                <div className="shopping-completed-title">
+                  <div>
+                    <CheckCircle2
+                      size={18}
+                    />
+
+                    <strong>
+                      Completed
+                    </strong>
+                  </div>
+
+                  <span>
+                    {
+                      completedItems.length
+                    }
+                  </span>
+                </div>
+
+                <div className="shopping-checklist-grid completed">
+                  {completedItems.map(
+                    renderItem
+                  )}
+                </div>
+              </section>
+            )}
+        </>
+      )}
+
+      {deleteAllConfirmOpen && (
+        <div
+          className="modal-backdrop reward-delete-backdrop"
+          onMouseDown={(event) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              setDeleteAllConfirmOpen(false);
+            }
+          }}
+        >
+          <div className="reward-delete-confirm-modal">
+            <div className="reward-delete-confirm-icon">
+              <Trash2 size={24} />
+            </div>
+
+            <div className="reward-delete-confirm-copy">
+              <span>Delete Shopping List</span>
+
+              <h2>Delete All Items?</h2>
+
+              <p>
+                Are you sure you want to delete every item
+                from the shopping list?
+              </p>
+
+              <small>
+                This cannot be undone.
+              </small>
+            </div>
+
+            <div className="reward-delete-confirm-actions">
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() =>
+                  setDeleteAllConfirmOpen(false)
+                }
+                disabled={deletingAll}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="reward-delete-confirm-button"
+                disabled={deletingAll}
+                onClick={async () => {
+                  await deleteAllItems();
+                  setDeleteAllConfirmOpen(false);
+                }}
+              >
+                {deletingAll
+                  ? "Deleting..."
+                  : "Delete All"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {clearCompletedConfirmOpen && (
+        <div
+          className="modal-backdrop reward-delete-backdrop"
+          onMouseDown={(event) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              setClearCompletedConfirmOpen(false);
+            }
+          }}
+        >
+          <div className="reward-delete-confirm-modal">
+            <div className="reward-delete-confirm-icon">
+              <Trash2 size={24} />
+            </div>
+
+            <div className="reward-delete-confirm-copy">
+              <span>Clear Completed</span>
+
+              <h2>
+                Clear {completedItems.length} Completed{" "}
+                {completedItems.length === 1
+                  ? "Item"
+                  : "Items"}?
+              </h2>
+
+              <p>
+                This will remove the completed items from
+                the shopping list.
+              </p>
+
+              <small>
+                Items still needed will not be removed.
+              </small>
+            </div>
+
+            <div className="reward-delete-confirm-actions">
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() =>
+                  setClearCompletedConfirmOpen(false)
+                }
+                disabled={clearingCompleted}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="reward-delete-confirm-button"
+                disabled={clearingCompleted}
+                onClick={async () => {
+                  await clearCompletedItems();
+                  setClearCompletedConfirmOpen(false);
+                }}
+              >
+                {clearingCompleted
+                  ? "Clearing..."
+                  : "Clear Completed"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

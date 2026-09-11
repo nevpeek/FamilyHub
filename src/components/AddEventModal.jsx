@@ -1,12 +1,39 @@
 import { useEffect, useMemo, useState } from "react";
 import { Trash2, X } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 
 const API_BASE_URL = "http://localhost:3001";
 
-function formatDateKey(date) {
+function formatDateKey(value) {
+  if (!value) {
+    return "";
+  }
+
+  if (
+    typeof value === "string" &&
+    /^\d{4}-\d{2}-\d{2}$/.test(value)
+  ) {
+    return value;
+  }
+
+  const date =
+    value instanceof Date
+      ? value
+      : new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+
+  const month = String(
+    date.getMonth() + 1
+  ).padStart(2, "0");
+
+  const day = String(
+    date.getDate()
+  ).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 }
@@ -16,27 +43,46 @@ function AddEventModal({
   onClose,
   members,
   initialDate,
+  initialTime,
+  initialAllDay = false,
   eventToEdit,
   occurrenceEditMode = false,
   futureEditMode = false,
   onEventSaved,
   onEventDeleted,
 }) {
+  const reduceMotion = useReducedMotion();
   const defaultDate = useMemo(() => {
     return initialDate
       ? formatDateKey(initialDate)
       : formatDateKey(new Date());
   }, [initialDate]);
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [startDate, setStartDate] = useState(defaultDate);
+const [title, setTitle] = useState("");
+const [description, setDescription] = useState("");
+const [notes, setNotes] = useState("");
+const [startDate, setStartDate] = useState(defaultDate);
   const [startTime, setStartTime] = useState("09:00");
   const [endDate, setEndDate] = useState(defaultDate);
   const [endTime, setEndTime] = useState("10:00");
-  const [allDay, setAllDay] = useState(false);
-  const [location, setLocation] = useState("");
-  const [category, setCategory] = useState("other");
+const [allDay, setAllDay] = useState(false);
+const [location, setLocation] = useState("");
+const [address, setAddress] = useState("");
+const [weatherLat, setWeatherLat] = useState(null);
+const [weatherLon, setWeatherLon] = useState(null);
+const [eventUrl, setEventUrl] = useState("");
+const [category, setCategory] = useState("other");
+
+const [reminderEnabled, setReminderEnabled] =
+  useState(false);
+
+const [reminderMinutes, setReminderMinutes] =
+  useState("15");
+
+const [showAsCountdown, setShowAsCountdown] =
+  useState(false);
+  const [linkedCountdownId, setLinkedCountdownId] =
+  useState(null);
 
   const [recurrenceRule, setRecurrenceRule] = useState("");
   const [recurrenceEndType, setRecurrenceEndType] =
@@ -49,9 +95,11 @@ function AddEventModal({
   const [selectedMemberIds, setSelectedMemberIds] =
     useState([]);
 
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState("");
+const [saving, setSaving] = useState(false);
+const [deleting, setDeleting] = useState(false);
+const [deleteConfirmOpen, setDeleteConfirmOpen] =
+  useState(false);
+const [error, setError] = useState("");
 
   useEffect(() => {
     if (!isOpen) {
@@ -59,10 +107,11 @@ function AddEventModal({
     }
 
     if (eventToEdit) {
-      setTitle(eventToEdit.title || "");
-      setDescription(eventToEdit.description || "");
+setTitle(eventToEdit.title || "");
+setDescription(eventToEdit.description || "");
+setNotes(eventToEdit.notes || eventToEdit.description || "");
 
-      setStartDate(
+setStartDate(
         eventToEdit.start_date || defaultDate
       );
 
@@ -80,9 +129,35 @@ function AddEventModal({
         eventToEdit.end_time || "10:00"
       );
 
-      setAllDay(Boolean(eventToEdit.all_day));
-      setLocation(eventToEdit.location || "");
-      setCategory(eventToEdit.category || "other");
+setAllDay(Boolean(eventToEdit.all_day));
+setLocation(eventToEdit.location || "");
+setAddress(eventToEdit.address || "");
+
+setWeatherLat(
+  eventToEdit.weather_lat ?? null
+);
+
+setWeatherLon(
+  eventToEdit.weather_lon ?? null
+);
+
+setEventUrl(eventToEdit.url || "");
+setCategory(eventToEdit.category || "other");
+
+setReminderEnabled(
+  Boolean(eventToEdit.reminder_enabled)
+);
+
+setReminderMinutes(
+  eventToEdit.reminder_minutes !== null &&
+  eventToEdit.reminder_minutes !== undefined
+    ? String(eventToEdit.reminder_minutes)
+    : "15"
+);
+
+setShowAsCountdown(
+  Boolean(eventToEdit.show_as_countdown)
+);
 
       setRecurrenceRule(
         eventToEdit.recurrence_rule || ""
@@ -111,16 +186,46 @@ function AddEventModal({
           (member) => member.id
         )
       );
-    } else {
-      setTitle("");
-      setDescription("");
-      setStartDate(defaultDate);
-      setStartTime("09:00");
-      setEndDate(defaultDate);
-      setEndTime("10:00");
-      setAllDay(false);
-      setLocation("");
-      setCategory("other");
+} else {
+setTitle("");
+setDescription("");
+setNotes("");
+setStartDate(defaultDate);
+
+  const newStartTime =
+    initialTime || "09:00";
+
+  const [hours, minutes] =
+    newStartTime.split(":").map(Number);
+
+  const endTimeDate = new Date();
+
+  endTimeDate.setHours(
+    hours,
+    minutes + 60,
+    0,
+    0
+  );
+
+  const newEndTime = `${String(
+    endTimeDate.getHours()
+  ).padStart(2, "0")}:${String(
+    endTimeDate.getMinutes()
+  ).padStart(2, "0")}`;
+
+  setStartTime(newStartTime);
+  setEndDate(defaultDate);
+  setEndTime(newEndTime);
+setAllDay(initialAllDay);
+setLocation("");
+setAddress("");
+setWeatherLat(null);
+setWeatherLon(null);
+setEventUrl("");
+setCategory("other");
+setReminderEnabled(false);
+setReminderMinutes("15");
+setShowAsCountdown(false);
 
       setRecurrenceRule("");
       setRecurrenceEndType("never");
@@ -136,7 +241,90 @@ function AddEventModal({
     eventToEdit,
     defaultDate,
     occurrenceEditMode,
+    initialAllDay,
+    initialTime,
   ]);
+
+useEffect(() => {
+  if (!isOpen) {
+    return;
+  }
+
+  if (
+    !eventToEdit ||
+    occurrenceEditMode ||
+    futureEditMode
+  ) {
+    setLinkedCountdownId(null);
+
+    if (!eventToEdit) {
+      setShowAsCountdown(false);
+    }
+
+    return;
+  }
+
+  let cancelled = false;
+
+  async function loadLinkedCountdown() {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/countdowns`
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            "Failed to load countdowns"
+        );
+      }
+
+      if (cancelled) {
+        return;
+      }
+
+      const linkedCountdown = (
+        data.countdowns || []
+      ).find(
+        (countdown) =>
+          Number(countdown.event_id) ===
+          Number(eventToEdit.id)
+      );
+
+      if (linkedCountdown) {
+        setLinkedCountdownId(
+          linkedCountdown.id
+        );
+        setShowAsCountdown(true);
+      } else {
+        setLinkedCountdownId(null);
+        setShowAsCountdown(false);
+      }
+    } catch (err) {
+      console.error(
+        "Unable to check event countdown:",
+        err
+      );
+
+      if (!cancelled) {
+        setLinkedCountdownId(null);
+      }
+    }
+  }
+
+  loadLinkedCountdown();
+
+  return () => {
+    cancelled = true;
+  };
+}, [
+  isOpen,
+  eventToEdit,
+  occurrenceEditMode,
+  futureEditMode,
+]);  
 
   if (!isOpen) {
     return null;
@@ -209,6 +397,51 @@ function AddEventModal({
 
     setSaving(true);
 
+    let resolvedWeatherLat = weatherLat;
+let resolvedWeatherLon = weatherLon;
+
+const weatherLocationQuery =
+  address.trim() || location.trim();
+
+if (weatherLocationQuery) {
+  try {
+    const geocodeResponse = await fetch(
+      `${API_BASE_URL}/api/weather/geocode?query=${encodeURIComponent(
+        weatherLocationQuery
+      )}`
+    );
+
+    if (geocodeResponse.ok) {
+      const geocodeData =
+        await geocodeResponse.json();
+
+      const firstResult =
+        geocodeData.results?.[0];
+
+      if (firstResult) {
+        resolvedWeatherLat =
+          firstResult.latitude;
+
+        resolvedWeatherLon =
+          firstResult.longitude;
+
+        setWeatherLat(
+          firstResult.latitude
+        );
+
+        setWeatherLon(
+          firstResult.longitude
+        );
+      }
+    }
+  } catch (err) {
+    console.error(
+      "Unable to geocode event location:",
+      err
+    );
+  }
+}
+
     try {
       let url = `${API_BASE_URL}/api/events`;
       let method = "POST";
@@ -232,9 +465,9 @@ if ((occurrenceEditMode || futureEditMode) && eventToEdit) {
 
   method = "PUT";
 } else if (eventToEdit) {
-
-        method = "PUT";
-      }
+  url = `${API_BASE_URL}/api/events/${eventToEdit.id}`;
+  method = "PUT";
+}
 
       const response = await fetch(url, {
         method,
@@ -242,11 +475,15 @@ if ((occurrenceEditMode || futureEditMode) && eventToEdit) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: title.trim(),
-          description:
-            description.trim() || null,
+title: title.trim(),
 
-          startDate,
+description:
+  description.trim() || null,
+
+notes:
+  notes.trim() || null,
+
+startDate,
           startTime:
             allDay ? null : startTime,
 
@@ -258,12 +495,32 @@ if ((occurrenceEditMode || futureEditMode) && eventToEdit) {
 
           allDay,
 
-          location:
-            location.trim() || null,
+location:
+  location.trim() || null,
 
-          category,
+address:
+  address.trim() || null,
 
-          recurrenceRule:
+weatherLat:
+  resolvedWeatherLat,
+
+weatherLon:
+  resolvedWeatherLon,
+
+url:
+  eventUrl.trim() || null,
+
+category,
+
+reminderEnabled:
+  !allDay && reminderEnabled,
+
+reminderMinutes:
+  !allDay && reminderEnabled
+    ? Number(reminderMinutes)
+    : null,
+
+recurrenceRule:
   occurrenceEditMode || futureEditMode
     ? null
     : recurrenceRule || null,
@@ -284,13 +541,6 @@ recurrenceCount:
       ? Number(recurrenceCount) || null
       : null,
 
-          recurrenceEndDate:
-            occurrenceEditMode
-              ? null
-              : recurrenceRule &&
-                  recurrenceEndType === "date"
-                ? recurrenceEndDate || null
-                : null,
 
           recurrenceCount:
             occurrenceEditMode
@@ -306,14 +556,91 @@ recurrenceCount:
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(
-          data.error || "Failed to save event"
-        );
-      }
+if (!response.ok) {
+  throw new Error(
+    data.error || "Failed to save event"
+  );
+}
 
-      onEventSaved?.(data.event);
-      onClose();
+const savedEvent = data.event;
+
+if (
+  showAsCountdown &&
+  savedEvent?.id &&
+  !occurrenceEditMode &&
+  !futureEditMode
+) {
+  const countdownResponse = await fetch(
+linkedCountdownId
+  ? `${API_BASE_URL}/api/countdowns/${linkedCountdownId}`
+  : `${API_BASE_URL}/api/countdowns`,
+    {
+      method: linkedCountdownId
+        ? "PUT"
+        : "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: title.trim(),
+        targetDate: startDate,
+        targetTime: allDay
+          ? null
+          : startTime,
+        description:
+          notes.trim() ||
+          description.trim() ||
+          null,
+        category,
+        colour: null,
+        eventId: savedEvent.id,
+        familyMemberId: null,
+        isAutomatic: false,
+        isActive: true,
+      }),
+    }
+  );
+
+  const countdownData =
+    await countdownResponse.json();
+
+  if (!countdownResponse.ok) {
+    throw new Error(
+      countdownData.error ||
+        "Event saved, but countdown could not be saved"
+    );
+  }
+}
+
+onEventSaved?.(savedEvent);
+onClose();
+
+if (
+  !showAsCountdown &&
+  linkedCountdownId &&
+  !occurrenceEditMode &&
+  !futureEditMode
+) {
+  const countdownResponse = await fetch(
+    `${API_BASE_URL}/api/countdowns/${linkedCountdownId}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  const countdownData =
+    await countdownResponse.json();
+
+  if (!countdownResponse.ok) {
+    throw new Error(
+      countdownData.error ||
+        "Event saved, but countdown could not be removed"
+    );
+  }
+
+  setLinkedCountdownId(null);
+}
+
     } catch (err) {
       console.error(err);
 
@@ -325,57 +652,98 @@ recurrenceCount:
     }
   }
 
-  async function handleDelete() {
-    if (!eventToEdit || occurrenceEditMode) {
-      return;
-    }
+async function handleDelete() {
+  if (!eventToEdit || occurrenceEditMode) {
+    return;
+  }
 
-    const confirmed = window.confirm(
-      `Delete "${eventToEdit.title}"? This cannot be undone.`
-    );
+  setDeleteConfirmOpen(true);
+}
 
-    if (!confirmed) {
-      return;
-    }
+async function confirmDelete() {
+  if (!eventToEdit || occurrenceEditMode) {
+    return;
+  }
 
-    setDeleting(true);
-    setError("");
+  setDeleting(true);
+  setError("");
 
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/events/${eventToEdit.id}`,
+  try {
+    if (linkedCountdownId) {
+      const countdownResponse = await fetch(
+        `${API_BASE_URL}/api/countdowns/${linkedCountdownId}`,
         {
           method: "DELETE",
         }
       );
 
-      const data = await response.json();
+      if (!countdownResponse.ok) {
+        const countdownData =
+          await countdownResponse
+            .json()
+            .catch(() => ({}));
 
-      if (!response.ok) {
         throw new Error(
-          data.error || "Failed to delete event"
+          countdownData.error ||
+            "Unable to delete linked countdown"
         );
       }
-
-      onEventDeleted?.(eventToEdit.id);
-      onClose();
-    } catch (err) {
-      console.error(err);
-
-      setError(
-        err.message || "Unable to delete event"
-      );
-    } finally {
-      setDeleting(false);
     }
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/events/${eventToEdit.id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Failed to delete event"
+      );
+    }
+
+    setDeleteConfirmOpen(false);
+
+    onEventDeleted?.(eventToEdit.id);
+
+    onClose();
+  } catch (err) {
+    console.error(err);
+
+    setError(
+      err.message || "Unable to delete event"
+    );
+
+    setDeleteConfirmOpen(false);
+  } finally {
+    setDeleting(false);
   }
+}
 
   return (
-    <div className="event-modal-backdrop">
-      <div
+    <motion.div
+      className="event-modal-backdrop"
+      initial={reduceMotion ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: reduceMotion ? 0 : 0.18 }}
+    >
+      <motion.div
         className="event-modal"
         role="dialog"
         aria-modal="true"
+        initial={
+          reduceMotion
+            ? false
+            : { opacity: 0, y: 14, scale: 0.98 }
+        }
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{
+          duration: reduceMotion ? 0 : 0.24,
+          ease: [0.22, 1, 0.36, 1],
+        }}
       >
         <div className="event-modal-header">
           <div>
@@ -459,16 +827,79 @@ recurrenceCount:
           </div>
 
           <label className="event-all-day">
-            <input
-              type="checkbox"
-              checked={allDay}
-              onChange={(event) =>
-                setAllDay(event.target.checked)
-              }
-            />
+<input
+  type="checkbox"
+  checked={allDay}
+  onChange={(event) => {
+    const checked = event.target.checked;
+
+    setAllDay(checked);
+
+    if (checked) {
+      setReminderEnabled(false);
+    }
+  }}
+/>
 
             <span>All-day event</span>
           </label>
+
+          <label className="event-all-day">
+  <input
+    type="checkbox"
+    checked={showAsCountdown}
+    onChange={(event) =>
+      setShowAsCountdown(
+        event.target.checked
+      )
+    }
+  />
+
+  <span>Show as countdown</span>
+</label>
+
+<label className="event-all-day">
+  <input
+    type="checkbox"
+    checked={reminderEnabled}
+    onChange={(event) =>
+      setReminderEnabled(
+        event.target.checked
+      )
+    }
+    disabled={allDay}
+  />
+
+  <span>
+    {allDay
+      ? "Reminder unavailable for all-day events"
+      : "Remind me"}
+  </span>
+</label>
+
+{reminderEnabled && !allDay && (
+  <label className="event-form-field">
+    <span>Reminder time</span>
+
+    <select
+      value={reminderMinutes}
+      onChange={(event) =>
+        setReminderMinutes(
+          event.target.value
+        )
+      }
+    >
+      <option value="0">At event time</option>
+      <option value="5">5 minutes before</option>
+      <option value="10">10 minutes before</option>
+      <option value="15">15 minutes before</option>
+      <option value="30">30 minutes before</option>
+      <option value="60">1 hour before</option>
+      <option value="120">2 hours before</option>
+      <option value="1440">1 day before</option>
+    </select>
+  </label>
+)}
 
           <div className="event-form-grid">
             <label className="event-form-field">
@@ -708,20 +1139,44 @@ recurrenceCount:
             </label>
           </div>
 
-          <label className="event-form-field">
-            <span>Notes</span>
+<label className="event-form-field">
+  <span>Address</span>
 
-            <textarea
-              rows="4"
-              value={description}
-              onChange={(event) =>
-                setDescription(
-                  event.target.value
-                )
-              }
-              placeholder="Optional notes"
-            />
-          </label>
+  <input
+    type="text"
+    value={address}
+    onChange={(event) =>
+      setAddress(event.target.value)
+    }
+    placeholder="Optional street address"
+  />
+</label>
+
+<label className="event-form-field">
+  <span>Event link</span>
+
+  <input
+    type="url"
+    value={eventUrl}
+    onChange={(event) =>
+      setEventUrl(event.target.value)
+    }
+    placeholder="https://example.com"
+  />
+</label>
+
+<label className="event-form-field">
+  <span>Notes</span>
+
+  <textarea
+    rows="4"
+    value={notes}
+    onChange={(event) =>
+      setNotes(event.target.value)
+    }
+    placeholder="Optional notes"
+  />
+</label>
 
           {error && (
             <p className="event-form-error">
@@ -775,8 +1230,51 @@ recurrenceCount:
   </div>
 </div>
         </form>
-      </div>
-    </div>
+      </motion.div>
+
+      {deleteConfirmOpen && (
+        <div className="modal-backdrop reward-delete-backdrop">
+          <div className="reward-delete-confirm">
+            <div className="reward-delete-confirm-copy">
+              <h2>Delete event?</h2>
+
+              <p>
+                Are you sure you want to delete
+                <strong> "{eventToEdit?.title}"</strong>?
+              </p>
+
+              <small>
+                This cannot be undone.
+              </small>
+            </div>
+
+            <div className="reward-delete-confirm-actions">
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() =>
+                  setDeleteConfirmOpen(false)
+                }
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+
+<button
+  type="button"
+  className="reward-delete-confirm-button"
+  onClick={confirmDelete}
+  disabled={deleting}
+>
+  {deleting
+    ? "Deleting..."
+    : "Delete Event"}
+</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </motion.div>
   );
 }
 

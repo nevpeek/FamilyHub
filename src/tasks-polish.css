@@ -1,0 +1,211 @@
+/* Tasks and Rewards: shared surfaces for both appearance modes. */
+.familyhub-shell .tasks-page {
+  --tasks-surface: #ffffff;
+  --tasks-inset: #f5f5f7;
+  --tasks-border: rgba(60, 60, 67, 0.12);
+  --tasks-star: #8a5700;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--tasks-text);
+}
+
+html[data-theme="dark"] .familyhub-shell .tasks-page {
+  --tasks-surface: #1c1c1e;
+  --tasks-inset: #2c2c2e;
+  --tasks-border: rgba(255, 255, 255, 0.12);
+  --tasks-star: #e9b949;
+  color-scheme: dark;
+}
+
+html .familyhub-shell:has(.tasks-page) {
+  background: #f5f5f7;
+}
+
+html[data-theme="dark"] .familyhub-shell:has(.tasks-page) {
+  background: #141416;
+}
+
+html .familyhub-shell .tasks-page :is(
+  .rewards-page-heading, .reward-goals-section, .reward-history-section,
+  .reward-card, .task-card-content, .routine-card-content, .routine-period,
+  .task-complete-button, .routine-complete-button
+) {
+  background: var(--tasks-surface);
+  border-color: var(--tasks-border);
+  box-shadow: none;
+}
+
+.familyhub-shell .tasks-page :is(.rewards-page-heading, .reward-card) {
+  padding: 24px;
+  border-radius: 20px;
+}
+
+.familyhub-shell .tasks-page .rewards-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 20px;
+}
+
+.familyhub-shell .tasks-page .reward-card {
+  min-width: 0;
+  gap: 16px;
+}
+
+.familyhub-shell .tasks-page .reward-card-copy {
+  padding-top: 0;
+}
+
+.familyhub-shell .tasks-page .reward-member-buttons {
+  padding-top: 0;
+  gap: 10px;
+}
+
+.familyhub-shell .tasks-page .reward-goals-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+
+html .familyhub-shell .tasks-page :is(.reward-goal-card, .reward-member-button) {
+  background: var(--tasks-inset);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.familyhub-shell .tasks-page .reward-goal-card {
+  min-width: 0;
+  padding: 18px;
+}
+
+html .familyhub-shell .tasks-page :is(
+  .reward-card-copy h3, .reward-goals-heading h3, .reward-history-heading h3,
+  .reward-goal-member strong, .reward-goal-progress-copy strong,
+  .task-card-top h3, .routine-card-copy h3, .routine-period-heading strong
+) {
+  color: var(--tasks-text);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+html .familyhub-shell .tasks-page :is(
+  .reward-card-copy p, .reward-card-spend-label, .reward-goals-heading small,
+  .reward-history-heading small, .reward-history-row time, .reward-history-empty,
+  .reward-goal-empty, .task-card-top p, .task-card-meta, .routine-card-meta
+) {
+  color: var(--tasks-muted);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+html .familyhub-shell .tasks-page :is(
+  .rewards-page-kicker, .reward-goals-heading > div > span,
+  .reward-history-heading > div > span
+) {
+  color: var(--tasks-muted);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+html .familyhub-shell .tasks-page :is(
+  .reward-card-footer strong, .reward-member-details small,
+  .reward-goal-member div > span, .reward-goal-progress-copy span,
+  .reward-history-stars
+) {
+  color: var(--tasks-star);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+html .familyhub-shell .tasks-page :is(
+  .reward-card-footer, .reward-goals-heading, .reward-history-heading,
+  .reward-history-row, .reward-goal-empty
+) {
+  border-color: var(--tasks-border);
+}
+
+html .familyhub-shell .tasks-page .reward-goal-card select {
+  min-height: 44px;
+  background: var(--tasks-surface);
+  color: var(--tasks-text);
+  border-color: var(--tasks-border);
+}
+
+html .familyhub-shell .tasks-page .reward-goal-progress {
+  height: 6px;
+  background: color-mix(in srgb, var(--tasks-text) 14%, var(--tasks-inset));
+}
+
+.familyhub-shell .tasks-page .tasks-list {
+  display: grid;
+  gap: 12px;
+}
+
+html .familyhub-shell .tasks-page .reward-edit-button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--tasks-inset);
+  color: var(--tasks-text);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+html .familyhub-shell .tasks-page .reward-member-button.cannot-afford {
+  opacity: 0.65;
+}
+
+html .familyhub-shell .tasks-page .add-event-button {
+  min-height: 44px;
+  border-radius: 12px;
+  background: var(--familyhub-accent, #007aff);
+  box-shadow: none;
+  font-family: inherit;
+  font-weight: 600;
+}
+
+html .familyhub-shell .tasks-page .tasks-toolbar {
+  background: transparent;
+  box-shadow: none;
+}
+
+html .familyhub-shell .tasks-page .tasks-toolbar-right {
+  background: var(--tasks-surface);
+  border-color: var(--tasks-border);
+  color: var(--tasks-muted);
+}
+
+.familyhub-shell .tasks-page :is(button, select):focus-visible {
+  outline: 3px solid var(--familyhub-accent, #007aff);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  html .familyhub-shell .tasks-page :is(
+    .reward-edit-button, .reward-member-button.can-afford,
+    .task-card-content, .routine-card-content
+  ):hover {
+    background: color-mix(in srgb, var(--tasks-text) 6%, var(--tasks-surface));
+    border-color: var(--tasks-border);
+    transform: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .familyhub-shell .tasks-page :is(.rewards-page-heading, .reward-goals-heading, .reward-history-heading) {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+  }
+
+  .familyhub-shell .tasks-page .reward-history-row {
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 14px 20px;
+  }
+
+  .familyhub-shell .tasks-page .reward-history-row time {
+    grid-column: 2 / -1;
+    text-align: left;
+  }
+}

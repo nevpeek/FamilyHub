@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { Trash2, X } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+import {
+  ExternalLink,
+  ShoppingCart,
+  Trash2,
+  X,
+} from "lucide-react";
 
 const API_BASE_URL = "http://localhost:3001";
 
@@ -8,17 +14,38 @@ function MealModal({
   meal,
   members,
   todayKey,
+  defaultMealDate,
+  defaultMealType,
+  defaultRecipe,
   onClose,
   onSaved,
 }) {
+  const reduceMotion = useReducedMotion();  
   const [title, setTitle] = useState("");
   const [memberIds, setMemberIds] = useState([]);
-  const [mealDate, setMealDate] = useState(todayKey);
-  const [mealType, setMealType] = useState("dinner");
-  const [description, setDescription] = useState("");
-  const [recipeUrl, setRecipeUrl] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+const [mealDate, setMealDate] = useState(todayKey);
+const [mealType, setMealType] = useState("dinner");
+const [mealTime, setMealTime] = useState("");
+const [reminderEnabled, setReminderEnabled] = useState(false);
+const [reminderMinutes, setReminderMinutes] = useState(30);
+const [description, setDescription] = useState("");
+const [recipeUrl, setRecipeUrl] = useState("");
+const [ingredients, setIngredients] = useState("");
+const [saving, setSaving] = useState(false);
+const [addingToShopping, setAddingToShopping] =
+  useState(false);
+
+const [recipes, setRecipes] = useState([]);
+const [selectedRecipeId, setSelectedRecipeId] =
+  useState("");
+
+const [error, setError] = useState("");
+
+const [deleteConfirmOpen, setDeleteConfirmOpen] =
+  useState(false);
+
+const isPlanningRecipe =
+  !meal && Boolean(defaultRecipe);
 
   useEffect(() => {
     if (!isOpen) {
@@ -38,30 +65,90 @@ function MealModal({
         meal.meal_date || todayKey
       );
 
-      setMealType(
-        meal.meal_type || "dinner"
-      );
+setMealType(
+  meal.meal_type || "dinner"
+);
 
-      setDescription(
-        meal.description || ""
-      );
+setMealTime(
+  meal.meal_time || ""
+);
 
+setReminderEnabled(
+  Boolean(meal.reminder_enabled)
+);
+
+setReminderMinutes(
+  meal.reminder_minutes ?? 30
+);
+
+setDescription(
+  meal.description || ""
+);
       setRecipeUrl(
-        meal.recipe_url || ""
-      );
-    } else {
-      setTitle("");
+  meal.recipe_url || ""
+);
 
+setIngredients(
+  meal.ingredients || ""
+);
+        } else {
       setMemberIds(
         members.map(
           (member) => member.id
         )
       );
 
-      setMealDate(todayKey);
-      setMealType("dinner");
-      setDescription("");
-      setRecipeUrl("");
+      setMealDate(
+        defaultMealDate || todayKey
+      );
+
+setMealType(
+  defaultMealType || "dinner"
+);
+
+setMealTime("");
+
+setReminderEnabled(false);
+setReminderMinutes(30);
+
+if (defaultRecipe) {
+        setTitle(
+          defaultRecipe.title || ""
+        );
+
+        setDescription(
+          defaultRecipe.description || ""
+        );
+
+        setIngredients(
+          defaultRecipe.ingredients || ""
+        );
+
+        setRecipeUrl(
+          defaultRecipe.recipe_url || ""
+        );
+
+        setSelectedRecipeId(
+          String(defaultRecipe.id)
+        );
+      } else {
+        setTitle("");
+        setDescription("");
+        setRecipeUrl("");
+        setIngredients("");
+        setSelectedRecipeId("");
+      }
+    }
+       if (meal?.recipe_id) {
+      setSelectedRecipeId(
+        String(meal.recipe_id)
+      );
+    } else if (defaultRecipe?.id) {
+      setSelectedRecipeId(
+        String(defaultRecipe.id)
+      );
+    } else {
+      setSelectedRecipeId("");
     }
 
     setSaving(false);
@@ -71,11 +158,55 @@ function MealModal({
     meal,
     members,
     todayKey,
+    defaultMealDate,
+    defaultMealType,
+    defaultRecipe,
   ]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    async function loadRecipes() {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/recipes`
+        );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ||
+              "Unable to load recipes"
+          );
+        }
+
+        setRecipes(
+          data.recipes || []
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadRecipes();
+  }, [isOpen]);
 
   if (!isOpen) {
     return null;
   }
+
+    const linkedRecipe =
+    meal?.recipe_id
+      ? recipes.find(
+          (recipe) =>
+            String(recipe.id) ===
+            String(meal.recipe_id)
+        )
+      : null;
 
   function toggleMember(memberId) {
     setMemberIds((current) =>
@@ -84,6 +215,46 @@ function MealModal({
             (id) => id !== memberId
           )
         : [...current, memberId]
+    );
+  }
+
+    function handleRecipeChange(event) {
+    const recipeId =
+      event.target.value;
+
+    setSelectedRecipeId(
+      recipeId
+    );
+
+    if (!recipeId) {
+      return;
+    }
+
+    const recipe =
+      recipes.find(
+        (item) =>
+          String(item.id) ===
+          String(recipeId)
+      );
+
+    if (!recipe) {
+      return;
+    }
+
+    setTitle(
+      recipe.title || ""
+    );
+
+    setDescription(
+      recipe.description || ""
+    );
+
+    setIngredients(
+      recipe.ingredients || ""
+    );
+
+    setRecipeUrl(
+      recipe.recipe_url || ""
     );
   }
 
@@ -97,14 +268,23 @@ function MealModal({
       return;
     }
 
-    if (!mealDate) {
-      setError(
-        "Please select a date."
-      );
-      return;
-    }
+if (!mealDate) {
+  setError(
+    "Please select a date."
+  );
 
-    if (memberIds.length === 0) {
+  return;
+}
+
+if (reminderEnabled && !mealTime) {
+  setError(
+    "Please select a meal time for the reminder."
+  );
+
+  return;
+}
+
+if (memberIds.length === 0) {
       setError(
         "Please select at least one family member."
       );
@@ -129,18 +309,33 @@ function MealModal({
               "application/json",
           },
 
-          body: JSON.stringify({
-            title: title.trim(),
-            mealDate,
-            mealType,
+body: JSON.stringify({
+title: title.trim(),
+mealDate,
+mealType,
+mealTime:
+  mealTime || null,
+reminderEnabled,
+reminderMinutes:
+  reminderEnabled
+    ? reminderMinutes
+    : null,
 
-            description:
-              description.trim() || null,
+description:
+  description.trim() || null,
 
             recipeUrl:
-              recipeUrl.trim() || null,
+  recipeUrl.trim() || null,
 
-            memberIds,
+ingredients:
+  ingredients.trim() || null,
+
+recipeId:
+  selectedRecipeId
+    ? Number(selectedRecipeId)
+    : null,
+
+memberIds,
           }),
         }
       );
@@ -169,19 +364,90 @@ function MealModal({
     }
   }
 
+  async function handleAddIngredientsToShopping() {
+  const ingredientItems = ingredients
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  if (ingredientItems.length === 0) {
+    setError(
+      "Add at least one ingredient first."
+    );
+    return;
+  }
+
+  if (memberIds.length === 0) {
+    setError(
+      "Select at least one family member."
+    );
+    return;
+  }
+
+  setAddingToShopping(true);
+  setError("");
+
+  try {
+    for (const ingredient of ingredientItems) {
+      const response = await fetch(
+        `${API_BASE_URL}/api/shopping`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            name: ingredient,
+            quantity: null,
+            category: "other",
+            notes:
+              title.trim()
+                ? `From meal: ${title.trim()}`
+                : "Added from Meal Planner",
+            memberIds,
+          }),
+        }
+      );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            `Unable to add "${ingredient}"`
+        );
+      }
+    }
+
+    window.alert(
+      `${ingredientItems.length} ingredient${
+        ingredientItems.length === 1
+          ? ""
+          : "s"
+      } added to the Shopping list.`
+    );
+  } catch (err) {
+    console.error(err);
+
+    setError(
+      err.message ||
+        "Unable to add ingredients to the Shopping list"
+    );
+  } finally {
+    setAddingToShopping(false);
+  }
+}
+
   async function handleDelete() {
     if (!meal) {
       return;
     }
 
-    const confirmed =
-      window.confirm(
-        `Delete "${meal.title}"?`
-      );
 
-    if (!confirmed) {
-      return;
-    }
 
     setSaving(true);
     setError("");
@@ -219,21 +485,31 @@ function MealModal({
   }
 
   return (
-    <div
+    <motion.div
       className="event-modal-backdrop"
+      initial={reduceMotion ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: reduceMotion ? 0 : 0.18 }}
       onMouseDown={(event) => {
-        if (
-          event.target ===
-          event.currentTarget
-        ) {
+        if (event.target === event.currentTarget) {
           onClose();
         }
       }}
     >
-      <div
+      <motion.div
         className="event-modal"
         role="dialog"
         aria-modal="true"
+        initial={
+          reduceMotion
+            ? false
+            : { opacity: 0, y: 14, scale: 0.98 }
+        }
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{
+          duration: reduceMotion ? 0 : 0.24,
+          ease: [0.22, 1, 0.36, 1],
+        }}
       >
         <div className="event-modal-header">
           <div>
@@ -241,11 +517,13 @@ function MealModal({
               Meals
             </p>
 
-            <h2>
-              {meal
-                ? "Edit Meal"
-                : "Add Meal"}
-            </h2>
+<h2>
+  {meal
+    ? "Edit Meal"
+    : isPlanningRecipe
+      ? "Plan This Meal"
+      : "Add Meal"}
+</h2>
           </div>
 
           <button
@@ -259,25 +537,102 @@ function MealModal({
           </button>
         </div>
 
-        <form
+                <form
           className="event-form"
           onSubmit={handleSubmit}
         >
-          <label className="event-form-field">
-            <span>Meal name</span>
 
-            <input
-              type="text"
-              value={title}
-              onChange={(event) =>
-                setTitle(
-                  event.target.value
-                )
-              }
-              placeholder="e.g. Spaghetti Bolognese"
-              autoFocus
-            />
-          </label>
+          {isPlanningRecipe && (
+  <div className="meal-plan-recipe-summary event-form-full">
+    <span>Selected meal</span>
+    <strong>{title}</strong>
+  </div>
+)}
+
+                    {meal?.recipe_id && (
+            <div className="meal-linked-recipe event-form-full">
+              <div className="meal-linked-recipe-info">
+                <span className="meal-linked-recipe-label">
+                  Linked Recipe
+                </span>
+
+                <strong>
+                  {linkedRecipe?.title ||
+                    meal.title}
+                </strong>
+              </div>
+
+              {(linkedRecipe?.recipe_url ||
+                meal.recipe_url) && (
+                <a
+                  className="meal-linked-recipe-button"
+                  href={
+                    linkedRecipe?.recipe_url ||
+                    meal.recipe_url
+                  }
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <ExternalLink size={16} />
+                  View Recipe
+                </a>
+              )}
+            </div>
+          )}
+
+
+{!meal && !isPlanningRecipe && (
+            <div className="event-form-field event-form-full">
+              <span>Saved Recipe</span>
+
+              <select
+                value={selectedRecipeId}
+                onChange={
+                  handleRecipeChange
+                }
+              >
+                <option value="">
+                  Start from scratch
+                </option>
+
+                {recipes.map(
+                  (recipe) => (
+                    <option
+                      key={recipe.id}
+                      value={recipe.id}
+                    >
+                      {recipe.title}
+                    </option>
+                  )
+                )}
+              </select>
+
+              {recipes.length > 0 && (
+                <small className="meal-recipe-hint">
+                  Choose a saved recipe to fill in
+                  the meal details automatically.
+                </small>
+              )}
+            </div>
+          )}
+
+{!isPlanningRecipe && (
+  <label className="event-form-field">
+    <span>Meal name</span>
+
+    <input
+      type="text"
+      value={title}
+      onChange={(event) =>
+        setTitle(
+          event.target.value
+        )
+      }
+      placeholder="e.g. Spaghetti Bolognese"
+      autoFocus
+    />
+  </label>
+)}
 
           <div className="event-form-field">
             <span>Family members</span>
@@ -319,33 +674,47 @@ function MealModal({
             </div>
           </div>
 
-          <div className="event-form-grid">
-            <label className="event-form-field">
-              <span>Date</span>
+<div className="event-form-grid">
+  <label className="event-form-field">
+    <span>Date</span>
 
-              <input
-                type="date"
-                value={mealDate}
-                onChange={(event) =>
-                  setMealDate(
-                    event.target.value
-                  )
-                }
-                required
-              />
-            </label>
+    <input
+      type="date"
+      value={mealDate}
+      onChange={(event) =>
+        setMealDate(
+          event.target.value
+        )
+      }
+      required
+    />
+  </label>
 
-            <label className="event-form-field">
-              <span>Meal type</span>
+  <label className="event-form-field">
+    <span>Time</span>
 
-              <select
-                value={mealType}
-                onChange={(event) =>
-                  setMealType(
-                    event.target.value
-                  )
-                }
-              >
+    <input
+      type="time"
+      value={mealTime}
+      onChange={(event) =>
+        setMealTime(
+          event.target.value
+        )
+      }
+    />
+  </label>
+
+  <label className="event-form-field">
+    <span>Meal type</span>
+
+    <select
+      value={mealType}
+      onChange={(event) =>
+        setMealType(
+          event.target.value
+        )
+      }
+    >
                 <option value="breakfast">
                   Breakfast
                 </option>
@@ -362,38 +731,138 @@ function MealModal({
                   Snack
                 </option>
               </select>
-            </label>
-          </div>
+  </label>
+</div>
 
-          <label className="event-form-field">
-            <span>Notes</span>
+{mealTime && (
+  <div className="event-form-grid">
+    <label className="event-all-day">
+      <input
+        type="checkbox"
+        checked={reminderEnabled}
+        onChange={(event) =>
+          setReminderEnabled(
+            event.target.checked
+          )
+        }
+      />
 
-            <textarea
-              value={description}
-              onChange={(event) =>
-                setDescription(
-                  event.target.value
-                )
-              }
-              placeholder="Optional notes"
-              rows={4}
-            />
-          </label>
+      <span>Remind me</span>
+    </label>
 
-          <label className="event-form-field">
-            <span>Recipe link</span>
+    {reminderEnabled && (
+      <label className="event-form-field">
+        <span>Reminder</span>
 
-            <input
-              type="url"
-              value={recipeUrl}
-              onChange={(event) =>
-                setRecipeUrl(
-                  event.target.value
-                )
-              }
-              placeholder="https://..."
-            />
-          </label>
+        <select
+          value={reminderMinutes}
+          onChange={(event) =>
+            setReminderMinutes(
+              Number(event.target.value)
+            )
+          }
+        >
+          <option value={0}>
+            At meal time
+          </option>
+
+          <option value={5}>
+            5 minutes before
+          </option>
+
+          <option value={15}>
+            15 minutes before
+          </option>
+
+          <option value={30}>
+            30 minutes before
+          </option>
+
+          <option value={60}>
+            1 hour before
+          </option>
+
+          <option value={120}>
+            2 hours before
+          </option>
+        </select>
+      </label>
+    )}
+  </div>
+)}
+
+{!isPlanningRecipe && (
+  <label className="event-form-field">
+    <span>Notes</span>
+
+    <textarea
+      value={description}
+      onChange={(event) =>
+        setDescription(
+          event.target.value
+        )
+      }
+      placeholder="Optional notes"
+      rows={4}
+    />
+  </label>
+)}
+
+{!isPlanningRecipe && (
+<div className="event-form-field event-form-full">
+  <span>Ingredients</span>
+
+  <textarea
+    value={ingredients}
+    onChange={(event) =>
+      setIngredients(
+        event.target.value
+      )
+    }
+    placeholder={
+      "One item per line\n500g mince\n1 onion\n2 carrots\nPasta sauce"
+    }
+    rows={6}
+  />
+
+  {ingredients.trim() && (
+    <button
+      type="button"
+      className="meal-add-shopping-button"
+      onClick={
+        handleAddIngredientsToShopping
+      }
+      disabled={
+        saving ||
+        addingToShopping
+      }
+    >
+      <ShoppingCart size={17} />
+
+      {addingToShopping
+        ? "Adding..."
+        : "Add ingredients to Shopping List"}
+    </button>
+  )}
+</div>
+)}
+
+{!isPlanningRecipe && (
+  <label className="event-form-field">
+    <span>Recipe link</span>
+
+    <input
+      type="url"
+      value={recipeUrl}
+      onChange={(event) =>
+        setRecipeUrl(
+          event.target.value
+        )
+      }
+      placeholder="https://..."
+    />
+  </label>
+)}
 
           {error && (
             <div className="event-form-error">
@@ -407,7 +876,9 @@ function MealModal({
                 <button
                   type="button"
                   className="event-delete-button"
-                  onClick={handleDelete}
+                  onClick={() =>
+  setDeleteConfirmOpen(true)
+}
                   disabled={saving}
                 >
                   <Trash2 size={18} />
@@ -431,17 +902,80 @@ function MealModal({
                 className="event-save-button"
                 disabled={saving}
               >
-                {saving
-                  ? "Saving..."
-                  : meal
-                    ? "Save Changes"
-                    : "Add Meal"}
+{saving
+  ? "Saving..."
+  : meal
+    ? "Save Changes"
+    : isPlanningRecipe
+      ? "Plan Meal"
+      : "Add Meal"}
               </button>
             </div>
           </div>
         </form>
-      </div>
-    </div>
+      </motion.div>
+
+      {deleteConfirmOpen && (
+        <div
+          className="modal-backdrop reward-delete-backdrop"
+          onMouseDown={(event) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              setDeleteConfirmOpen(false);
+            }
+          }}
+        >
+          <div className="reward-delete-confirm-modal">
+            <div className="reward-delete-confirm-icon">
+              <Trash2 size={24} />
+            </div>
+
+            <div className="reward-delete-confirm-copy">
+              <span>Delete Meal</span>
+
+              <h2>{meal?.title}</h2>
+
+              <p>
+                Are you sure you want to delete this meal?
+              </p>
+
+              <small>
+                This will remove it from the meal planner.
+              </small>
+            </div>
+
+            <div className="reward-delete-confirm-actions">
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() =>
+                  setDeleteConfirmOpen(false)
+                }
+                disabled={saving}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="reward-delete-confirm-button"
+                disabled={saving}
+                onClick={async () => {
+                  await handleDelete();
+                  setDeleteConfirmOpen(false);
+                }}
+              >
+                {saving
+                  ? "Deleting..."
+                  : "Delete Meal"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </motion.div>
   );
 }
 

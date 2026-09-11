@@ -1,0 +1,97 @@
+/* Settings uses the same neutral surfaces as the other FamilyHub pages. */
+.familyhub-shell .settings-page {
+  --settings-surface: #fff;
+  --settings-inset: #f5f5f7;
+  --settings-text: #1d1d1f;
+  --settings-muted: #636366;
+  --settings-border: rgba(60, 60, 67, .14);
+  --settings-danger: #b42318;
+  color: var(--settings-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  gap: 24px;
+}
+html[data-theme="dark"] .familyhub-shell .settings-page {
+  --settings-surface: #1c1c1e;
+  --settings-inset: #2c2c2e;
+  --settings-text: #f5f5f7;
+  --settings-muted: #aeaeb2;
+  --settings-border: rgba(255, 255, 255, .14);
+  --settings-danger: #ff8a80;
+  color-scheme: dark;
+}
+html .familyhub-shell:has(.settings-page) { background: #f5f5f7; }
+html[data-theme="dark"] .familyhub-shell:has(.settings-page) { background: #141416; }
+html .familyhub-shell .settings-page :is(h2, h3, strong) { color: var(--settings-text); font-weight: 600; }
+html .familyhub-shell .settings-page h2 { letter-spacing: -.035em; font-family: inherit; }
+html .familyhub-shell .settings-page :is(p, .section-kicker, .settings-appearance-copy span, .settings-member-details span, .settings-theme-button small, .settings-calendar-source-copy > span, .settings-calendar-source-copy small, .settings-weather-field > span, .settings-weather-coordinates > span, .settings-weather-warning-toggle > div > span) {
+  color: var(--settings-muted);
+  opacity: 1;
+  line-height: 1.5;
+}
+html .familyhub-shell .settings-page .settings-section {
+  background: var(--settings-surface);
+  border-color: var(--settings-border);
+  border-radius: 20px;
+  box-shadow: none;
+}
+.familyhub-shell .settings-page .settings-section-heading { padding: 22px; border-color: var(--settings-border); }
+.familyhub-shell .settings-page .settings-section-heading > div:last-child { flex: 1; min-width: 0; }
+.familyhub-shell .settings-page :is(.settings-section-heading-copy, .settings-family-heading-row, .settings-calendar-heading-actions) { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.familyhub-shell .settings-page .settings-family-heading-row { justify-content: space-between; }
+html .familyhub-shell .settings-page .settings-appearance-block { margin: 0; padding: 22px; background: transparent; border: 0; border-radius: 0; }
+html .familyhub-shell .settings-page :is(.settings-calendar-source-row, .settings-member-card, .settings-weather-warning-toggle) {
+  background: var(--settings-inset);
+  border: 1px solid var(--settings-border);
+  color: var(--settings-text);
+  box-shadow: none;
+}
+.familyhub-shell .settings-page .settings-calendar-source-row { flex-wrap: wrap; gap: 20px; }
+.familyhub-shell .settings-page .settings-calendar-source-copy { flex: 1 1 260px; gap: 5px; }
+.familyhub-shell .settings-page .settings-calendar-source-copy small { white-space: normal; overflow-wrap: anywhere; font-size: .8rem; }
+.familyhub-shell .settings-page .settings-calendar-source-status { flex-wrap: wrap; gap: 10px; }
+.familyhub-shell .settings-page .settings-calendar-source-toggle { min-height: 44px; display: inline-flex; align-items: center; }
+.familyhub-shell .settings-page .settings-member-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+html .familyhub-shell .settings-page button { font-family: inherit; font-weight: 600; box-shadow: none; }
+html .familyhub-shell .settings-page :is(.settings-calendar-add-button, .settings-add-member-button, .settings-weather-find-button, .settings-calendar-source-edit-button, .settings-calendar-source-sync-button, .settings-confirm-cancel-button, .settings-colour-button, .settings-theme-button) {
+  min-height: 44px;
+  border: 1px solid var(--settings-border);
+  border-radius: 12px;
+  background: var(--settings-inset);
+  color: var(--settings-text);
+  white-space: normal;
+}
+html .familyhub-shell .settings-page :is(.settings-calendar-save-button, .settings-weather-save-button) { min-height: 44px; border-radius: 12px; background: var(--familyhub-accent); color: white; }
+html .familyhub-shell .settings-page :is(.settings-calendar-source-delete-button, .settings-confirm-delete-button) { min-height: 44px; border-radius: 12px; background: transparent; color: var(--settings-danger); border: 1px solid var(--settings-border); }
+html .familyhub-shell .settings-page :is(.settings-calendar-source-error, .settings-calendar-form-error) { color: var(--settings-danger); }
+.familyhub-shell .settings-page .settings-calendar-source-form { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 22px; border-color: var(--settings-border); }
+.familyhub-shell .settings-page .settings-calendar-form-field { min-width: 0; }
+html .familyhub-shell .settings-page :is(input:not([type="checkbox"]), select) { min-height: 44px; min-width: 0; background: var(--settings-inset); color: var(--settings-text); border: 1px solid var(--settings-border); border-radius: 12px; font-family: inherit; box-shadow: none; }
+html .familyhub-shell .settings-page input::placeholder { color: var(--settings-muted); }
+.familyhub-shell .settings-page :is(.settings-weather-location-row, .settings-weather-actions) { flex-wrap: wrap; }
+.familyhub-shell .settings-page .settings-theme-divider { background: var(--settings-border); }
+html .familyhub-shell .settings-page .settings-theme-icon { background: var(--settings-surface); color: var(--settings-text); }
+html .familyhub-shell .settings-page :is(.settings-colour-button, .settings-theme-button).selected {
+  border-color: var(--familyhub-accent);
+  background: color-mix(in srgb, var(--familyhub-accent) 14%, var(--settings-surface));
+}
+.familyhub-shell .settings-page .settings-theme-button { min-height: 76px; }
+.familyhub-shell .settings-page .settings-toggle-input:checked + .settings-toggle-switch { background: var(--familyhub-accent); }
+.familyhub-shell .settings-page .settings-weather-warning-toggle :is(.settings-toggle-switch, .settings-toggle-knob) { opacity: 1; }
+.familyhub-shell .settings-page :is(button, input, select):focus-visible { outline: 3px solid var(--familyhub-accent); outline-offset: 3px; }
+.familyhub-shell .settings-page .settings-toggle-input:focus-visible + .settings-toggle-switch { outline-color: var(--familyhub-accent); }
+html .familyhub-shell .settings-page .settings-confirm-modal { background: var(--settings-surface); color: var(--settings-text); border: 1px solid var(--settings-border); border-radius: 24px; }
+html .familyhub-shell .settings-page button:disabled { opacity: .5; cursor: not-allowed; }
+@media (hover: hover) {
+  html .familyhub-shell .settings-page .settings-member-card:hover { background: var(--settings-surface); border-color: var(--familyhub-accent); transform: none; }
+}
+@media (max-width: 700px) {
+  .familyhub-shell .settings-page .settings-calendar-source-form { grid-template-columns: 1fr; }
+  .familyhub-shell .settings-page .settings-calendar-source-status { width: 100%; }
+  .familyhub-shell .settings-page .settings-calendar-heading-actions { width: 100%; }
+  .familyhub-shell .settings-page .settings-calendar-heading-actions button { flex: 1 1 160px; }
+  .familyhub-shell .settings-page .settings-section-heading { align-items: flex-start; padding: 16px; }
+  html .familyhub-shell .settings-page .settings-appearance-block { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .familyhub-shell .settings-page :is(button, .settings-toggle-switch, .settings-toggle-knob) { transition: none; }
+}

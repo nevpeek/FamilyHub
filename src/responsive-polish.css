@@ -1,0 +1,87 @@
+/* Keep the shared header and Calendar controls readable on narrow screens. */
+@media (max-width: 700px) {
+  html { scroll-padding-bottom: 160px; }
+  .familyhub-shell:not(.wall-mode) .familyhub-main { padding: 20px 14px calc(156px + env(safe-area-inset-bottom)); }
+  .familyhub-shell:not(.wall-mode) .bottom-navigation {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    width: calc(100% - 16px);
+    max-width: 520px;
+    left: 50%;
+    right: auto;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    padding: 6px;
+    border-radius: 20px;
+  }
+  .familyhub-shell:not(.wall-mode) .bottom-navigation .nav-button {
+    width: 100%; min-width: 0; min-height: 52px; padding: 5px 2px;
+    display: flex; flex-direction: column; justify-content: center; gap: 3px;
+    border-radius: 14px;
+  }
+  .familyhub-shell:not(.wall-mode) .bottom-navigation .nav-label { display: block; font-size: 12px; line-height: 1.2; }
+  .familyhub-shell:not(.wall-mode) .bottom-navigation .nav-button svg { width: 21px; height: 21px; }
+  .familyhub-shell :is(.page-title-row, .calendar-page-heading) { gap: 16px; margin-bottom: 0; }
+  .familyhub-shell :is(.page-title-row, .calendar-page-heading) h2 { font-size: clamp(1.6rem, 7vw, 2rem); line-height: 1.15; overflow-wrap: anywhere; }
+  .familyhub-shell :is(.page-description, .calendar-page-heading p) { font-size: 14px; line-height: 1.5; }
+  .familyhub-shell .family-selector {
+    display: flex; flex-wrap: nowrap; overflow-x: auto; max-width: 100%;
+    padding: 4px 2px 10px; gap: 8px; scroll-padding-inline: 2px;
+  }
+  .familyhub-shell .family-selector .family-selector-button { flex: 0 0 auto; min-height: 46px; padding: 5px 12px 5px 6px; font-size: 14px; }
+  .familyhub-shell .family-selector .family-selector-avatar { width: 32px; height: 32px; flex-basis: 32px; }
+  .familyhub-shell .apple-home .home-quick-actions { margin: 0; gap: 10px; }
+  .familyhub-shell .apple-home .family-filter-section { margin: 0; padding: 0; }
+  .familyhub-shell .apple-home .home-quick-action { min-height: 64px; padding: 10px; border-radius: 16px; }
+  .familyhub-shell .apple-home .panel { padding: 18px; border-radius: 20px; }
+  .familyhub-shell .apple-home .home-family-lists { grid-template-columns: minmax(0, 1fr); }
+  .familyhub-shell .apple-home .home-next-up { align-items: center; }
+  .familyhub-shell .apple-home .home-next-up strong { overflow-wrap: anywhere; }
+  .familyhub-shell .meals-page .meal-week-scroll { overflow: visible; }
+  .familyhub-shell .meals-page .meal-week-grid { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+  .familyhub-shell .meals-page .meal-week-slot { min-height: 0; padding: 14px; }
+  .familyhub-shell .meals-page .meal-week-day { min-width: 0; }
+  .familyhub-shell .lists-page .lists-workspace { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .familyhub-shell .lists-page .lists-sidebar { padding: 14px; }
+  .familyhub-shell .lists-page .lists-sidebar-items { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 8px; }
+  .familyhub-shell .lists-page .lists-sidebar-item { flex: 0 0 150px; min-height: 56px; padding: 10px; }
+  .familyhub-shell .lists-page .lists-sidebar-heading { margin-bottom: 10px; }
+  .familyhub-shell .lists-page .lists-create-form { margin-bottom: 12px; }
+  .familyhub-shell .lists-page .page-title-icon { display: none; }
+  .familyhub-shell .lists-page :is(.lists-board, .family-list-content) { min-width: 0; }
+  .familyhub-shell :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) { font-size: 16px; }
+  .familyhub-shell :is(.event-modal-backdrop, .modal-backdrop, .pantry-item-backdrop) { padding: 8px; align-items: center; }
+  .familyhub-shell .event-modal,
+  html .familyhub-shell .pantry-page .pantry-item-modal {
+    width: 100%; min-width: 0; max-width: 100%;
+    max-height: calc(100dvh - 16px); overflow-y: auto; overscroll-behavior: contain;
+    margin: 0; border-radius: 20px;
+  }
+  .familyhub-shell .event-modal :is(.event-modal-header, .event-modal-heading) { padding: 16px; gap: 12px; }
+  .familyhub-shell .event-modal .event-form { padding: 16px; grid-template-columns: minmax(0, 1fr); }
+  .familyhub-shell .event-modal .event-form-grid { grid-template-columns: minmax(0, 1fr); }
+  .familyhub-shell .event-modal :is(.event-form-field, .event-field) { min-width: 0; }
+  .familyhub-shell .event-modal :is(input, select, textarea) { max-width: 100%; min-width: 0; }
+  .familyhub-shell .event-modal :is(.event-modal-actions, .event-modal-action-right) { flex-wrap: wrap; gap: 10px; width: 100%; }
+  .familyhub-shell .event-modal .event-modal-action-right > button { flex: 1; min-height: 44px; }
+  .familyhub-shell .event-modal :is(.event-modal-close, .modal-close-button, .event-member-option) { min-width: 44px; min-height: 44px; }
+  .familyhub-shell .event-modal :is(.event-member-picker, .task-star-picker) { flex-wrap: wrap; }
+}
+@media (max-width: 700px) {
+  .familyhub-shell .calendar-toolbar-status { width: 100%; flex-wrap: wrap; gap: 12px; }
+  .familyhub-shell .calendar-month-label { flex: 1 0 100%; }
+  .familyhub-shell .calendar-view-switch { width: 100%; }
+  .familyhub-shell .calendar-view-button { flex: 1; min-height: 44px; }
+}
+@media (max-width: 480px) {
+  .familyhub-shell:not(.wall-mode) .familyhub-header { gap: 10px; }
+  .familyhub-shell:not(.wall-mode) .brand-kicker { display: none; }
+  .familyhub-shell:not(.wall-mode) .brand-area { gap: 8px; }
+  .familyhub-shell:not(.wall-mode) .header-actions { gap: 8px; }
+  .familyhub-shell:not(.wall-mode) .header-date strong { white-space: nowrap; font-size: 1rem; }
+  .familyhub-shell:not(.wall-mode) .wall-mode-button { min-height: 44px; padding: 6px 10px; }
+}
+html[data-theme="dark"] .familyhub-shell .tasks-page .task-priority-normal {
+  color: color-mix(in srgb, var(--familyhub-accent, #007aff) 60%, white);
+}

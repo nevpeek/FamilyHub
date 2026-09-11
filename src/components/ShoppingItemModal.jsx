@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import {
   ShoppingCart,
   Trash2,
@@ -15,6 +16,7 @@ function ShoppingItemModal({
   onSaved,
   onDeleted,
 }) {
+  const reduceMotion = useReducedMotion();
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [category, setCategory] =
@@ -26,6 +28,9 @@ function ShoppingItemModal({
   const [deleting, setDeleting] =
     useState(false);
   const [error, setError] = useState("");
+
+  const [deleteConfirmOpen, setDeleteConfirmOpen] =
+  useState(false);
 
   const isEditing = Boolean(item?.id);
 
@@ -141,13 +146,6 @@ function ShoppingItemModal({
       return;
     }
 
-    const confirmed = window.confirm(
-      `Delete "${item.name}" from the shopping list?`
-    );
-
-    if (!confirmed) {
-      return;
-    }
 
     setDeleting(true);
     setError("");
@@ -184,22 +182,32 @@ function ShoppingItemModal({
   }
 
   return (
-    <div
+<motion.div
   className="event-modal-backdrop"
+  initial={reduceMotion ? false : { opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ duration: reduceMotion ? 0 : 0.18 }}
   onMouseDown={(event) => {
-    if (
-      event.target ===
-      event.currentTarget
-    ) {
+    if (event.target === event.currentTarget) {
       onClose?.();
     }
   }}
 >
-  <div
+  <motion.div
     className="event-modal"
     role="dialog"
     aria-modal="true"
     aria-labelledby="shopping-modal-title"
+    initial={
+      reduceMotion
+        ? false
+        : { opacity: 0, y: 14, scale: 0.98 }
+    }
+    animate={{ opacity: 1, y: 0, scale: 1 }}
+    transition={{
+      duration: reduceMotion ? 0 : 0.24,
+      ease: [0.22, 1, 0.36, 1],
+    }}
   >
         <div className="event-modal-header">
           <div>
@@ -343,7 +351,9 @@ function ShoppingItemModal({
         <button
           type="button"
           className="event-delete-button"
-          onClick={handleDelete}
+onClick={() =>
+  setDeleteConfirmOpen(true)
+}
           disabled={saving || deleting}
         >
           <Trash2 size={18} />
@@ -379,8 +389,69 @@ function ShoppingItemModal({
     </div>
   </div>
 </form>
-      </div>
-    </div>
+            </motion.div>
+
+      {deleteConfirmOpen && (
+        <div
+          className="modal-backdrop reward-delete-backdrop"
+          onMouseDown={(event) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              setDeleteConfirmOpen(false);
+            }
+          }}
+        >
+          <div className="reward-delete-confirm-modal">
+            <div className="reward-delete-confirm-icon">
+              <Trash2 size={24} />
+            </div>
+
+            <div className="reward-delete-confirm-copy">
+              <span>Delete Shopping Item</span>
+
+              <h2>{item?.name}</h2>
+
+              <p>
+                Are you sure you want to delete this item?
+              </p>
+
+              <small>
+                This will remove it from the Shopping list.
+              </small>
+            </div>
+
+            <div className="reward-delete-confirm-actions">
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() =>
+                  setDeleteConfirmOpen(false)
+                }
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="reward-delete-confirm-button"
+                disabled={deleting}
+                onClick={async () => {
+                  await handleDelete();
+                  setDeleteConfirmOpen(false);
+                }}
+              >
+                {deleting
+                  ? "Deleting..."
+                  : "Delete Item"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </motion.div>
   );
 }
 
