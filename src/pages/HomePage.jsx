@@ -5,110 +5,22 @@ import {
   CheckSquare,
   ChevronRight,
   Circle,
-  Cloud,
-  CloudDrizzle,
-  CloudFog,
-  CloudLightning,
-  CloudRain,
-  CloudSnow,
-  CloudSun,
   Plus,
   ShoppingCart,
   Snowflake,
   Soup,
   Star,
-  Sun,
 } from "lucide-react";
 
 import { API_BASE_URL } from "../config/api";
+import HomeHeader from "../components/HomeHeader";
+import {
+  formatLongDate,
+} from "../utils/homeUtils";
+import {
+  formatEventTime,
+} from "../utils/calendarUtils";
 
-function formatLongDate(date) {
-  return new Intl.DateTimeFormat("en-AU", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(date);
-}
-
-function formatEventTime(time) {
-  if (!time) {
-    return "";
-  }
-
-  const [hours, minutes] = time.split(":");
-
-  const date = new Date();
-
-  date.setHours(
-    Number(hours),
-    Number(minutes),
-    0,
-    0
-  );
-
-  return new Intl.DateTimeFormat("en-AU", {
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(date);
-}
-
-function getGreeting(date) {
-  const hour = date.getHours();
-
-  if (hour < 12) {
-    return "Good Morning";
-  }
-
-  if (hour < 17) {
-    return "Good Afternoon";
-  }
-
-  return "Good Evening";
-}
-
-function getWeatherDescription(code) {
-  if (code === 0) return "Clear";
-  if (code === 1) return "Mostly clear";
-  if (code === 2) return "Partly cloudy";
-  if (code === 3) return "Cloudy";
-
-  if ([45, 48].includes(code)) return "Foggy";
-
-  if ([51, 53, 55].includes(code)) {
-    return "Drizzle";
-  }
-
-  if ([56, 57].includes(code)) {
-    return "Freezing drizzle";
-  }
-
-  if ([61, 63, 65].includes(code)) {
-    return "Rain";
-  }
-
-  if ([66, 67].includes(code)) {
-    return "Freezing rain";
-  }
-
-  if ([71, 73, 75, 77].includes(code)) {
-    return "Snow";
-  }
-
-  if ([80, 81, 82].includes(code)) {
-    return "Showers";
-  }
-
-  if ([85, 86].includes(code)) {
-    return "Snow showers";
-  }
-
-  if ([95, 96, 99].includes(code)) {
-    return "Thunderstorm";
-  }
-
-  return "Weather";
-}
 
 function getWeatherIcon(code) {
   if (code === 0) {
@@ -529,62 +441,12 @@ const upcomingDays = Array.from(
     ease: [0.22, 1, 0.36, 1],
   }}
 >
-      <section className="page-title-row">
-        <div>
-<p className="section-kicker">
-  {homeDayHeading}
-</p>
-
-<h2>
-  {getGreeting(currentTime)}
-</h2>
-
-<p className="page-description home-today-date">
-  {new Intl.DateTimeFormat(
-    "en-AU",
-    {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-    }
-  ).format(currentTime)}
-</p>
-        </div>
-
-<div className="home-header-actions">
-  <div className="home-weather">
-    {weather?.current
-  ? getWeatherIcon(
-      weather.current.weatherCode
-    )
-  : <CloudSun size={28} />}
-
-    <div>
-      <strong>
-        {weatherLoading
-          ? "--°"
-          : weather?.current
-            ? `${Math.round(
-                weather.current.temperature
-              )}°`
-            : "--°"}
-      </strong>
-
-      <span>
-        {weather?.current
-          ? `${getWeatherDescription(
-              weather.current.weatherCode
-            )} · Feels ${Math.round(
-              weather.current.apparentTemperature
-            )}°`
-          : "Gawler"}
-      </span>
-    </div>
-  </div>
-
-
-</div>
-</section>
+<HomeHeader
+  currentTime={currentTime}
+  homeDayHeading={homeDayHeading}
+  weather={weather}
+  weatherLoading={weatherLoading}
+/>
 
 <section className="home-quick-actions">
   <button
