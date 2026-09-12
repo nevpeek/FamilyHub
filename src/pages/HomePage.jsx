@@ -1,27 +1,24 @@
 import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import {
+  motion,
+  useReducedMotion,
+} from "motion/react";
 import {
   CalendarDays,
   CheckSquare,
-  ChevronRight,
-  Circle,
-  Plus,
   ShoppingCart,
-  Snowflake,
   Soup,
-  Star,
 } from "lucide-react";
 
 import { API_BASE_URL } from "../config/api";
 import HomeHeader from "../components/HomeHeader";
 import HomeTodayPanel from "../components/HomeTodayPanel";
 import HomeChoresPanel from "../components/HomeChoresPanel";
-import {
-  formatLongDate,
-} from "../utils/homeUtils";
-import {
-  formatEventTime,
-} from "../utils/calendarUtils";
+import HomeCountdownPanel from "../components/HomeCountdownPanel";
+import HomeContextCards from "../components/HomeContextCards";
+import HomeDinnerPanel from "../components/HomeDinnerPanel";
+import HomeFamilyOutlookPanel from "../components/HomeFamilyOutlookPanel";
+import HomeListsPanel from "../components/HomeListsPanel";
 
 export default function HomePage({
   members,
@@ -633,464 +630,42 @@ const upcomingDays = Array.from(
 
 <aside className="dashboard-side-column">
 
-<article className="panel quick-panel home-countdown-panel">
-  <div className="panel-heading">
-    <div>
-      <p className="section-kicker">
-        Countdown
-      </p>
-
-      <h3>Important dates</h3>
-    </div>
-  </div>
-
-  {homeCountdownsLoading ? (
-    <div className="small-empty-state">
-      <CalendarDays size={24} />
-      <span>Loading countdowns...</span>
-    </div>
-  ) : homeCountdownsError ? (
-    <div className="small-empty-state">
-      <CalendarDays size={24} />
-      <span>{homeCountdownsError}</span>
-    </div>
-  ) : upcomingCountdowns.length === 0 ? (
-    <div className="small-empty-state">
-      <CalendarDays size={24} />
-      <span>No upcoming countdowns</span>
-    </div>
-  ) : (
-    <div className="home-countdown-list">
-      {upcomingCountdowns
-        .slice(0, 3)
-        .map((countdown) => {
-          const targetDate = new Date(
-            `${countdown.target_date}T12:00:00`
-          );
-
-          const today = new Date(currentTime);
-          today.setHours(0, 0, 0, 0);
-
-          const target = new Date(targetDate);
-          target.setHours(0, 0, 0, 0);
-
-          const daysRemaining = Math.ceil(
-            (target - today) /
-              (1000 * 60 * 60 * 24)
-          );
-
-          const turningAge =
-            countdown.category === "birthday" &&
-            countdown.family_member_birthday
-              ? targetDate.getFullYear() -
-                Number(
-                  countdown.family_member_birthday.slice(
-                    0,
-                    4
-                  )
-                )
-              : null;
-
-          return (
-<div
-  key={countdown.id}
-  className="home-countdown-card"
-  style={{
-    "--countdown-colour":
-      countdown.colour ||
-      "#7C3AED",
-  }}
->
-              <div className="home-countdown-copy">
-                <strong>
-                  {countdown.title}
-                </strong>
-
-                <span>
-                  {new Intl.DateTimeFormat(
-                    "en-AU",
-                    {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    }
-                  ).format(targetDate)}
-                </span>
-
-                {turningAge !== null && (
-                  <span className="home-countdown-age">
-                    Turning {turningAge}
-                  </span>
-                )}
-              </div>
-
-              <div className="home-countdown-days">
-                {daysRemaining === 0 ? (
-                  <strong>TODAY</strong>
-                ) : (
-                  <>
-                    <strong>
-                      {daysRemaining}
-                    </strong>
-
-                    <span>
-                      {daysRemaining === 1
-                        ? "day"
-                        : "days"}
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-          );
-        })}
-    </div>
-  )}
-</article>
-
-<button
-  type="button"
-  className="home-tonight-context"
- onClick={() =>
-  homeMeals.length > 0
-    ? onNavigate("meals")
-    : onAddMeal?.()
-}
->
-  <span>Tonight</span>
-
-<strong>
-  {homeMeals.length > 0
-    ? homeMeals[0].title
-    : "Plan dinner"}
-</strong>
-  <ChevronRight
-  className="home-tonight-arrow"
-  size={16}
+<HomeCountdownPanel
+  currentTime={currentTime}
+  upcomingCountdowns={upcomingCountdowns}
+  homeCountdownsLoading={homeCountdownsLoading}
+  homeCountdownsError={homeCountdownsError}
 />
-</button>
 
-{openShoppingItems.length > 0 && (
-  <button
-    type="button"
-    className="home-shopping-context"
-    onClick={() => onNavigate("shopping")}
-  >
-<span className="home-shopping-context-label">
-  <ShoppingCart size={14} />
-  Shopping
-</span>
+<HomeContextCards
+  homeMeals={homeMeals}
+  openShoppingItems={openShoppingItems}
+  onNavigate={onNavigate}
+  onAddMeal={onAddMeal}
+/>
 
-    <strong>
-      {openShoppingItems.length}{" "}
-      {openShoppingItems.length === 1
-        ? "item"
-        : "items"}{" "}
-      left
-    </strong>
+<HomeDinnerPanel
+  homeMeals={homeMeals}
+  homeMealsLoading={homeMealsLoading}
+  homeMealsError={homeMealsError}
+  onNavigate={onNavigate}
+  onAddMeal={onAddMeal}
+/>
 
-    <ChevronRight
-      className="home-shopping-context-arrow"
-      size={16}
-    />
-  </button>
-)}
+</aside>
 
-<article className="panel quick-panel home-dinner-panel">
-            <div className="panel-heading">
-              <div>
-                <p className="section-kicker">Dinner</p>
-                <h3>Tonight&apos;s meal</h3>
-              </div>
-              <button type="button" className="text-button" onClick={() => onNavigate("meals")}>
-                View meals
-                <ChevronRight size={18} />
-              </button>
-            </div>
+<HomeFamilyOutlookPanel
+  upcomingDays={upcomingDays}
+  onNavigate={onNavigate}
+/>
 
-            {homeMealsLoading ? (
-              <div className="small-empty-state"><Soup size={24} /><span>Loading dinner...</span></div>
-            ) : homeMealsError ? (
-              <div className="small-empty-state"><Soup size={24} /><span>{homeMealsError}</span></div>
-            ) : homeMeals.length === 0 ? (
-<div className="small-empty-state">
-  <Soup size={24} />
-  <span>Nothing planned yet</span>
+<HomeListsPanel
+  homeLists={homeLists}
+  homeListsLoading={homeListsLoading}
+  onNavigate={onNavigate}
+/>
 
-  <button
-    type="button"
-    className="home-dinner-plan-button"
-    onClick={onAddMeal}
-  >
-    <Plus size={15} />
-    Plan dinner
-  </button>
-</div>
-            ) : (
-              <div className="home-meal-list">
-                {homeMeals.map((meal) => (
-                  <div key={meal.id} className="home-meal-card">
-                    <div className="home-meal-icon"><Soup size={22} /></div>
-                    <div className="home-meal-content">
-                      <strong>{meal.title}</strong>
-                      <span className="home-meal-meta">Dinner{meal.description ? ` · ${meal.description}` : ""}</span>
-                      <div className="home-meal-members">
-                        {(meal.members || []).map((member) => (
-                          <span key={member.id} className="home-meal-member">
-                            <span className="home-meal-dot" style={{ backgroundColor: member.colour }} />
-                            {member.name}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </article>
-
-
-        </aside>
-
-<article className="panel upcoming-panel">
-  <div className="panel-heading">
-    <div>
-      <p className="section-kicker">
-        Family Outlook
-      </p>
-
-      <h3>Next 7 days</h3>
-    </div>
-  </div>
-
-  <div className="upcoming-placeholder">
-    {upcomingDays.map(
-      (
-        {
-          date,
-          dateKey,
-          events,
-          meals,
-          tasks,
-        },
-        index
-      ) => {
-        const dayLabel =
-          index === 0
-            ? "Tomorrow"
-            : new Intl.DateTimeFormat(
-                "en-AU",
-                {
-                  weekday: "long",
-                }
-              ).format(date);
-
-        const eventCount = events.length;
-        const mealCount = meals.length;
-        const taskCount = tasks.length;
-
-        const totalItems =
-          eventCount +
-          mealCount +
-          taskCount;
-
-        return (
-          <button
-            key={dateKey}
-            type="button"
-            className={`home-outlook-day ${
-              totalItems === 0
-                ? "empty"
-                : ""
-            }`}
-            onClick={() =>
-              onNavigate("calendar")
-            }
-          >
-            <div className="home-outlook-date">
-              <span>{dayLabel}</span>
-
-              <strong>
-                {date.getDate()}
-              </strong>
-
-              <small>
-                {new Intl.DateTimeFormat(
-                  "en-AU",
-                  {
-                    month: "short",
-                  }
-                ).format(date)}
-              </small>
-            </div>
-
-            <div className="home-outlook-content">
-              {totalItems === 0 ? (
-                <span className="home-outlook-empty">
-                  Nothing planned
-                </span>
-              ) : (
-                <>
-                  <div className="home-outlook-counts">
-                    {eventCount > 0 && (
-                      <span>
-                        <CalendarDays size={14} />
-                        {eventCount}
-                      </span>
-                    )}
-
-                    {taskCount > 0 && (
-                      <span>
-                        <CheckSquare size={14} />
-                        {taskCount}
-                      </span>
-                    )}
-
-                    {mealCount > 0 && (
-                      <span>
-                        <Soup size={14} />
-                        {mealCount}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="home-outlook-preview">
-                    {events[0] && (
-                      <span>
-                        <i
-                          style={{
-                            backgroundColor:
-                              events[0]
-                                .members?.[0]
-                                ?.colour ||
-                              "#64748b",
-                          }}
-                        />
-
-                        {events[0].title}
-                      </span>
-                    )}
-
-                    {meals[0] && (
-                      <span>
-                        <Soup size={13} />
-                        {meals[0].title}
-                      </span>
-                    )}
-
-                    {!events[0] &&
-                      !meals[0] &&
-                      taskCount > 0 && (
-                        <span>
-                          <CheckSquare size={13} />
-                          {taskCount}{" "}
-                          {taskCount === 1
-                            ? "task"
-                            : "tasks"}{" "}
-                          due
-                        </span>
-                      )}
-                  </div>
-                </>
-              )}
-            </div>
-
-            <ChevronRight
-              className="home-outlook-arrow"
-              size={16}
-            />
-          </button>
-        );
-      }
-    )}
-  </div>
-</article>
-
-<article className="panel quick-panel home-lists-panel">
-  <div className="panel-heading">
-    <div>
-      <p className="section-kicker">
-        Family Lists
-      </p>
-
-      <h3>Household lists</h3>
-    </div>
-
-    <button
-      type="button"
-      className="text-button"
-      onClick={() =>
-        onNavigate("lists")
-      }
-    >
-      View lists
-      <ChevronRight size={18} />
-    </button>
-  </div>
-
-  {homeListsLoading ? (
-    <div className="small-empty-state">
-      <CheckSquare size={24} />
-      <span>Loading lists...</span>
-    </div>
-  ) : homeLists.length === 0 ? (
-    <div className="small-empty-state">
-      <CheckSquare size={24} />
-      <span>No family lists yet</span>
-    </div>
-  ) : (
-    <div className="home-family-lists">
-      {homeLists
-        .slice()
-        .sort(
-          (a, b) =>
-            Number(b.open_count || 0) -
-            Number(a.open_count || 0)
-        )
-        .slice(0, 4)
-        .map((list) => (
-          <button
-            key={list.id}
-            type="button"
-            className="home-family-list-card"
-            style={{
-              "--list-colour":
-                list.colour ||
-                "#22c55e",
-            }}
-            onClick={() =>
-              onNavigate("lists")
-            }
-          >
-            <span className="home-family-list-icon">
-              {list.icon || "📋"}
-            </span>
-
-            <span className="home-family-list-copy">
-              <strong>
-                {list.name}
-              </strong>
-
-              <small>
-                {Number(
-                  list.open_count || 0
-                )}{" "}
-                {Number(
-                  list.open_count || 0
-                ) === 1
-                  ? "item open"
-                  : "items open"}
-              </small>
-            </span>
-
-            <ChevronRight size={16} />
-          </button>
-        ))}
-    </div>
-  )}
-</article>    
-
-      </section>
-    </motion.div>
+</section>
+</motion.div>
   );
 }
