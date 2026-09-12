@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config/api";
 import {
   CalendarPlus,
   Clock3,
@@ -9,9 +10,6 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-
-const API_BASE_URL =
-  "http://localhost:3001";
 
 function RecipeDetailsModal({
   open,

@@ -1,8 +1,7 @@
+import { API_BASE_URL } from "../config/api";
 import { useEffect, useMemo, useState } from "react";
 import { Trash2, X } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
-
-const API_BASE_URL = "http://localhost:3001";
 
 function formatDateKey(value) {
   if (!value) {

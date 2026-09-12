@@ -1,10 +1,9 @@
+import { API_BASE_URL } from "../config/api";
 import { useEffect, useState } from "react";
 import {
   Trash2,
   X,
 } from "lucide-react";
-
-const API_BASE_URL = "http://localhost:3001";
 
 const colourOptions = [
   "#3B82F6",

@@ -1,7 +1,6 @@
+import { API_BASE_URL } from "../config/api";
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-
-const API_BASE_URL = "http://localhost:3001";
 
 function EventDetailsModal({
   event,
@@ -156,7 +155,7 @@ function EventDetailsModal({
             >
               {member.photo_url ? (
                 <img
-                  src={`http://localhost:3001${member.photo_url}`}
+                  src={`${API_BASE_URL}${member.photo_url}`}
                   alt={member.name}
                 />
               ) : (

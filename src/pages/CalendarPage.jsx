@@ -19,8 +19,7 @@ import {
 } from "lucide-react";
 
 import EventDetailsModal from "../components/EventDetailsModal";
-
-const API_BASE_URL = "http://localhost:3001";
+import { API_BASE_URL } from "../config/api";
 
 const WEEK_START_HOUR = 6;
 const WEEK_END_HOUR = 23;
@@ -1060,7 +1059,7 @@ function goToToday() {
       >
         {member.photo_url ? (
           <img
-            src={`http://localhost:3001${member.photo_url}`}
+           src={`${API_BASE_URL}${member.photo_url}`}
             alt={member.name}
           />
         ) : (

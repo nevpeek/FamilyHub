@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config/api";
 import { useEffect, useMemo, useState } from "react";
 
 import {
@@ -10,8 +11,6 @@ import {
 } from "lucide-react";
 
 import FoodPicture from "../components/FoodPicture";
-
-const API_BASE_URL = "http://localhost:3001";
 
 const SHOPPING_CATEGORIES = [
   {

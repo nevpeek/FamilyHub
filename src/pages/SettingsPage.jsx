@@ -7,7 +7,7 @@ import {
   Users,
 } from "lucide-react";
 
-const API_BASE_URL = "http://localhost:3001";
+import { API_BASE_URL } from "../config/api";
 
 function SettingsPage({
   members,
@@ -701,11 +701,38 @@ async function addGoogleCalendar(calendar) {
   }
 }
 
-function connectGoogleCalendar() {
-  setGoogleCalendarError("");
+async function connectGoogleCalendar() {
+  try {
+    setGoogleCalendarError("");
 
-  window.location.href =
-    `${API_BASE_URL}/api/calendar-sources/google/connect`;
+    const response = await fetch(
+      `${API_BASE_URL}/api/calendar-sources/google/connect`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          "Unable to start Google Calendar connection"
+      );
+    }
+
+    if (!data.authUrl) {
+      throw new Error(
+        "Google Calendar authorization URL was not returned"
+      );
+    }
+
+    window.location.href = data.authUrl;
+  } catch (error) {
+    console.error(error);
+
+    setGoogleCalendarError(
+      error.message ||
+        "Unable to connect Google Calendar"
+    );
+  }
 }
 
 async function addCalendarSource() {
@@ -1262,7 +1289,7 @@ syncIntervalMinutes:
 >
   {member.photo_url ? (
     <img
-      src={`http://localhost:3001${member.photo_url}`}
+      src={`${API_BASE_URL}${member.photo_url}`}
       alt={member.name}
       className="family-member-avatar-photo"
     />

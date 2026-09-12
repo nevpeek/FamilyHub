@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config/api";
 import {
   ImagePlus,
   Trash2,
@@ -7,9 +8,6 @@ import {
   useEffect,
   useState,
 } from "react";
-
-const API_BASE_URL =
-  "http://localhost:3001";
 
 function RecipeModal({
   open,

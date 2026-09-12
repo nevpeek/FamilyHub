@@ -11,9 +11,7 @@ import {
 
 import ListItemModal from "../components/ListItemModal";
 import ListModal from "../components/ListModal";
-
-const API_BASE_URL =
-  "http://localhost:3001";
+import { API_BASE_URL } from "../config/api";
 
 function ListsPage({
   members = [],

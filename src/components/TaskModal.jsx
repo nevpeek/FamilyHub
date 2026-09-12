@@ -1,11 +1,10 @@
+import { API_BASE_URL } from "../config/api";
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import {
   Trash2,
   X,
 } from "lucide-react";
-
-const API_BASE_URL = "http://localhost:3001";
 
 function TaskModal({
   open,

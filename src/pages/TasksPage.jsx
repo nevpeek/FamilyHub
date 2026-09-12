@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config/api";
 import { useEffect, useMemo, useState } from "react";
 import {
   CheckCircle2,
@@ -7,8 +8,6 @@ import {
 } from "lucide-react";
 
 import RewardModal from "../components/RewardModal";
-
-const API_BASE_URL = "http://localhost:3001";
 
 function formatTaskTime(time) {
   if (!time) {

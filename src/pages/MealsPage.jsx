@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config/api";
 import { useEffect, useMemo, useState } from "react";
 import {
   BookOpen,
@@ -13,8 +14,6 @@ import {
   Soup,
   Utensils,
 } from "lucide-react";
-
-const API_BASE_URL = "http://localhost:3001";
 
 function toDateKey(date) {
   const year = date.getFullYear();

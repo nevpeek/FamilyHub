@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "./config/api";
 import {
   useEffect,
   useMemo,
@@ -51,8 +52,6 @@ import RecipeDetailsModal from "./components/RecipeDetailsModal";
 import ShoppingItemModal from "./components/ShoppingItemModal";
 import FamilyMemberModal from "./components/FamilyMemberModal";
 import { MotionConfig, motion } from "motion/react";
-
-const API_BASE_URL = "http://localhost:3001";
 
 const navigationItems = [
   {
