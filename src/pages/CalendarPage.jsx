@@ -7,376 +7,31 @@ import {
 import {
   ChevronLeft,
   ChevronRight,
-  Cloud,
-  CloudDrizzle,
-  CloudFog,
-  CloudLightning,
-  CloudRain,
-  CloudSnow,
-  CloudSun,
   Plus,
-  Sun,
 } from "lucide-react";
 
 import EventDetailsModal from "../components/EventDetailsModal";
+import CalendarWeatherIcon from "../components/CalendarWeatherIcon";
 import { API_BASE_URL } from "../config/api";
+import {
+  WEEK_START_HOUR,
+  WEEK_END_HOUR,
+  WEEK_HOUR_HEIGHT,
+  weekHours,
+  formatHourLabel,
+  getCurrentTimeTop,
+  getEventTop,
+  getEventDurationMinutes,
+  getEventHeight,
+  layoutOverlappingEvents,
+  getMonthGrid,
+  isSameDate,
+  formatDateKey,
+  getWeatherForDate,
+  formatEventTime,
+  formatEventTimeRange,
+} from "../utils/calendarUtils";
 
-const WEEK_START_HOUR = 6;
-const WEEK_END_HOUR = 23;
-const WEEK_HOUR_HEIGHT = 64;
-
-const weekHours = Array.from(
-  {
-    length:
-      WEEK_END_HOUR - WEEK_START_HOUR + 1,
-  },
-  (_, index) => WEEK_START_HOUR + index
-);
-
-function formatHourLabel(hour) {
-  const date = new Date();
-  date.setHours(hour, 0, 0, 0);
-
-  return new Intl.DateTimeFormat("en-AU", {
-    hour: "numeric",
-  }).format(date);
-}
-
-function getCurrentTimeTop(date) {
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-
-  const minutesFromStart =
-    (hours - WEEK_START_HOUR) * 60 +
-    minutes;
-
-  return (
-    (minutesFromStart / 60) *
-    WEEK_HOUR_HEIGHT
-  );
-}
-
-function getEventTop(time) {
-  if (!time) {
-    return 0;
-  }
-
-  const [hours, minutes] = time
-    .split(":")
-    .map(Number);
-
-  const minutesFromStart =
-    (hours - WEEK_START_HOUR) * 60 + minutes;
-
-  return Math.max(
-    0,
-    (minutesFromStart / 60) * WEEK_HOUR_HEIGHT
-  );
-}
-
-function getEventDurationMinutes(event) {
-  if (
-    !event.start_date ||
-    !event.start_time
-  ) {
-    return 60;
-  }
-
-  const start = new Date(
-    `${event.start_date}T${event.start_time}:00`
-  );
-
-  const end = new Date(
-    `${event.end_date || event.start_date}T${
-      event.end_time || event.start_time
-    }:00`
-  );
-
-  const durationMinutes =
-    (end.getTime() - start.getTime()) /
-    60000;
-
-  if (
-    !Number.isFinite(durationMinutes) ||
-    durationMinutes <= 0
-  ) {
-    return 60;
-  }
-
-  return durationMinutes;
-}
-
-function getEventHeight(event) {
-  return Math.max(
-    32,
-    (getEventDurationMinutes(event) / 60) *
-      WEEK_HOUR_HEIGHT
-  );
-}
-
-function getEventStartMinutes(event) {
-  if (!event.start_time) {
-    return 0;
-  }
-
-  const [hours, minutes] =
-    event.start_time
-      .split(":")
-      .map(Number);
-
-  return hours * 60 + minutes;
-}
-
-function getEventEndMinutes(event) {
-  return (
-    getEventStartMinutes(event) +
-    getEventDurationMinutes(event)
-  );
-}
-
-function layoutOverlappingEvents(events) {
-  const timedEvents = events
-    .filter(
-      (event) =>
-        !event.all_day &&
-        event.start_time
-    )
-    .sort(
-      (a, b) =>
-        getEventStartMinutes(a) -
-        getEventStartMinutes(b)
-    );
-
-  const groups = [];
-  let currentGroup = [];
-  let currentGroupEnd = -1;
-
-  for (const event of timedEvents) {
-    const start =
-      getEventStartMinutes(event);
-
-    const end =
-      getEventEndMinutes(event);
-
-    if (
-      currentGroup.length > 0 &&
-      start >= currentGroupEnd
-    ) {
-      groups.push(currentGroup);
-      currentGroup = [];
-      currentGroupEnd = -1;
-    }
-
-    currentGroup.push(event);
-
-    currentGroupEnd = Math.max(
-      currentGroupEnd,
-      end
-    );
-  }
-
-  if (currentGroup.length > 0) {
-    groups.push(currentGroup);
-  }
-
-  return groups.flatMap((group) => {
-    const laneEndTimes = [];
-    const laidOutEvents = [];
-
-    for (const event of group) {
-      const start =
-        getEventStartMinutes(event);
-
-      const end =
-        getEventEndMinutes(event);
-
-      let columnIndex =
-        laneEndTimes.findIndex(
-          (laneEnd) => laneEnd <= start
-        );
-
-      if (columnIndex === -1) {
-        columnIndex =
-          laneEndTimes.length;
-
-        laneEndTimes.push(end);
-      } else {
-        laneEndTimes[columnIndex] =
-          end;
-      }
-
-      laidOutEvents.push({
-        event,
-        columnIndex,
-      });
-    }
-
-    const columnCount =
-      laneEndTimes.length;
-
-    return laidOutEvents.map(
-      ({ event, columnIndex }) => ({
-        event,
-        columnIndex,
-        columnCount,
-      })
-    );
-  });
-}
-function getMonthGrid(year, month) {
-  const firstDay = new Date(year, month, 1);
-
-  const mondayIndex = (firstDay.getDay() + 6) % 7;
-
-  const gridStart = new Date(year, month, 1 - mondayIndex);
-
-  return Array.from({ length: 42 }, (_, index) => {
-    const date = new Date(gridStart);
-    date.setDate(gridStart.getDate() + index);
-
-    return {
-      date,
-      isCurrentMonth: date.getMonth() === month,
-    };
-  });
-}
-
-function isSameDate(a, b) {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
-}
-
-function formatDateKey(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-function getWeatherForDate(weather, date) {
-  if (!weather?.daily || !date) {
-    return null;
-  }
-
-  const dateKey = formatDateKey(date);
-
-  return (
-    weather.daily.find(
-      (day) => day.date === dateKey
-    ) || null
-  );
-}
-
-function getCalendarWeatherIcon(code) {
-  if (code === 0) {
-    return <Sun size={15} />;
-  }
-
-  if ([1, 2].includes(code)) {
-    return <CloudSun size={15} />;
-  }
-
-  if (code === 3) {
-    return <Cloud size={15} />;
-  }
-
-  if ([45, 48].includes(code)) {
-    return <CloudFog size={15} />;
-  }
-
-  if ([51, 53, 55, 56, 57].includes(code)) {
-    return <CloudDrizzle size={15} />;
-  }
-
-  if (
-    [61, 63, 65, 66, 67, 80, 81, 82].includes(code)
-  ) {
-    return <CloudRain size={15} />;
-  }
-
-  if ([71, 73, 75, 77, 85, 86].includes(code)) {
-    return <CloudSnow size={15} />;
-  }
-
-  if ([95, 96, 99].includes(code)) {
-    return <CloudLightning size={15} />;
-  }
-
-  return <CloudSun size={15} />;
-}
-
-function formatEventTime(time) {
-  if (!time) {
-    return "";
-  }
-
-  const [hourText, minuteText] =
-    time.split(":");
-
-  const date = new Date();
-
-  date.setHours(
-    Number(hourText),
-    Number(minuteText),
-    0,
-    0
-  );
-
-  return new Intl.DateTimeFormat(
-    "en-AU",
-    {
-      hour: "numeric",
-      minute: "2-digit",
-    }
-  ).format(date);
-}
-
-function formatEventTimeRange(
-  startTime,
-  endTime
-) {
-  if (!startTime) {
-    return "";
-  }
-
-  if (!endTime) {
-    return formatEventTime(startTime);
-  }
-
-  const start = formatEventTime(startTime);
-  const end = formatEventTime(endTime);
-
-  const startMatch = start.match(
-    /^(.+?)\s*(am|pm)$/i
-  );
-
-  const endMatch = end.match(
-    /^(.+?)\s*(am|pm)$/i
-  );
-
-  if (!startMatch || !endMatch) {
-    return `${start} – ${end}`;
-  }
-
-  const [, startClock, startPeriod] =
-    startMatch;
-
-  const [, endClock, endPeriod] =
-    endMatch;
-
-  if (
-    startPeriod.toLowerCase() ===
-    endPeriod.toLowerCase()
-  ) {
-    return `${startClock}–${endClock} ${endPeriod}`;
-  }
-
-  return `${startClock} ${startPeriod}–${endClock} ${endPeriod}`;
-}
 
 function CalendarPage({
   members,
@@ -1269,9 +924,9 @@ const dayEvents = [
 
 {dayWeather && (
   <span className="calendar-day-weather">
-    {getCalendarWeatherIcon(
-      dayWeather.weatherCode
-    )}
+<CalendarWeatherIcon
+  code={dayWeather.weatherCode}
+/>
 
     <span>
       {Math.round(
@@ -1800,9 +1455,9 @@ onDoubleClick={(clickEvent) => {
 
 {dayWeather && (
   <span className="calendar-schedule-weather">
-    {getCalendarWeatherIcon(
-      dayWeather.weatherCode
-    )}
+<CalendarWeatherIcon
+  code={dayWeather.weatherCode}
+/>
 
     <span>
       {Math.round(
@@ -1995,9 +1650,9 @@ onClick={() => {
 
 {dayWeather && (
   <span className="calendar-day-weather">
-    {getCalendarWeatherIcon(
-      dayWeather.weatherCode
-    )}
+<CalendarWeatherIcon
+  code={dayWeather.weatherCode}
+/>
 
     <span>
       {Math.round(
@@ -2536,9 +2191,9 @@ className={[
 
 {dayWeather && (
   <span className="calendar-month-weather">
-    {getCalendarWeatherIcon(
-      dayWeather.weatherCode
-    )}
+<CalendarWeatherIcon
+  code={dayWeather.weatherCode}
+/>
 
     <span>
       {Math.round(
