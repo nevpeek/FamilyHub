@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 
 import EventDetailsModal from "../components/EventDetailsModal";
-import CalendarWeatherIcon from "../components/CalendarWeatherIcon";
 import CalendarScheduleView from "../components/CalendarScheduleView";
 import CalendarMonthView from "../components/CalendarMonthView";
 import CalendarDayView from "../components/CalendarDayView";
@@ -19,21 +18,10 @@ import CalendarWeekView from "../components/CalendarWeekView";
 import { API_BASE_URL } from "../config/api";
 import {
   WEEK_START_HOUR,
-  WEEK_END_HOUR,
   WEEK_HOUR_HEIGHT,
-  weekHours,
-  formatHourLabel,
-  getCurrentTimeTop,
-  getEventTop,
   getEventDurationMinutes,
-  getEventHeight,
-  layoutOverlappingEvents,
   getMonthGrid,
-  isSameDate,
   formatDateKey,
-  getWeatherForDate,
-  formatEventTime,
-  formatEventTimeRange,
 } from "../utils/calendarUtils";
 
 
@@ -62,10 +50,6 @@ const [draggedEvent, setDraggedEvent] = useState(null);
 const [dragPreview, setDragPreview] = useState(null);
 
 const [weather, setWeather] = useState(null);
-const [weatherLoading, setWeatherLoading] =
-  useState(true);
-const [weatherError, setWeatherError] =
-  useState("");
 
 const [currentTime, setCurrentTime] = useState(
   () => new Date()
@@ -85,8 +69,7 @@ useEffect(() => {
   let cancelled = false;
 
   async function loadWeather() {
-    setWeatherLoading(true);
-    setWeatherError("");
+
 
     try {
       const response = await fetch(
@@ -104,16 +87,6 @@ useEffect(() => {
       }
     } catch (err) {
       console.error(err);
-
-      if (!cancelled) {
-        setWeatherError(
-          "Unable to load calendar weather"
-        );
-      }
-    } finally {
-      if (!cancelled) {
-        setWeatherLoading(false);
-      }
     }
   }
 
@@ -280,7 +253,6 @@ const scheduleLabel =
     ]
   )}`;
 
-const dayDate = formatDateKey(visibleDate);
 
 const visibleStartDate =
   calendarView === "schedule"
@@ -362,15 +334,6 @@ const params = new URLSearchParams({
     event.members?.map((member) => member.id) ||
     [];
 
-const oldStart = new Date(
-  `${event.start_date}T${event.start_time}:00`
-);
-
-const oldEnd = new Date(
-  `${event.end_date || event.start_date}T${
-    event.end_time || event.start_time
-  }:00`
-);
 
 const durationMinutes =
   getEventDurationMinutes(event);
