@@ -3,12 +3,6 @@ import {
   motion,
   useReducedMotion,
 } from "motion/react";
-import {
-  CalendarDays,
-  CheckSquare,
-  ShoppingCart,
-  Soup,
-} from "lucide-react";
 
 import { API_BASE_URL } from "../config/api";
 import HomeHeader from "../components/HomeHeader";
@@ -19,6 +13,9 @@ import HomeContextCards from "../components/HomeContextCards";
 import HomeDinnerPanel from "../components/HomeDinnerPanel";
 import HomeFamilyOutlookPanel from "../components/HomeFamilyOutlookPanel";
 import HomeListsPanel from "../components/HomeListsPanel";
+import HomeQuickActions from "../components/HomeQuickActions";
+import HomeFamilySelector from "../components/HomeFamilySelector";
+import HomeSummaryLine from "../components/HomeSummaryLine";
 
 export default function HomePage({
   members,
@@ -408,196 +405,30 @@ const upcomingDays = Array.from(
   weatherLoading={weatherLoading}
 />
 
-<section className="home-quick-actions">
-  <button
-    type="button"
-    className="home-quick-action"
-    onClick={() => onAddEvent?.()}
-  >
-    <CalendarDays size={22} />
-    <span>Event</span>
-  </button>
+<HomeQuickActions
+  onAddEvent={onAddEvent}
+  onAddTask={onAddTask}
+  onAddMeal={onAddMeal}
+  onAddShoppingItem={onAddShoppingItem}
+/>
 
-  <button
-    type="button"
-    className="home-quick-action"
-    onClick={() => onAddTask?.()}
-  >
-    <CheckSquare size={22} />
-    <span>Task</span>
-  </button>
+<HomeFamilySelector
+  members={members}
+  loading={loading}
+  error={error}
+  selectedMemberId={selectedMemberId}
+  setSelectedMemberId={setSelectedMemberId}
+/>
 
-  <button
-    type="button"
-    className="home-quick-action"
-    onClick={() => onAddMeal?.()}
-  >
-    <Soup size={22} />
-    <span>Meal</span>
-  </button>
-
-  <button
-    type="button"
-    className="home-quick-action"
-    onClick={() => onAddShoppingItem?.()}
-  >
-    <ShoppingCart size={22} />
-    <span>Shopping</span>
-  </button>
-</section>
-
-    <section className="family-filter-section family-selector-section">
-        {loading && (
-          <p className="status-message">
-            Loading family...
-          </p>
-        )}
-
-        {error && (
-          <p className="status-message status-message-error">
-            {error}
-          </p>
-        )}
-
-        {!loading && !error && (
-          <div className="family-selector">
-            <button
-              type="button"
-              className={`family-selector-button family-selector-everyone ${
-                selectedMemberId === "all"
-                  ? "selected"
-                  : ""
-              }`}
-              onClick={() =>
-                setSelectedMemberId("all")
-              }
-            >
-              Everyone
-            </button>
-
-            {members.map((member) => (
-              <button
-                type="button"
-                key={member.id}
-                className={`family-selector-button ${
-                  selectedMemberId === member.id
-                    ? "selected"
-                    : ""
-                }`}
-                onClick={() =>
-                  setSelectedMemberId(member.id)
-                }
-              >
-                <span
-                  className="family-selector-avatar"
-                  style={{
-                    backgroundColor:
-                      member.colour,
-                  }}
-                >
-                  {member.photo_url ? (
-                    <img
-                      src={`${API_BASE_URL}${member.photo_url}`}
-                      alt={member.name}
-                    />
-                  ) : (
-                    member.initials ||
-                    member.name
-                      .charAt(0)
-                      .toUpperCase()
-                  )}
-                </span>
-
-                {member.name}
-              </button>
-            ))}
-          </div>
-        )}
-      </section>
-
-<div className="home-summary-line">
-<button
-  type="button"
-  className="home-summary-link"
-  onClick={() => onNavigate("calendar")}
->
-  <strong>{todayEvents.length}</strong>{" "}
-  {todayEvents.length === 1
-    ? "event"
-    : "events"}{" "}
-  today
-</button>
-
-  <span>·</span>
-
-<button
-  type="button"
-  className="home-summary-link"
-  onClick={() => onNavigate("tasks")}
->
-  {todayTaskAssignments > 0 ? (
-    <>
-      <strong>
-        {todayTaskCompletions}/{todayTaskAssignments}
-      </strong>{" "}
-      chores done
-    </>
-  ) : (
-    "No chores due"
-  )}
-</button>
-
-  <span>·</span>
-
-<button
-  type="button"
-  className="home-summary-link"
-  onClick={() => onNavigate("meals")}
->
-  {homeMeals.length > 0
-    ? `${homeMeals[0].title} tonight`
-    : "No dinner planned"}
-</button>
-
-{openShoppingItems.length > 0 && (
-  <>
-    <span>·</span>
-
-<button
-  type="button"
-  className="home-summary-link"
-  onClick={() => onNavigate("shopping")}
->
-  <strong>
-    {openShoppingItems.length}
-  </strong>{" "}
-  {openShoppingItems.length === 1
-    ? "shopping item"
-    : "shopping items"}
-</button>
-  </>
-)}
-
-  <span>·</span>
-
-<button
-  type="button"
-  className="home-summary-link"
-  onClick={() => onNavigate("lists")}
->
-  <strong>
-    {homeLists.reduce(
-      (total, list) =>
-        total +
-        Number(
-          list.open_count || 0
-        ),
-      0
-    )}
-  </strong>{" "}
-  list items open
-</button>
-</div>
+<HomeSummaryLine
+  todayEvents={todayEvents}
+  todayTaskAssignments={todayTaskAssignments}
+  todayTaskCompletions={todayTaskCompletions}
+  homeMeals={homeMeals}
+  openShoppingItems={openShoppingItems}
+  homeLists={homeLists}
+  onNavigate={onNavigate}
+/>
 
 <section className="dashboard-layout">
 <div className="dashboard-main-column">
