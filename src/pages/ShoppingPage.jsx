@@ -1,10 +1,10 @@
 import { API_BASE_URL } from "../config/api";
+import { startAutoRefresh } from "../utils/startAutoRefresh";
 import { useEffect, useMemo, useState } from "react";
 
 import {
   CheckCircle2,
   Circle,
-  PackageOpen,
   Plus,
   ShoppingCart,
   Trash2,
@@ -77,62 +77,83 @@ const [clearingCompleted, setClearingCompleted] =
   useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+    let inFlight = false;
+    let hasLoaded = false;
+    const controller = new AbortController();
+
+    setLoading(true);
+    setError("");
+
     async function loadItems() {
-      setLoading(true);
-      setError("");
+      if (cancelled || inFlight) {
+        return;
+      }
+
+      inFlight = true;
 
       try {
         const params = new URLSearchParams();
 
         if (selectedMemberId !== "all") {
-          params.set(
-            "memberId",
-            String(selectedMemberId)
-          );
+          params.set("memberId", String(selectedMemberId));
         }
 
         if (!showCompleted) {
-          params.set(
-            "completed",
-            "false"
-          );
+          params.set("completed", "false");
         }
 
         if (categoryFilter !== "all") {
-          params.set(
-            "category",
-            categoryFilter
-          );
+          params.set("category", categoryFilter);
         }
 
         const query = params.toString();
 
         const response = await fetch(
-          `${API_BASE_URL}/api/shopping${
-            query ? `?${query}` : ""
-          }`
+          `${API_BASE_URL}/api/shopping${query ? `?${query}` : ""}`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
         );
 
         if (!response.ok) {
-          throw new Error(
-            "Failed to load shopping items"
-          );
+          throw new Error("Failed to load shopping items");
         }
 
         const data = await response.json();
 
+        if (cancelled) return;
+
         setItems(data.items || []);
+        setError("");
+        hasLoaded = true;
       } catch (err) {
+        if (cancelled || err.name === "AbortError") return;
+
         console.error(err);
-        setError(
-          "Unable to load shopping list"
-        );
+
+        if (!hasLoaded) {
+          setError("Unable to load shopping list. Retrying…");
+        }
       } finally {
-        setLoading(false);
+        inFlight = false;
+
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     loadItems();
+
+    const stopAutoRefresh = startAutoRefresh(loadItems);
+
+    return () => {
+      cancelled = true;
+      stopAutoRefresh();
+      controller.abort();
+    };
   }, [
     selectedMemberId,
     showCompleted,
@@ -174,56 +195,107 @@ const [clearingCompleted, setClearingCompleted] =
         );
     }, [activeItems]);
 
-  async function toggleItemCompletion(item) {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/shopping/${item.id}/completion`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            completed:
-              !item.is_completed,
-          }),
-        }
-      );
+async function toggleItemCompletion(item) {
+  try {
+    /*
+     * Marking an active Shopping item
+     * as bought also restocks Pantry.
+     */
+    if (!item.is_completed) {
+      const pantryResponse =
+        await fetch(
+          `${API_BASE_URL}/api/pantry/from-shopping`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              name: item.name,
 
-      const data = await response.json();
+              quantity:
+                item.quantity ||
+                null,
 
-      if (!response.ok) {
+              category:
+                item.category ||
+                "other",
+
+              notes:
+                item.notes ||
+                null,
+            }),
+          }
+        );
+
+      const pantryData =
+        await pantryResponse.json();
+
+      if (!pantryResponse.ok) {
         throw new Error(
-          data.error ||
-            "Unable to update shopping item"
+          pantryData.error ||
+            "Unable to restock Pantry"
         );
       }
+    }
 
-      setItems((current) =>
-        current
-          .map((entry) =>
-            entry.id === item.id
-              ? data.item
-              : entry
-          )
-          .filter((entry) =>
-            showCompleted
-              ? true
-              : !entry.is_completed
-          )
-      );
+    /*
+     * Pantry succeeded, so now update
+     * the Shopping completion state.
+     *
+     * Completed → active does NOT
+     * subtract anything from Pantry.
+     */
+    const response = await fetch(
+      `${API_BASE_URL}/api/shopping/${item.id}/completion`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          completed:
+            !item.is_completed,
+        }),
+      }
+    );
 
-      onItemChanged?.();
-    } catch (err) {
-      console.error(err);
+    const data =
+      await response.json();
 
-      window.alert(
-        err.message ||
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
           "Unable to update shopping item"
       );
     }
+
+    setItems((current) =>
+      current
+        .map((entry) =>
+          entry.id === item.id
+            ? data.item
+            : entry
+        )
+        .filter((entry) =>
+          showCompleted
+            ? true
+            : !entry.is_completed
+        )
+    );
+
+    onItemChanged?.();
+  } catch (err) {
+    console.error(err);
+
+    window.alert(
+      err.message ||
+        "Unable to mark item as bought"
+    );
   }
+}
 
     async function deleteAllItems() {
 setDeletingAll(true);
@@ -260,78 +332,6 @@ setDeletingAll(true);
   setDeletingAll(false);
 }
   }
-
-    async function moveItemToPantry(item) {
-    try {
-      const pantryResponse =
-        await fetch(
-          `${API_BASE_URL}/api/pantry`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            body: JSON.stringify({
-              name: item.name,
-              quantity:
-                item.quantity || null,
-              category:
-                item.category || "other",
-              notes: null,
-            }),
-          }
-        );
-
-      const pantryData =
-        await pantryResponse.json();
-
-      if (
-        !pantryResponse.ok &&
-        pantryResponse.status !== 409
-      ) {
-        throw new Error(
-          pantryData.error ||
-            "Unable to add item to Pantry"
-        );
-      }
-
-      const deleteResponse =
-        await fetch(
-          `${API_BASE_URL}/api/shopping/${item.id}`,
-          {
-            method: "DELETE",
-          }
-        );
-
-      const deleteData =
-        await deleteResponse.json();
-
-      if (!deleteResponse.ok) {
-        throw new Error(
-          deleteData.error ||
-            "Unable to remove shopping item"
-        );
-      }
-
-      setItems((current) =>
-        current.filter(
-          (entry) =>
-            entry.id !== item.id
-        )
-      );
-
-      onItemChanged?.();
-    } catch (err) {
-      console.error(err);
-
-      window.alert(
-        err.message ||
-          "Unable to move item to Pantry"
-      );
-    }
-  }
-
 
   async function clearCompletedItems() {
     if (completedItems.length === 0) {
@@ -458,19 +458,7 @@ setDeletingAll(true);
           </div>
         </button>
 
-        {item.is_completed && (
-          <button
-            type="button"
-            className="shopping-move-pantry"
-            onClick={() =>
-              moveItemToPantry(item)
-            }
-            title="Move to Pantry"
-          >
-            <PackageOpen size={16} />
-            <span>Move to Pantry</span>
-          </button>
-        )}
+
       </article>
     );
   }

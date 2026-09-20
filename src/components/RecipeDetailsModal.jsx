@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../config/api";
+import { startAutoRefresh } from "../utils/startAutoRefresh";
 import {
   CalendarPlus,
   Clock3,
@@ -47,44 +48,71 @@ function RecipeDetailsModal({
     setPantryLoading,
   ] = useState(false);
 
+  const [
+    shoppingSuccess,
+    setShoppingSuccess,
+  ] = useState("");
+
   useEffect(() => {
-    if (!open) {
-      return;
-    }
+    if (!open) return;
+
+    let cancelled = false;
+    let inFlight = false;
+    const controller = new AbortController();
+
+    setPantryLoading(true);
 
     async function loadPantry() {
-      setPantryLoading(true);
+      if (cancelled || inFlight) return;
+
+      inFlight = true;
 
       try {
         const response = await fetch(
-          `${API_BASE_URL}/api/pantry`
+          `${API_BASE_URL}/api/pantry`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
         );
 
-        const data =
-          await response.json();
+        const data = await response.json();
 
         if (!response.ok) {
           throw new Error(
-            data.error ||
-              "Unable to load pantry"
+            data.error || "Unable to load pantry"
           );
         }
 
+        if (cancelled) return;
+
         setPantryItems(
           (data.items || []).filter(
-            (item) =>
-              item.is_available !== 0
+            (item) => item.is_available !== 0
           )
         );
       } catch (err) {
-        console.error(err);
-        setPantryItems([]);
+        if (cancelled || err.name === "AbortError") return;
+
+        console.error("Recipe pantry refresh error:", err);
       } finally {
-        setPantryLoading(false);
+        inFlight = false;
+
+        if (!cancelled) {
+          setPantryLoading(false);
+        }
       }
     }
 
     loadPantry();
+
+    const stopAutoRefresh = startAutoRefresh(loadPantry);
+
+    return () => {
+      cancelled = true;
+      stopAutoRefresh();
+      controller.abort();
+    };
   }, [open]);
 
   if (!open || !recipe) {
@@ -108,9 +136,53 @@ function RecipeDetailsModal({
       value || ""
     )
       .trim()
-      .toLowerCase()
+      .toLowerCase();
+
+    /*
+     * Remove recipe quantities before
+     * comparing with Pantry.
+     *
+     * Examples:
+     *
+     * 2 Garlic Cloves
+     *   -> Garlic Cloves
+     *
+     * 750g Ground Lamb Mince
+     *   -> Ground Lamb Mince
+     *
+     * 1 1/2 tbsp Olive Oil
+     *   -> Olive Oil
+     */
+    normalized = normalized
+      .replace(
+        /^\s*\d+\s+\d+\s*\/\s*\d+\s*/i,
+        ""
+      )
+      .replace(
+        /^\s*\d+\s*\/\s*\d+\s*/i,
+        ""
+      )
+      .replace(
+        /^\s*\d+(?:\.\d+)?\s*/i,
+        ""
+      );
+
+    /*
+     * Remove a measurement unit left at
+     * the beginning after the quantity.
+     */
+    normalized = normalized.replace(
+      /^(?:kg|g|mg|l|ml|cup|cups|tbsp|tablespoon|tablespoons|tsp|teaspoon|teaspoons|oz|ounce|ounces|lb|lbs|pound|pounds)\b\.?\s*/i,
+      ""
+    );
+
+    /*
+     * Normal Pantry-name cleanup.
+     */
+    normalized = normalized
       .replace(/[^\w\s]/g, "")
-      .replace(/\s+/g, " ");
+      .replace(/\s+/g, " ")
+      .trim();
 
     if (
       normalized.endsWith("ies") &&
@@ -267,13 +339,17 @@ function RecipeDetailsModal({
 
       setShoppingPickerOpen(false);
 
-      window.alert(
+      setShoppingSuccess(
         `${ingredientsToAdd.length} ingredient${
           ingredientsToAdd.length === 1
             ? ""
             : "s"
-        } added to the Shopping list.`
+        } added to Shopping`
       );
+
+      window.setTimeout(() => {
+        setShoppingSuccess("");
+      }, 3200);
     } catch (err) {
       console.error(err);
 
@@ -323,21 +399,18 @@ function RecipeDetailsModal({
 
         <div className="recipe-details-content">
           <div className="recipe-details-heading">
-            <div>
-              <p className="section-kicker">
-                Saved Recipe
-              </p>
 
-              <h2>
-                {recipe.title}
-              </h2>
+<div>
+  <h2>
+    {recipe.title}
+  </h2>
 
-              {recipe.description && (
-                <p>
-                  {recipe.description}
-                </p>
-              )}
-            </div>
+  {recipe.description && (
+    <p>
+      {recipe.description}
+    </p>
+  )}
+</div>
 
             <button
               type="button"
@@ -489,8 +562,24 @@ function RecipeDetailsModal({
             </div>
           )}
 
-                    {shoppingPickerOpen && (
-            <div className="recipe-shopping-picker">
+          {shoppingPickerOpen && (
+            <div
+              className="recipe-shopping-picker-backdrop"
+              onMouseDown={(event) => {
+                if (
+                  event.target ===
+                  event.currentTarget
+                ) {
+                  setShoppingPickerOpen(false);
+                }
+              }}
+            >
+              <div
+                className="recipe-shopping-picker recipe-shopping-picker-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-label={`Add ${recipe.title} ingredients to Shopping`}
+              >
               <div className="recipe-shopping-picker-heading">
                 <div>
                   <h3>
@@ -498,7 +587,7 @@ function RecipeDetailsModal({
                   </h3>
 
                   <p>
-                    Choose what you need to buy.
+                    {recipe.title} · Choose what you need to buy.
                   </p>
                 </div>
 
@@ -516,19 +605,35 @@ function RecipeDetailsModal({
               </div>
 
               <div className="recipe-shopping-picker-tools">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSelectedIngredients(
-                      ingredients.map(
-                        (_, index) =>
-                          index
-                      )
-                    )
-                  }
-                >
-                  Select all
-                </button>
+<button
+  type="button"
+  onClick={() =>
+    setSelectedIngredients(
+      ingredients
+        .map(
+          (
+            ingredient,
+            index
+          ) => ({
+            ingredient,
+            index,
+          })
+        )
+        .filter(
+          ({ ingredient }) =>
+            !ingredientMatchesPantry(
+              ingredient
+            )
+        )
+        .map(
+          ({ index }) =>
+            index
+        )
+    )
+  }
+>
+  Select all
+</button>
 
                 <button
                   type="button"
@@ -590,11 +695,17 @@ function RecipeDetailsModal({
                           {ingredient}
                         </span>
 
-                        {alreadyHave && (
-                          <span className="recipe-shopping-pantry-badge">
-                            Already Have
-                          </span>
-                        )}
+<span
+  className={`recipe-shopping-stock-badge ${
+    alreadyHave
+      ? "in-pantry"
+      : "need-to-buy"
+  }`}
+>
+  {alreadyHave
+    ? "✓ In Pantry"
+    : "Need to Buy"}
+</span>
                       </label>
                     );
                   }
@@ -636,7 +747,43 @@ function RecipeDetailsModal({
                 </button>
               </div>
             </div>
+          </div>
           )}
+
+                    {shoppingSuccess && (
+            <div
+              className="recipe-shopping-success"
+              role="status"
+              aria-live="polite"
+            >
+              <div className="recipe-shopping-success-icon">
+                ✓
+              </div>
+
+              <div className="recipe-shopping-success-copy">
+                <strong>
+                  Added to Shopping
+                </strong>
+
+                <span>
+                  {shoppingSuccess}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                className="recipe-shopping-success-close"
+                onClick={() =>
+                  setShoppingSuccess("")
+                }
+                aria-label="Dismiss notification"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          )}
+
+          <div className="recipe-details-actions"></div>
 
           <div className="recipe-details-actions">
             <button

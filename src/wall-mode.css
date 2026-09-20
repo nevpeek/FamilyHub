@@ -1,0 +1,251 @@
+/* Phase 10 — Wall navigation */
+
+.familyhub-shell.wall-mode .bottom-navigation {
+  display: grid;
+  grid-template-columns: repeat(var(--navigation-count, 9), minmax(0, 1fr));
+  gap: 8px;
+
+  width: min(1100px, calc(100% - 32px));
+  max-width: 1100px;
+  padding: 10px;
+
+  left: 50%;
+  right: auto;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  border-radius: 24px;
+}
+
+.familyhub-shell.wall-mode .bottom-navigation .nav-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 76px;
+  padding: 10px 6px;
+  border-radius: 16px;
+  touch-action: manipulation;
+}
+
+.familyhub-shell.wall-mode .bottom-navigation .nav-button svg {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.familyhub-shell.wall-mode .bottom-navigation .nav-label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.familyhub-shell.wall-mode .familyhub-main {
+  padding-bottom: calc(136px + env(safe-area-inset-bottom));
+}
+
+/* Portrait and smaller wall displays */
+@media (max-width: 900px) {
+  .familyhub-shell.wall-mode .bottom-navigation {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .familyhub-shell.wall-mode .bottom-navigation .nav-button {
+    min-height: 68px;
+    gap: 6px;
+  }
+
+  .familyhub-shell.wall-mode .familyhub-main {
+    padding-bottom: calc(190px + env(safe-area-inset-bottom));
+  }
+}
+
+/* Phase 10 — comfortable touch controls */
+
+html .familyhub-shell.wall-mode :is(
+  .add-event-button,
+  .wall-mode-button,
+  .family-selector-button,
+  .event-member-option
+) {
+  min-height: 56px;
+  font-size: 16px;
+  touch-action: manipulation;
+}
+
+html .familyhub-shell.wall-mode .family-selector {
+  gap: 12px;
+}
+
+html .familyhub-shell.wall-mode .event-member-picker {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Form fields: readable text and room to tap */
+html .familyhub-shell.wall-mode .event-modal :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+  select,
+  textarea
+) {
+  min-height: 56px;
+  font-size: 18px;
+}
+
+html .familyhub-shell.wall-mode .event-modal textarea {
+  min-height: 120px;
+}
+
+/* Save, Cancel and Close */
+html .familyhub-shell.wall-mode .event-modal :is(
+  .event-save-button,
+  .event-cancel-button,
+  .event-delete-button,
+  .event-secondary-button
+) {
+  min-height: 56px;
+  padding: 12px 20px;
+  font-size: 16px;
+  touch-action: manipulation;
+}
+
+html .familyhub-shell.wall-mode .event-modal :is(
+  .event-modal-close,
+  .modal-close-button
+) {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+}
+
+html .familyhub-shell.wall-mode .event-modal :is(
+  .event-modal-actions,
+  .event-modal-action-right
+) {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Keep long forms scrollable on the wall display */
+html .familyhub-shell.wall-mode .event-modal {
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.familyhub-shell.wall-mode .ambient-household-focus {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 16px 0;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.familyhub-shell.wall-mode .ambient-household-focus strong {
+  color: #f5f5f7;
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 600;
+}
+
+.familyhub-shell.wall-mode .ambient-household-focus span {
+  color: #d1d1d6;
+  font-size: 20px;
+}
+
+.familyhub-shell.wall-mode .ambient-household-focus small {
+  color: #aeaeb2;
+  font-size: 18px;
+}
+
+/* Phase 10 — ambient display fit and readability */
+
+html .familyhub-shell.wall-mode .ambient-display {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100dvh;
+  transform: none;
+
+  padding:
+    max(24px, env(safe-area-inset-top))
+    max(20px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom))
+    max(20px, env(safe-area-inset-left));
+
+  justify-content: flex-start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #141416;
+}
+
+.familyhub-shell.wall-mode .ambient-display > * {
+  flex-shrink: 0;
+  max-width: 100%;
+}
+
+.familyhub-shell.wall-mode .ambient-clock {
+  margin-top: auto;
+  padding-top: 12px;
+  font-size: clamp(56px, 10vw, 120px);
+  font-weight: 600;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.familyhub-shell.wall-mode .ambient-date {
+  margin-top: 12px;
+  color: #d1d1d6;
+}
+
+.familyhub-shell.wall-mode :is(
+  .ambient-summary,
+  .ambient-dinner,
+  .ambient-next-event
+) {
+  margin-top: 20px;
+}
+
+.familyhub-shell.wall-mode .ambient-summary span {
+  min-height: 44px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.familyhub-shell.wall-mode :is(
+  .ambient-dinner,
+  .ambient-next-event
+) > strong {
+  overflow-wrap: anywhere;
+  font-weight: 600;
+}
+
+.familyhub-shell.wall-mode :is(
+  .ambient-dinner,
+  .ambient-next-event
+) > span {
+  color: #aeaeb2;
+  font-size: 14px;
+}
+
+.familyhub-shell.wall-mode .ambient-wake-hint {
+  position: static;
+  transform: none;
+  margin-top: 24px;
+  margin-bottom: auto;
+  padding-bottom: 12px;
+  white-space: normal;
+  color: #aeaeb2;
+  font-size: 16px;
+}
+
+.familyhub-shell.wall-mode .ambient-display:focus-visible {
+  outline: 3px solid var(--familyhub-accent);
+  outline-offset: -6px;
+}

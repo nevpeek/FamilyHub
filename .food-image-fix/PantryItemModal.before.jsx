@@ -17,239 +17,6 @@ const pantryCategories = [
   "other",
 ];
 
-function getAutomaticPantryCategory(
-  value
-) {
-  const name =
-    String(value || "")
-      .toLowerCase()
-      .replace(
-        /[^a-z0-9\s]/g,
-        " "
-      )
-      .replace(
-        /\s+/g,
-        " "
-      )
-      .trim();
-
-  if (!name) {
-    return "pantry";
-  }
-
-  const hasAny = (
-    terms
-  ) =>
-    terms.some(
-      (term) =>
-        name === term ||
-        name.includes(
-          ` ${term} `
-        ) ||
-        name.startsWith(
-          `${term} `
-        ) ||
-        name.endsWith(
-          ` ${term}`
-        )
-    );
-
-  /*
-   * Fresh fruit, vegetables
-   * and herbs.
-   */
-
-  if (
-    hasAny([
-      "apple",
-      "apples",
-      "avocado",
-      "avocados",
-      "banana",
-      "bananas",
-      "blueberry",
-      "blueberries",
-      "broccoli",
-      "cabbage",
-      "capsicum",
-      "capsicums",
-      "carrot",
-      "carrots",
-      "cauliflower",
-      "celery",
-      "cherry",
-      "cherries",
-      "corn",
-      "cucumber",
-      "cucumbers",
-      "eggplant",
-      "garlic",
-      "grape",
-      "grapes",
-      "kiwi",
-      "lemon",
-      "lemons",
-      "lettuce",
-      "lime",
-      "limes",
-      "mango",
-      "mangoes",
-      "mushroom",
-      "mushrooms",
-      "onion",
-      "onions",
-      "orange",
-      "oranges",
-      "peach",
-      "peaches",
-      "pear",
-      "pears",
-      "peas",
-      "pineapple",
-      "potato",
-      "potatoes",
-      "pumpkin",
-      "spinach",
-      "strawberry",
-      "strawberries",
-      "sweet potato",
-      "sweet potatoes",
-      "tomato",
-      "tomatoes",
-      "watermelon",
-      "zucchini",
-      "basil",
-      "coriander",
-      "mint",
-      "parsley",
-      "rosemary",
-      "thyme",
-    ])
-  ) {
-    return "produce";
-  }
-
-  /*
-   * Meat and seafood.
-   */
-
-  if (
-    hasAny([
-      "bacon",
-      "beef",
-      "beef mince",
-      "steak",
-      "chicken",
-      "chicken breast",
-      "chicken thigh",
-      "chicken drumstick",
-      "ham",
-      "lamb",
-      "lamb chop",
-      "pork",
-      "pork chop",
-      "pork mince",
-      "sausage",
-      "sausages",
-      "hot dog",
-      "hot dogs",
-      "fish",
-      "salmon",
-      "tuna",
-      "prawn",
-      "prawns",
-      "shrimp",
-    ])
-  ) {
-    return "meat";
-  }
-
-  /*
-   * Dairy and refrigerated
-   * staples.
-   */
-
-  if (
-    hasAny([
-      "milk",
-      "cheese",
-      "butter",
-      "cream",
-      "yoghurt",
-      "yogurt",
-      "custard",
-      "egg",
-      "eggs",
-    ])
-  ) {
-    return "dairy";
-  }
-
-  /*
-   * Bread and bakery products.
-   */
-
-  if (
-    hasAny([
-      "bread",
-      "bread roll",
-      "bread rolls",
-      "bun",
-      "buns",
-      "hot dog buns",
-      "naan",
-      "naan bread",
-      "wrap",
-      "wraps",
-      "bagel",
-      "bagels",
-      "croissant",
-      "croissants",
-    ])
-  ) {
-    return "bakery";
-  }
-
-  /*
-   * Drinks.
-   */
-
-  if (
-    hasAny([
-      "coke",
-      "coca cola",
-      "pepsi",
-      "lemonade",
-      "juice",
-      "water",
-      "soft drink",
-      "soft drinks",
-      "sports drink",
-      "energy drink",
-    ])
-  ) {
-    return "drinks";
-  }
-
-  /*
-   * Frozen foods.
-   */
-
-  if (
-    hasAny([
-      "frozen",
-      "ice cream",
-      "frozen chips",
-      "frozen peas",
-      "frozen vegetables",
-    ])
-  ) {
-    return "frozen";
-  }
-
-  return "pantry";
-}
-
 export default function PantryItemModal({
   open,
   item = null,
@@ -257,43 +24,11 @@ export default function PantryItemModal({
   onSaved,
   onDeleted,
 }) {
-const [name, setName] = useState("");
-const [quantity, setQuantity] = useState("");
-
-const [
-  packSize,
-  setPackSize,
-] = useState("");
-
-const [
-  lowStockEnabled,
-  setLowStockEnabled,
-] = useState(false);
-
-const [
-  lowStockThreshold,
-  setLowStockThreshold,
-] = useState("");
-
-const [
-  autoAddToShopping,
-  setAutoAddToShopping,
-] = useState(false);
-
-const [
-  restockQuantity,
-  setRestockQuantity,
-] = useState("");
-
-const [category, setCategory] =
-  useState("pantry");
-
-const [
-  categoryManuallySelected,
-  setCategoryManuallySelected,
-] = useState(false);
-
-const [notes, setNotes] = useState("");
+  const [name, setName] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [category, setCategory] =
+    useState("pantry");
+  const [notes, setNotes] = useState("");
   const [saving, setSaving] =
     useState(false);
 
@@ -368,59 +103,11 @@ useEffect(() => {
     return;
   }
 
-setName(item?.name || "");
-
-setQuantity(
-  item?.id
-    ? String(item?.quantity || "1")
-    : "1"
-);
-
-setPackSize(
-  item?.pack_size !== null &&
-    item?.pack_size !== undefined
-    ? String(item.pack_size)
-    : ""
-);
-
-setLowStockEnabled(true);
-
-setLowStockThreshold(
-  item?.low_stock_threshold !== null &&
-    item?.low_stock_threshold !==
-      undefined
-    ? String(
-        item.low_stock_threshold
-      )
-    : "1"
-);
-
-setAutoAddToShopping(
-  item?.id
-    ? Boolean(
-        item?.auto_add_to_shopping
-      )
-    : true
-);
-
-setRestockQuantity(
-  item?.restock_quantity !== null &&
-    item?.restock_quantity !==
-      undefined
-    ? String(
-        item.restock_quantity
-      )
-    : "1"
-);
-
-setCategory(
-  item?.category || "pantry"
-);
-
-setCategoryManuallySelected(
-  Boolean(item?.id)
-);
-
+  setName(item?.name || "");
+  setQuantity(item?.quantity || "");
+  setCategory(
+    item?.category || "pantry"
+  );
 setNotes(item?.notes || "");
 setImageLookupName(
   item?.name || ""
@@ -706,8 +393,6 @@ async function handleCustomImageUrl() {
         current + 1
     );
 
-    notifyFoodImageChanged(cleanName);
-
     setCustomImageUrl("");
     setImageUrlMode(false);
     setChangeImageOpen(false);
@@ -795,7 +480,19 @@ setCustomImageVersion(
     current + 1
 );
 
-notifyFoodImageChanged(cleanName);
+notifyFoodImageChanged(
+  cleanName
+);
+
+/*
+ * Tell every FoodPicture currently
+ * on screen that this food's image
+ * has changed.
+ */
+
+notifyFoodImageChanged(
+  cleanName
+);
 
 setAutomaticImageMode(
   false
@@ -977,8 +674,6 @@ async function handleRotateImage(
       (current) =>
         current + 1
     );
-
-    notifyFoodImageChanged(cleanName);
   } catch (err) {
     console.error(err);
 
@@ -1047,8 +742,6 @@ async function handleResetImage() {
         current + 1
     );
 
-    notifyFoodImageChanged(cleanName);
-
     setCustomImageUrl("");
     setImageUrlMode(false);
     setChangeImageOpen(false);
@@ -1094,46 +787,15 @@ async function handleSubmit(event) {
             "Content-Type":
               "application/json",
           },
-body: JSON.stringify({
-  name: name.trim(),
-
-  quantity:
-    quantity.trim() || "1",
-
-  packSize:
-    packSize.trim() || null,
-
-  category,
-
-  notes:
-    notes.trim() || null,
-
-  isAvailable: 1,
-
-  /*
-   * Running Low is now a standard
-   * Pantry feature for every item.
-   */
-  lowStockEnabled: 1,
-
-  lowStockThreshold:
-    lowStockThreshold !== ""
-      ? Number(
-          lowStockThreshold
-        )
-      : 1,
-
-  autoAddToShopping:
-    autoAddToShopping
-      ? 1
-      : 0,
-
-  restockQuantity:
-    autoAddToShopping &&
-    restockQuantity.trim()
-      ? restockQuantity.trim()
-      : "1",
-}),
+          body: JSON.stringify({
+            name: name.trim(),
+            quantity:
+              quantity.trim() || null,
+            category,
+            notes:
+              notes.trim() || null,
+            isAvailable: 1,
+          }),
         }
       );
 
@@ -1335,9 +997,7 @@ body: JSON.stringify({
 <span className="pantry-automatic-image-option-picture">
   <img
     src={
-      option.imageUrl.startsWith("/uploads/")
-        ? `${API_BASE_URL}${option.imageUrl}`
-        : option.imageUrl
+      option.imageUrl
     }
     alt={
       option.matchedProduct ||
@@ -1585,211 +1245,45 @@ body: JSON.stringify({
 <label className="pantry-item-field">
   <span>Item</span>
 
-<input
-  type="text"
-  value={name}
-  onChange={(event) => {
-    const nextName =
-      event.target.value;
-
-    setName(
-      nextName
-    );
-
-    /*
-     * Only automatically choose the
-     * category when creating a new
-     * Pantry item.
-     *
-     * Existing items keep whatever
-     * category the user previously
-     * selected.
-     */
-
-if (
-  !item?.id &&
-  !categoryManuallySelected
-) {
-  setCategory(
-    getAutomaticPantryCategory(
-      nextName
-    )
-  );
-}
-  }}
-  placeholder="e.g. Weet-Bix"
-  autoFocus
-/>
-</label>
-
-<div className="pantry-stock-fields">
-  <label>
-    <span>Quantity</span>
-
-<input
-  type="number"
-  min="0"
-  step="1"
-  required
-  value={quantity}
-  onChange={(event) =>
-    setQuantity(
-      event.target.value
-    )
-  }
-  placeholder="e.g. 1"
-/>
-
-    <small>
-      How many of this item you
-      currently have.
-    </small>
-  </label>
-
-  <label>
-    <span>Pack Size</span>
-
-    <input
-      type="text"
-      value={packSize}
-      onChange={(event) =>
-        setPackSize(
-          event.target.value
-        )
-      }
-      placeholder="e.g. 1kg, 2L, 180g"
-    />
-
-    <small>
-      Optional size of each
-      package or item.
-    </small>
-  </label>
-</div>
-
-<div className="pantry-low-stock-control">
-
-<div className="pantry-low-stock-heading">
-  <div>
-    <strong>
-      Stock Settings
-    </strong>
-
-    <small>
-      FamilyHub keeps track of when
-      this item is running low.
-    </small>
-  </div>
-</div>
-
-  <div className="pantry-low-stock-options">
-
-<label className="pantry-low-stock-threshold">
-  <span>
-    Low At
-  </span>
-
   <input
-    type="number"
-    min="0"
-    step="1"
-    required
-    value={lowStockThreshold}
+    type="text"
+    value={name}
     onChange={(event) =>
-      setLowStockThreshold(
+      setName(
         event.target.value
       )
     }
-    placeholder="e.g. 1"
+    placeholder="e.g. Weet-Bix"
+    autoFocus
   />
-
-  <small>
-    Mark as Running Low when{" "}
-    {lowStockThreshold || "this many"}{" "}
-    or fewer remain.
-  </small>
 </label>
 
-    <div className="pantry-auto-shopping-section">
-      <div className="pantry-auto-shopping-control">
-        <div>
-          <strong>
-            Automatically add to Shopping
-          </strong>
-
-          <small>
-            Add this item to the shared
-            Shopping List when it becomes
-            Running Low.
-          </small>
-        </div>
-
-        <button
-          type="button"
-          className={`pantry-low-stock-toggle ${
-            autoAddToShopping
-              ? "is-active"
-              : ""
-          }`}
-          onClick={() =>
-            setAutoAddToShopping(
-              (current) =>
-                !current
-            )
-          }
-          aria-label="Automatically add to Shopping"
-          aria-pressed={
-            autoAddToShopping
-          }
-        >
-          <span />
-        </button>
-      </div>
-
-      {autoAddToShopping && (
-        <label className="pantry-restock-quantity">
-          <span>
-            Buy Quantity
-          </span>
+        <label className="pantry-item-field">
+          <span>Quantity</span>
 
           <input
-            type="number"
-            min="1"
-            step="1"
-            value={restockQuantity}
+            type="text"
+            value={quantity}
             onChange={(event) =>
-              setRestockQuantity(
+              setQuantity(
                 event.target.value
               )
             }
-            placeholder="e.g. 1"
+            placeholder="e.g. 2 kg"
           />
-
-<small>
-  Number of items to add to
-  Shopping when Running Low.
-</small>
         </label>
-      )}
-    </div>
-  </div>
-</div>
 
         <label className="pantry-item-field">
           <span>Category</span>
 
-<select
-  value={category}
-  onChange={(event) => {
-    setCategory(
-      event.target.value
-    );
-
-    setCategoryManuallySelected(
-      true
-    );
-  }}
->
+          <select
+            value={category}
+            onChange={(event) =>
+              setCategory(
+                event.target.value
+              )
+            }
+          >
             {pantryCategories.map(
               (value) => (
                 <option

@@ -112,31 +112,55 @@ html .familyhub-shell .shopping-page .add-event-button {
 
 html .familyhub-shell .shopping-page .shopping-card {
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr);
+  grid-template-columns: 52px minmax(0, 1fr);
+  align-items: stretch;
   gap: 0;
-  min-height: 100px;
+  min-height: 118px;
+  overflow: hidden;
   border-radius: 16px;
 }
 
 html .familyhub-shell .shopping-page .shopping-complete-button {
-  width: 56px;
-  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  min-width: 52px;
+  min-height: 100%;
   border: 0;
+  border-right: 1px solid var(--shopping-border);
   border-radius: 0;
   background: transparent;
   color: var(--shopping-muted);
 }
 
 html .familyhub-shell .shopping-page .shopping-card-content {
-  padding: 16px 18px 16px 0;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 12px 14px;
   background: transparent;
   border: 0;
   border-radius: 0;
   opacity: 1;
 }
 
-.familyhub-shell .shopping-page .shopping-card-main { align-items: center; flex-wrap: wrap; }
-.familyhub-shell .shopping-page .shopping-item-with-picture { flex: 1 1 180px; }
+.familyhub-shell .shopping-page .shopping-card-main {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+}
+
+.familyhub-shell .shopping-page .shopping-item-with-picture {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
 
 html .familyhub-shell .shopping-page .shopping-card-main h3 {
   color: var(--shopping-text);
@@ -205,4 +229,670 @@ html .familyhub-shell .shopping-page .shopping-card.completed h3 { color: var(--
   .familyhub-shell .shopping-page .shopping-toolbar-actions { width: 100%; }
   .familyhub-shell .shopping-page .shopping-toolbar select { width: 100%; }
   .familyhub-shell .shopping-page .shopping-heading-actions { flex-wrap: wrap; gap: 10px; }
+}
+
+/* ========================================
+   Shopping product card layout
+   ======================================== */
+
+.familyhub-shell
+  .shopping-page
+  .shopping-item-with-picture
+  .food-picture {
+  flex: 0 0 92px;
+  width: 92px;
+  height: 92px;
+  min-width: 92px;
+  min-height: 92px;
+  max-width: 92px;
+  max-height: 92px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.familyhub-shell
+  .shopping-page
+  .shopping-item-with-picture
+  .food-picture
+  img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.familyhub-shell
+  .shopping-page
+  .shopping-item-with-picture
+  > div:not(.food-picture) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.familyhub-shell
+  .shopping-page
+  .shopping-card-main
+  h3 {
+  margin: 0;
+}
+
+.familyhub-shell
+  .shopping-page
+  .shopping-card-main
+  p {
+  margin: 4px 0 0;
+}
+
+.familyhub-shell
+  .shopping-page
+  .shopping-quantity {
+  flex: 0 0 auto;
+  min-width: 38px;
+  padding: 7px 11px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .familyhub-shell
+    .shopping-page
+    .shopping-item-with-picture
+    .food-picture {
+    flex-basis: 76px;
+    width: 76px;
+    height: 76px;
+    min-width: 76px;
+    min-height: 76px;
+    max-width: 76px;
+    max-height: 76px;
+  }
+}
+
+/* ========================================
+   Shopping shared food image preview
+   ======================================== */
+
+.familyhub-shell
+  .shopping-item-image-preview {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+
+  padding: 16px;
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.1);
+
+  border-radius: 18px;
+
+  background:
+    rgba(255, 255, 255, 0.035);
+}
+
+.familyhub-shell
+  .shopping-item-image-picture {
+  width: 150px;
+  height: 150px;
+
+  overflow: hidden;
+  border-radius: 16px;
+
+  background: #fff;
+}
+
+.familyhub-shell
+  .shopping-item-image-picture
+  .food-picture {
+  width: 100%;
+  height: 100%;
+}
+
+.familyhub-shell
+  .shopping-item-image-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.familyhub-shell
+  .shopping-item-image-copy
+  > span {
+  margin-bottom: 5px;
+
+  color:
+    rgba(255, 255, 255, 0.55);
+
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.familyhub-shell
+  .shopping-item-image-copy
+  > strong {
+  color: #fff;
+  font-size: 19px;
+  font-weight: 750;
+}
+
+.familyhub-shell
+  .shopping-item-image-copy
+  > small {
+  margin-top: 4px;
+
+  color:
+    rgba(255, 255, 255, 0.55);
+
+  font-size: 12px;
+}
+
+.familyhub-shell
+  .shopping-change-image-button {
+  margin-top: 14px;
+
+  min-height: 40px;
+  padding: 0 16px;
+
+  border: 1px solid
+    rgba(139, 92, 246, 0.65);
+
+  border-radius: 11px;
+
+  background:
+    rgba(124, 58, 237, 0.22);
+
+  color: #fff;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+
+  cursor: pointer;
+}
+
+.familyhub-shell
+  .shopping-change-image-button:hover {
+  background:
+    rgba(124, 58, 237, 0.32);
+}
+
+@media (max-width: 700px) {
+  .familyhub-shell
+    .shopping-item-image-preview {
+    grid-template-columns: 1fr;
+  }
+
+  .familyhub-shell
+    .shopping-item-image-picture {
+    width: 100%;
+    height: 180px;
+  }
+}
+
+/* ========================================
+   Shopping image change controls
+   ======================================== */
+
+.familyhub-shell
+  .shopping-image-change-controls {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.familyhub-shell
+  .shopping-image-change-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.familyhub-shell
+  .shopping-image-change-primary,
+.familyhub-shell
+  .shopping-image-change-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.familyhub-shell
+  .shopping-automatic-images-button,
+.familyhub-shell
+  .shopping-upload-image-button,
+.familyhub-shell
+  .shopping-image-url-button,
+.familyhub-shell
+  .shopping-image-tool-button,
+.familyhub-shell
+  .shopping-image-change-cancel {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 38px;
+  padding: 0 13px;
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+
+  background:
+    rgba(255, 255, 255, 0.065);
+
+  color: rgba(255, 255, 255, 0.9);
+
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+
+  white-space: nowrap;
+  cursor: pointer;
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.familyhub-shell
+  .shopping-automatic-images-button {
+  border-color:
+    rgba(139, 92, 246, 0.55);
+
+  background:
+    rgba(124, 58, 237, 0.18);
+
+  color: #fff;
+}
+
+.familyhub-shell
+  .shopping-automatic-images-button:hover,
+.familyhub-shell
+  .shopping-upload-image-button:hover,
+.familyhub-shell
+  .shopping-image-url-button:hover,
+.familyhub-shell
+  .shopping-image-tool-button:hover,
+.familyhub-shell
+  .shopping-image-change-cancel:hover {
+  background:
+    rgba(255, 255, 255, 0.11);
+
+  border-color:
+    rgba(255, 255, 255, 0.2);
+}
+
+.familyhub-shell
+  .shopping-automatic-images-button:hover {
+  background:
+    rgba(124, 58, 237, 0.28);
+
+  border-color:
+    rgba(139, 92, 246, 0.8);
+}
+
+.familyhub-shell
+  .shopping-upload-image-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.familyhub-shell
+  .shopping-upload-image-button
+  input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.familyhub-shell
+  .shopping-image-tool-button {
+  min-height: 34px;
+  padding: 0 11px;
+
+  color:
+    rgba(255, 255, 255, 0.72);
+
+  font-size: 11px;
+}
+
+.familyhub-shell
+  .shopping-image-tool-reset {
+  color: #ff8a8a;
+
+  border-color:
+    rgba(255, 90, 90, 0.22);
+
+  background:
+    rgba(255, 80, 80, 0.08);
+}
+
+.familyhub-shell
+  .shopping-image-change-cancel {
+  min-height: 34px;
+  padding: 0 11px;
+
+  color:
+    rgba(255, 255, 255, 0.6);
+
+  font-size: 11px;
+}
+
+/* ========================================
+   Automatic image chooser
+   ======================================== */
+
+.familyhub-shell
+  .shopping-automatic-image-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+
+  margin-top: 2px;
+}
+
+.familyhub-shell
+  .shopping-automatic-image-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.familyhub-shell
+  .shopping-automatic-image-heading
+  strong {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.familyhub-shell
+  .shopping-automatic-image-heading
+  small {
+  color:
+    rgba(255, 255, 255, 0.5);
+
+  font-size: 11px;
+}
+
+.familyhub-shell
+  .shopping-automatic-image-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 9px;
+  width: 100%;
+}
+
+.familyhub-shell
+  .shopping-automatic-image-option {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  padding: 6px;
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.1);
+
+  border-radius: 12px;
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  color: #fff;
+
+  font: inherit;
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.familyhub-shell
+  .shopping-automatic-image-option:hover {
+  border-color:
+    rgba(139, 92, 246, 0.65);
+
+  background:
+    rgba(124, 58, 237, 0.12);
+
+  transform: translateY(-1px);
+}
+
+.familyhub-shell
+  .shopping-automatic-image-option-picture {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+
+  overflow: hidden;
+  border-radius: 9px;
+
+  background: #fff;
+}
+
+.familyhub-shell
+  .shopping-automatic-image-option-picture
+  img {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+}
+
+.familyhub-shell
+  .shopping-automatic-image-option-name {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  min-width: 0;
+  padding: 6px 2px 2px;
+}
+
+.familyhub-shell
+  .shopping-automatic-image-option-name
+  > span {
+  overflow: hidden;
+
+  color:
+    rgba(255, 255, 255, 0.78);
+
+  font-size: 10px;
+  font-weight: 650;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.familyhub-shell
+  .shopping-automatic-image-preferred {
+  color: #9ee6b3;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.familyhub-shell
+  .shopping-automatic-image-message {
+  padding: 14px;
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.08);
+
+  border-radius: 11px;
+
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  color:
+    rgba(255, 255, 255, 0.55);
+
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ========================================
+   Paste image URL
+   ======================================== */
+
+.familyhub-shell
+  .shopping-image-url-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+
+  width: 100%;
+}
+
+.familyhub-shell
+  .shopping-image-url-entry
+  > input {
+  box-sizing: border-box;
+
+  width: 100%;
+  height: 42px;
+
+  padding: 0 12px;
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.12);
+
+  border-radius: 11px;
+  outline: none;
+
+  background:
+    rgba(255, 255, 255, 0.055);
+
+  color: #fff;
+
+  font: inherit;
+  font-size: 12px;
+}
+
+.familyhub-shell
+  .shopping-image-url-entry
+  > input:focus {
+  border-color:
+    rgba(139, 92, 246, 0.8);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(124, 58, 237, 0.12);
+}
+
+.familyhub-shell
+  .shopping-image-url-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ========================================
+   Disabled states
+   ======================================== */
+
+.familyhub-shell
+  .shopping-image-change-controls
+  button:disabled,
+.familyhub-shell
+  .shopping-image-change-controls
+  label:has(input:disabled) {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ========================================
+   Smaller screens
+   ======================================== */
+
+@media (max-width: 700px) {
+  .familyhub-shell
+    .shopping-automatic-image-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .familyhub-shell
+    .shopping-image-change-primary,
+  .familyhub-shell
+    .shopping-image-change-tools {
+    align-items: stretch;
+  }
+}
+
+/* ========================================
+   Shopping item picture sizing fix
+   ======================================== */
+
+.familyhub-shell
+  .shopping-item-image-picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 150px;
+  height: 150px;
+
+  padding: 12px;
+  box-sizing: border-box;
+
+  overflow: hidden;
+  border-radius: 16px;
+
+  background: #fff;
+}
+
+.familyhub-shell
+  .shopping-item-image-picture
+  .food-picture {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+.familyhub-shell
+  .shopping-item-image-picture
+  .food-picture
+  img,
+.familyhub-shell
+  .shopping-item-image-picture
+  img {
+  display: block;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  object-fit: contain !important;
+  object-position: center !important;
 }

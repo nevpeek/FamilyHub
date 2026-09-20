@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../config/api";
+import { startAutoRefresh } from "../utils/startAutoRefresh";
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import {
@@ -155,7 +156,6 @@ if (defaultRecipe) {
   }, [
     isOpen,
     meal,
-    members,
     todayKey,
     defaultMealDate,
     defaultMealType,
@@ -163,35 +163,55 @@ if (defaultRecipe) {
   ]);
 
   useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
+    if (!isOpen) return;
+
+    let cancelled = false;
+    let inFlight = false;
+    const controller = new AbortController();
 
     async function loadRecipes() {
+      if (cancelled || inFlight) return;
+
+      inFlight = true;
+
       try {
         const response = await fetch(
-          `${API_BASE_URL}/api/recipes`
+          `${API_BASE_URL}/api/recipes`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
         );
 
-        const data =
-          await response.json();
+        const data = await response.json();
 
         if (!response.ok) {
           throw new Error(
-            data.error ||
-              "Unable to load recipes"
+            data.error || "Unable to load recipes"
           );
         }
 
-        setRecipes(
-          data.recipes || []
-        );
+        if (cancelled) return;
+
+        setRecipes(data.recipes || []);
       } catch (err) {
-        console.error(err);
+        if (cancelled || err.name === "AbortError") return;
+
+        console.error("Meal recipe picker refresh error:", err);
+      } finally {
+        inFlight = false;
       }
     }
 
     loadRecipes();
+
+    const stopAutoRefresh = startAutoRefresh(loadRecipes);
+
+    return () => {
+      cancelled = true;
+      stopAutoRefresh();
+      controller.abort();
+    };
   }, [isOpen]);
 
   if (!isOpen) {

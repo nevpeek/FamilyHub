@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../config/api";
+import { startAutoRefresh } from "../utils/startAutoRefresh";
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 
@@ -15,51 +16,64 @@ function EventDetailsModal({
 
   useEffect(() => {
     if (
-      !event?.weather_lat ||
-      !event?.weather_lon ||
+      event?.weather_lat == null ||
+      event.weather_lat === "" ||
+      event?.weather_lon == null ||
+      event.weather_lon === "" ||
       !event?.start_date
     ) {
       setEventWeather(null);
+      setEventWeatherLoading(false);
       return;
     }
 
     let cancelled = false;
+    let inFlight = false;
+    const controller = new AbortController();
+
+    setEventWeather(null);
+    setEventWeatherLoading(true);
 
     async function loadEventWeather() {
-      setEventWeatherLoading(true);
+      if (cancelled || inFlight) return;
+
+      inFlight = true;
 
       try {
+        const params = new URLSearchParams({
+          latitude: String(event.weather_lat),
+          longitude: String(event.weather_lon),
+        });
+
         const response = await fetch(
-          `${API_BASE_URL}/api/weather?latitude=${event.weather_lat}&longitude=${event.weather_lon}`
+          `${API_BASE_URL}/api/weather?${params.toString()}`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
         );
 
         if (!response.ok) {
-          throw new Error(
-            "Unable to load event weather"
-          );
+          throw new Error("Unable to load event weather");
         }
 
         const data = await response.json();
 
+        if (cancelled) return;
+
         const forecast =
           data.daily?.find(
-            (day) =>
-              day.date === event.start_date
+            (day) => day.date === event.start_date
           ) || null;
 
-        if (!cancelled) {
-          setEventWeather(forecast);
-        }
+        setEventWeather(forecast);
       } catch (err) {
-        console.error(
-          "Unable to load event weather:",
-          err
-        );
+        if (cancelled || err.name === "AbortError") return;
 
-        if (!cancelled) {
-          setEventWeather(null);
-        }
+        console.error("Event weather refresh error:", err);
       } finally {
+        inFlight = false;
+
         if (!cancelled) {
           setEventWeatherLoading(false);
         }
@@ -68,8 +82,12 @@ function EventDetailsModal({
 
     loadEventWeather();
 
+    const stopAutoRefresh = startAutoRefresh(loadEventWeather);
+
     return () => {
       cancelled = true;
+      stopAutoRefresh();
+      controller.abort();
     };
   }, [
     event?.weather_lat,

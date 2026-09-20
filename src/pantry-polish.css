@@ -68,8 +68,15 @@ html .familyhub-shell .pantry-page :is(.pantry-card, .empty-state) {
   box-shadow: none;
 }
 
-.familyhub-shell .pantry-page .pantry-card { min-height: 112px; gap: 16px; }
-.familyhub-shell .pantry-page .pantry-card-content { gap: 6px; }
+.familyhub-shell .pantry-page .pantry-card {
+  min-height: 154px;
+  gap: 20px;
+}
+
+.familyhub-shell .pantry-page .pantry-card-content {
+  gap: 7px;
+  min-width: 0;
+}
 
 html .familyhub-shell .pantry-page :is(.pantry-card-content strong, .empty-state h4) {
   color: var(--pantry-text);
@@ -86,11 +93,65 @@ html .familyhub-shell .pantry-page :is(.pantry-card-content span, .pantry-card-c
 }
 
 html .familyhub-shell .pantry-page .food-picture {
+  flex: 0 0 114px !important;
+
+  width: 114px !important;
+  height: 114px !important;
+
+  min-width: 114px !important;
+  min-height: 114px !important;
+
+  max-width: 114px !important;
+  max-height: 114px !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 7px;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+
   background: var(--pantry-inset);
-  border-color: var(--pantry-border);
+
+  border: 1px solid var(--pantry-border);
+  border-radius: 16px;
+
   box-shadow: none;
 }
 
+html .familyhub-shell .pantry-page .food-picture-real {
+  width: 114px !important;
+  height: 114px !important;
+
+  min-width: 114px !important;
+  min-height: 114px !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 7px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+}
+
+html .familyhub-shell .pantry-page .food-picture-real img {
+  display: block;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  max-width: 100% !important;
+  max-height: 100% !important;
+
+  object-fit: contain;
+  object-position: center;
+}
 html .familyhub-shell .pantry-page .add-event-button {
   min-height: 44px;
   background: var(--familyhub-accent, #007aff);
@@ -167,4 +228,2186 @@ html .familyhub-shell .pantry-page .pantry-item-delete {
 
 @media (prefers-reduced-motion: reduce) {
   .familyhub-shell .pantry-page .pantry-card { transition: none; }
+}
+
+/* Pantry item image preview */
+
+html .familyhub-shell .pantry-item-modal .pantry-item-image-preview {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  width: 100%;
+  min-height: 160px;
+
+  margin: 18px 0 22px;
+  padding: 16px;
+
+  box-sizing: border-box;
+
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-item-image-preview-picture {
+  flex: 0 0 240px;
+
+  width: 240px;
+  height: 170px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  padding: 6px;
+  box-sizing: border-box;
+
+  background: #ffffff;
+  border-radius: 18px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-item-image-preview-picture .food-picture {
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 100% !important;
+  min-height: 100% !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+  border-radius: 12px;
+
+  background: transparent;
+  overflow: visible;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-item-image-preview-picture .food-picture-real {
+  width: 100% !important;
+  height: 100% !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  overflow: visible;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-item-image-preview-picture .food-picture-real img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  max-width: none;
+  max-height: none;
+
+  margin: 0;
+  padding: 0;
+
+  object-fit: contain;
+  object-position: center;
+
+  transform-origin: center;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-item-image-preview-picture .food-picture-real img.food-picture-image-sideways {
+  width: 158px !important;
+  height: 224px !important;
+
+  min-width: 158px !important;
+  min-height: 224px !important;
+
+  max-width: none !important;
+  max-height: none !important;
+
+  flex: 0 0 auto;
+
+  object-fit: contain;
+  object-position: center;
+
+  scale: none;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-item-image-preview-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  gap: 5px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-item-image-preview-copy > span {
+  display: block;
+
+  color: rgba(255, 255, 255, 0.58);
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-item-image-preview-copy > strong {
+  display: block;
+  width: 100%;
+
+  color: rgba(255, 255, 255, 0.96);
+
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-item-image-preview-copy > small {
+  display: block;
+
+  color: rgba(255, 255, 255, 0.58);
+
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Pantry custom image controls */
+
+html .familyhub-shell .pantry-item-modal .pantry-image-change-controls {
+  width: 100%;
+  margin-top: 10px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-change-image-button,
+html .familyhub-shell .pantry-item-modal .pantry-upload-image-button,
+html .familyhub-shell .pantry-item-modal .pantry-image-change-cancel {
+  min-height: 36px;
+  padding: 8px 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  border-radius: 10px;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-change-image-button {
+  color: #ffffff;
+
+  background: rgba(124, 58, 237, 0.18);
+  border: 1px solid rgba(139, 92, 246, 0.42);
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-change-menu {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-upload-image-button {
+  color: #ffffff;
+
+  background: #7c3aed;
+  border: 1px solid #7c3aed;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-upload-image-button input {
+  display: none;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-change-cancel {
+  color: rgba(255, 255, 255, 0.8);
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-change-image-button:hover,
+html .familyhub-shell .pantry-item-modal .pantry-upload-image-button:hover {
+  filter: brightness(1.12);
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-change-cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-change-image-button:disabled,
+html .familyhub-shell .pantry-item-modal .pantry-upload-image-button:has(input:disabled),
+html .familyhub-shell .pantry-item-modal .pantry-image-change-cancel:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Expanded pantry image changer */
+
+html .familyhub-shell .pantry-item-modal .pantry-image-change-panel {
+  width: 100%;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-change-menu {
+  width: 100%;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-url-button,
+html .familyhub-shell .pantry-item-modal .pantry-image-reset-button {
+  min-height: 36px;
+  padding: 8px 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  border-radius: 10px;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-url-button {
+  color: rgba(255, 255, 255, 0.92);
+
+  background: rgba(255, 255, 255, 0.07);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.14);
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-reset-button {
+  color: #ffb4b4;
+
+  background: rgba(255, 76, 76, 0.08);
+
+  border:
+    1px solid
+    rgba(255, 92, 92, 0.22);
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-url-entry {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-url-entry > input {
+  width: 100%;
+  min-height: 40px;
+
+  padding: 9px 11px;
+
+  box-sizing: border-box;
+
+  color: rgba(255, 255, 255, 0.94);
+
+  background: rgba(255, 255, 255, 0.07);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.14);
+
+  border-radius: 10px;
+
+  outline: none;
+
+  font: inherit;
+  font-size: 13px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-url-entry > input:focus {
+  border-color:
+    rgba(139, 92, 246, 0.7);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(124, 58, 237, 0.12);
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-url-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-url-button:hover {
+  background:
+    rgba(255, 255, 255, 0.11);
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-reset-button:hover {
+  background:
+    rgba(255, 76, 76, 0.14);
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-url-button:disabled,
+html .familyhub-shell .pantry-item-modal .pantry-image-reset-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Wider Pantry Item modal */
+
+html .familyhub-shell .pantry-item-modal {
+  width: min(720px, calc(100vw - 40px)) !important;
+  max-width: 720px !important;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-item-image-preview {
+  gap: 24px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-item-image-preview-picture {
+  flex: 0 0 270px;
+  width: 270px;
+  height: 190px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-item-image-preview-copy {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-image-url-entry > input {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 700px) {
+  html .familyhub-shell .pantry-item-modal {
+    width: calc(100vw - 24px) !important;
+  }
+
+  html .familyhub-shell .pantry-item-modal .pantry-item-image-preview {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  html .familyhub-shell .pantry-item-modal .pantry-item-image-preview-picture {
+    flex: none;
+    width: 100%;
+    height: 210px;
+  }
+}
+
+/* Automatic pantry image gallery */
+
+html .familyhub-shell .pantry-item-modal .pantry-automatic-images-button {
+  min-height: 36px;
+  padding: 8px 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  color: #ffffff;
+
+  background: rgba(124, 58, 237, 0.18);
+
+  border:
+    1px solid
+    rgba(139, 92, 246, 0.42);
+
+  border-radius: 10px;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-automatic-images-button:hover {
+  background:
+    rgba(124, 58, 237, 0.28);
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-automatic-image-panel {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-automatic-image-heading {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-automatic-image-heading > strong {
+  color:
+    rgba(255, 255, 255, 0.96);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-automatic-image-heading > small {
+  color:
+    rgba(255, 255, 255, 0.56);
+
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-automatic-image-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 10px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-automatic-image-option {
+  min-width: 0;
+
+  padding: 7px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  gap: 6px;
+
+  color:
+    rgba(255, 255, 255, 0.9);
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.1);
+
+  border-radius: 12px;
+
+  font: inherit;
+
+  cursor: pointer;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-automatic-image-option:hover {
+  background:
+    rgba(124, 58, 237, 0.12);
+
+  border-color:
+    rgba(139, 92, 246, 0.48);
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-automatic-image-option-picture {
+  width: 100%;
+  height: 82px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+
+  padding: 4px;
+
+  background: #ffffff;
+
+  border-radius: 9px;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-automatic-image-option-picture img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+  object-position: center;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-automatic-image-option-name {
+  display: block;
+
+  width: 100%;
+
+  overflow: hidden;
+
+  color:
+    rgba(255, 255, 255, 0.76);
+
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+
+  text-align: center;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-automatic-image-message {
+  padding: 18px 10px;
+
+  color:
+    rgba(255, 255, 255, 0.58);
+
+  font-size: 13px;
+  text-align: center;
+}
+
+html .familyhub-shell .pantry-item-modal .pantry-automatic-images-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   Pantry image controls - compact layout
+   ======================================== */
+
+html .familyhub-shell .pantry-image-change-panel {
+  width: 100%;
+  margin-top: 4px;
+}
+
+html .familyhub-shell .pantry-image-change-primary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+html .familyhub-shell .pantry-image-change-primary > button,
+html .familyhub-shell .pantry-image-change-primary > label {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  margin: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  border-radius: 10px;
+
+  white-space: nowrap;
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+html .familyhub-shell .pantry-image-change-primary .pantry-upload-image-button {
+  padding: 0 12px;
+}
+
+html .familyhub-shell .pantry-image-change-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  width: 100%;
+
+  margin-top: 8px;
+  padding-top: 8px;
+
+  border-top: 1px solid
+    rgba(255, 255, 255, 0.08);
+}
+
+html .familyhub-shell .pantry-image-tool-button {
+  appearance: none;
+
+  min-width: 0;
+  height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  margin: 0;
+  padding: 0 10px;
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.11);
+  border-radius: 8px;
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  color: rgba(255, 255, 255, 0.76);
+
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    transform 140ms ease;
+}
+
+html .familyhub-shell .pantry-image-tool-button:hover:not(:disabled) {
+  background:
+    rgba(255, 255, 255, 0.08);
+
+  border-color:
+    rgba(255, 255, 255, 0.17);
+
+  color: #ffffff;
+}
+
+html .familyhub-shell .pantry-image-tool-button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+html .familyhub-shell .pantry-image-tool-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+html .familyhub-shell .pantry-image-tool-button > span {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+html .familyhub-shell .pantry-image-tool-reset {
+  margin-left: auto;
+
+  border-color:
+    rgba(255, 105, 105, 0.18);
+
+  background:
+    rgba(255, 80, 80, 0.06);
+
+  color:
+    rgba(255, 150, 150, 0.9);
+}
+
+html .familyhub-shell .pantry-image-tool-reset:hover:not(:disabled) {
+  border-color:
+    rgba(255, 105, 105, 0.3);
+
+  background:
+    rgba(255, 80, 80, 0.1);
+
+  color:
+    rgb(255, 170, 170);
+}
+
+@media (max-width: 700px) {
+  html .familyhub-shell .pantry-image-change-primary {
+    grid-template-columns: 1fr;
+  }
+
+  html .familyhub-shell .pantry-image-change-tools {
+    flex-wrap: wrap;
+  }
+
+  html .familyhub-shell .pantry-image-tool-reset {
+    margin-left: 0;
+  }
+}
+
+/* Final sizing for Pantry image action row */
+
+html .familyhub-shell .pantry-image-change-primary {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.2fr)
+    minmax(0, 1fr)
+    minmax(0, 0.9fr);
+
+  gap: 8px;
+
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  box-sizing: border-box;
+}
+
+html .familyhub-shell .pantry-image-change-primary > button,
+html .familyhub-shell .pantry-image-change-primary > label {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  padding-left: 8px;
+  padding-right: 8px;
+
+  box-sizing: border-box;
+
+  font-size: 12px;
+
+  overflow: hidden;
+}
+
+html .familyhub-shell .pantry-image-change-primary > button,
+html .familyhub-shell .pantry-image-change-primary > label > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html .familyhub-shell .pantry-image-change-panel {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  box-sizing: border-box;
+}
+
+html .familyhub-shell .pantry-image-change-tools {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  justify-content: flex-start;
+
+  box-sizing: border-box;
+}
+
+html .familyhub-shell .pantry-image-tool-button {
+  height: 32px;
+  padding: 0 11px;
+}
+
+html .familyhub-shell .pantry-image-tool-reset {
+  margin-left: auto;
+}
+
+/* ========================================
+   Preferred fresh-food image
+   ======================================== */
+
+html .familyhub-shell .pantry-automatic-image-option-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+html .familyhub-shell .pantry-automatic-image-preferred {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 3px 7px;
+
+  border-radius: 999px;
+
+  background: rgba(52, 199, 89, 0.12);
+  border: 1px solid rgba(52, 199, 89, 0.2);
+
+  color: rgb(72, 210, 101);
+
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Preferred master fresh-food image */
+
+html .familyhub-shell .pantry-automatic-image-option-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+html .familyhub-shell .pantry-automatic-image-preferred {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: fit-content;
+  padding: 4px 8px;
+
+  border-radius: 999px;
+
+  background: rgba(52, 199, 89, 0.18);
+  border: 1px solid rgba(52, 199, 89, 0.35);
+
+  color: #34c759;
+
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+
+  white-space: nowrap;
+}
+
+/* ========================================
+   Pantry category segmented filter
+   ======================================== */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 5px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border: 1px solid
+    var(--pantry-border);
+  border-radius: 16px;
+  background:
+    var(--pantry-inset);
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-filter::-webkit-scrollbar {
+  display: none;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-filter-button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--pantry-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 120ms ease;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-filter-button:hover {
+  color: var(--pantry-text);
+  background:
+    rgba(120, 120, 128, 0.08);
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-filter-button:active {
+  transform: scale(0.97);
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-filter-button.is-active {
+  background:
+    var(--pantry-surface);
+  color:
+    var(--pantry-text);
+  box-shadow:
+    0 1px 3px
+      rgba(0, 0, 0, 0.08),
+    0 1px 1px
+      rgba(0, 0, 0, 0.04);
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-filter-button
+  small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background:
+    rgba(120, 120, 128, 0.12);
+  color: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-filter-button.is-active
+  small {
+  background:
+    var(--familyhub-accent, #007aff);
+  color: #fff;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-count {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .familyhub-shell
+    .pantry-page
+    .pantry-toolbar-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .familyhub-shell
+    .pantry-page
+    .pantry-category-filter {
+    width: 100%;
+  }
+
+  .familyhub-shell
+    .pantry-page
+    .pantry-count {
+    padding-left: 4px;
+  }
+}
+
+/* ========================================
+   Pantry combined toolbar
+   ======================================== */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-toolbar-combined {
+  display: grid;
+  grid-template-columns:
+    minmax(220px, 290px)
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-toolbar-combined
+  .pantry-search {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-toolbar-combined
+  .pantry-category-filter {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-toolbar-combined
+  .pantry-count {
+  margin: 0;
+  padding: 0 2px;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .familyhub-shell
+    .pantry-page
+    .pantry-toolbar-combined {
+    grid-template-columns:
+      minmax(220px, 280px)
+      minmax(0, 1fr);
+  }
+
+  .familyhub-shell
+    .pantry-page
+    .pantry-toolbar-combined
+    .pantry-count {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .familyhub-shell
+    .pantry-page
+    .pantry-toolbar-combined {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .familyhub-shell
+    .pantry-page
+    .pantry-toolbar-combined
+    .pantry-search {
+    width: 100%;
+    max-width: none;
+  }
+
+  .familyhub-shell
+    .pantry-page
+    .pantry-toolbar-combined
+    .pantry-count {
+    padding-left: 4px;
+  }
+}
+
+/* ========================================
+   Pantry card information hierarchy
+   ======================================== */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card-name {
+  display: block;
+  color: var(--pantry-text);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* Quantity */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card-quantity {
+  display: block;
+  color: var(--pantry-text);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card-quantity.has-quantity {
+  color: var(--pantry-text);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card-quantity.no-quantity {
+  color: var(--pantry-muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* Category badge */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+  padding: 3px 9px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+  background:
+    rgba(120, 120, 128, 0.14);
+  color: var(--pantry-muted);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Produce */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-produce {
+  background:
+    rgba(48, 209, 88, 0.13);
+  color: #30d158;
+}
+
+/* Meat */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-meat {
+  background:
+    rgba(255, 69, 58, 0.13);
+  color: #ff6961;
+}
+
+/* Dairy */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-dairy {
+  background:
+    rgba(100, 210, 255, 0.13);
+  color: #64d2ff;
+}
+
+/* Bakery */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-bakery {
+  background:
+    rgba(255, 159, 10, 0.13);
+  color: #ffb340;
+}
+
+/* Pantry */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-pantry {
+  background:
+    rgba(191, 90, 242, 0.13);
+  color: #bf5af2;
+}
+
+/* Frozen */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-frozen {
+  background:
+    rgba(90, 200, 250, 0.13);
+  color: #5ac8fa;
+}
+
+/* Drinks */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-drinks {
+  background:
+    rgba(10, 132, 255, 0.13);
+  color: #409cff;
+}
+
+/* Household */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-household {
+  background:
+    rgba(255, 214, 10, 0.13);
+  color: #ffd60a;
+}
+
+/* Other */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-category-other {
+  background:
+    rgba(142, 142, 147, 0.16);
+  color: #aeaeb2;
+}
+
+/* ========================================
+   Pantry card interaction
+   ======================================== */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card {
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card:hover {
+  transform: translateY(-2px);
+  border-color:
+    rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 10px 28px
+      rgba(0, 0, 0, 0.22);
+}
+
+/* ========================================
+   Pantry low-stock controls
+   ======================================== */
+
+.familyhub-shell
+  .pantry-low-stock-control {
+  padding: 14px 16px;
+  border: 1px solid
+    var(--pantry-border);
+  border-radius: 14px;
+  background:
+    var(--pantry-inset);
+}
+
+.familyhub-shell
+  .pantry-low-stock-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.familyhub-shell
+  .pantry-low-stock-heading
+  > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.familyhub-shell
+  .pantry-low-stock-heading
+  strong {
+  color: var(--pantry-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.familyhub-shell
+  .pantry-low-stock-heading
+  small {
+  color: var(--pantry-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* Switch */
+
+.familyhub-shell
+  .pantry-low-stock-toggle {
+  position: relative;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background:
+    rgba(120, 120, 128, 0.32);
+  cursor: pointer;
+  transition:
+    background 160ms ease;
+}
+
+.familyhub-shell
+  .pantry-low-stock-toggle
+  span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 1px 4px
+      rgba(0, 0, 0, 0.25);
+  transition:
+    transform 180ms ease;
+}
+
+.familyhub-shell
+  .pantry-low-stock-toggle.is-active {
+  background:
+    var(
+      --familyhub-accent,
+      #7c3aed
+    );
+}
+
+.familyhub-shell
+  .pantry-low-stock-toggle.is-active
+  span {
+  transform:
+    translateX(18px);
+}
+
+/* Threshold */
+
+.familyhub-shell
+  .pantry-low-stock-threshold {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid
+    var(--pantry-border);
+}
+
+.familyhub-shell
+  .pantry-low-stock-threshold
+  input {
+  width: 120px;
+}
+
+.familyhub-shell
+  .pantry-low-stock-threshold
+  small {
+  color: var(--pantry-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* ========================================
+   Pantry running-low status
+   ======================================== */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-low-stock-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+  padding: 3px 9px;
+  border: 1px solid
+    rgba(255, 105, 97, 0.28);
+  border-radius: 999px;
+  background:
+    rgba(255, 105, 97, 0.14);
+  color: #ff6961;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-running-low-filter {
+  position: relative;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-running-low-filter
+  > span {
+  color: #ff6961;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-running-low-filter.is-active {
+  border-color:
+    rgba(255, 105, 97, 0.3);
+  background:
+    rgba(255, 105, 97, 0.13);
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-running-low-filter.is-active
+  > span {
+  color: #ff6961;
+}
+
+/* ========================================
+   Pantry → Shopping
+   ======================================== */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-add-shopping-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+  padding: 3px 9px;
+  border: 1px solid
+    rgba(124, 58, 237, 0.34);
+  border-radius: 999px;
+  background:
+    rgba(124, 58, 237, 0.14);
+  color: #a78bfa;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-add-shopping-button:hover {
+  border-color:
+    rgba(124, 58, 237, 0.55);
+  background:
+    rgba(124, 58, 237, 0.24);
+  transform: translateY(-1px);
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-add-shopping-button:disabled {
+  opacity: 0.55;
+  cursor: default;
+  transform: none;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-on-shopping-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+  padding: 3px 9px;
+  border: 1px solid
+    rgba(48, 209, 88, 0.24);
+  border-radius: 999px;
+  background:
+    rgba(48, 209, 88, 0.12);
+  color: #30d158;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* ========================================
+   Pantry automatic Shopping
+   ======================================== */
+
+.familyhub-shell
+  .pantry-low-stock-options {
+  display: flex;
+  flex-direction: column;
+}
+
+.familyhub-shell
+  .pantry-auto-shopping-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid
+    var(--pantry-border);
+}
+
+.familyhub-shell
+  .pantry-auto-shopping-control
+  > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.familyhub-shell
+  .pantry-auto-shopping-control
+  strong {
+  color: var(--pantry-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.familyhub-shell
+  .pantry-auto-shopping-control
+  small {
+  color: var(--pantry-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* ========================================
+   Pantry Buy Quantity
+   ======================================== */
+
+.familyhub-shell
+  .pantry-auto-shopping-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.familyhub-shell
+  .pantry-restock-quantity {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid
+    var(--pantry-border);
+}
+
+.familyhub-shell
+  .pantry-restock-quantity
+  > span {
+  color: var(--pantry-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.familyhub-shell
+  .pantry-restock-quantity
+  input {
+  width: 180px;
+  max-width: 100%;
+}
+
+.familyhub-shell
+  .pantry-restock-quantity
+  small {
+  color: var(--pantry-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* ========================================
+   Pantry quick quantity controls
+   ======================================== */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-quantity-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid
+    var(--pantry-border);
+  border-radius: 12px;
+  background: var(--pantry-inset);
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-quantity-stepper-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: var(--pantry-surface);
+  color: var(--pantry-text);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    background 120ms ease,
+    opacity 120ms ease;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-quantity-stepper-button:hover:not(:disabled) {
+  background: rgba(
+    120,
+    120,
+    128,
+    0.12
+  );
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-quantity-stepper-button:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-quantity-stepper-button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-quantity-stepper-value {
+  min-width: 30px;
+  padding: 0 4px;
+  color: var(--pantry-text);
+  font-size: 15px;
+  font-weight: 750;
+  text-align: center;
+  font-variant-numeric:
+    tabular-nums;
+}
+
+/* ========================================
+   Pantry stock + pack size
+   ======================================== */
+
+.familyhub-shell
+  .pantry-stock-fields {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+  gap: 14px;
+}
+
+.familyhub-shell
+  .pantry-stock-fields
+  label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.familyhub-shell
+  .pantry-stock-fields
+  small {
+  margin-top: 6px;
+  color: var(--pantry-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+@media (max-width: 700px) {
+  .familyhub-shell
+    .pantry-stock-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========================================
+   Pantry stock field polish
+   ======================================== */
+
+.familyhub-shell
+  .pantry-stock-fields {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+.familyhub-shell
+  .pantry-stock-fields
+  label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.familyhub-shell
+  .pantry-stock-fields
+  label
+  > span {
+  color: var(--pantry-text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.familyhub-shell
+  .pantry-stock-fields
+  input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+
+  border: 1px solid
+    var(--pantry-border);
+  border-radius: 13px;
+
+  outline: none;
+
+  background: var(--pantry-inset);
+  color: var(--pantry-text);
+
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.familyhub-shell
+  .pantry-stock-fields
+  input::placeholder {
+  color: var(--pantry-muted);
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.familyhub-shell
+  .pantry-stock-fields
+  input:hover {
+  border-color: rgba(
+    142,
+    61,
+    255,
+    0.42
+  );
+}
+
+.familyhub-shell
+  .pantry-stock-fields
+  input:focus {
+  border-color: #8e3dff;
+  box-shadow:
+    0 0 0 3px
+    rgba(142, 61, 255, 0.14);
+}
+
+.familyhub-shell
+  .pantry-stock-fields
+  small {
+  min-height: 30px;
+  margin: 0;
+
+  color: var(--pantry-muted);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+/*
+ * Quantity only needs enough room
+ * for a stock count.
+ */
+
+.familyhub-shell
+  .pantry-stock-fields
+  label:first-child
+  input {
+  text-align: center;
+  font-size: 17px;
+  font-weight: 750;
+  font-variant-numeric:
+    tabular-nums;
+}
+
+/*
+ * Remove the ugly native number
+ * spinner buttons from Quantity.
+ */
+
+.familyhub-shell
+  .pantry-stock-fields
+  input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.familyhub-shell
+  .pantry-stock-fields
+  input[type="number"]::-webkit-inner-spin-button,
+.familyhub-shell
+  .pantry-stock-fields
+  input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+/*
+ * Stack the fields on smaller
+ * screens.
+ */
+
+@media (max-width: 700px) {
+  .familyhub-shell
+    .pantry-stock-fields {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .familyhub-shell
+    .pantry-stock-fields
+    small {
+    min-height: 0;
+  }
+}
+
+/* ========================================
+   Pantry card pack size
+   ======================================== */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card-pack-size {
+  display: block;
+  margin-top: 3px;
+  margin-bottom: 7px;
+
+  color: var(--pantry-muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ========================================
+   Pantry card information hierarchy
+   ======================================== */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  margin-bottom: 8px;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card-name {
+  display: block;
+  width: 100%;
+  margin: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: var(--pantry-text);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card-pack-size {
+  display: block;
+  margin: 3px 0 0;
+
+  color: var(--pantry-muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  min-width: 0;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-quantity-stepper {
+  margin: 0;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-card-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+}
+
+/* ========================================
+   Pantry Stock Settings input polish
+   ======================================== */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-low-stock-threshold,
+.familyhub-shell
+  .pantry-page
+  .pantry-restock-quantity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  width: 100%;
+  min-width: 0;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-low-stock-threshold
+  > span,
+.familyhub-shell
+  .pantry-page
+  .pantry-restock-quantity
+  > span {
+  color: var(--pantry-text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/*
+ * Match Quantity / Pack Size styling.
+ */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-low-stock-threshold
+  input,
+.familyhub-shell
+  .pantry-page
+  .pantry-restock-quantity
+  input {
+  box-sizing: border-box;
+
+  width: 150px;
+  height: 48px;
+
+  padding: 0 14px;
+
+  border: 1px solid
+    var(--pantry-border);
+  border-radius: 13px;
+  outline: none;
+
+  background:
+    var(--pantry-inset);
+
+  color:
+    var(--pantry-text);
+
+  font: inherit;
+  font-size: 17px;
+  font-weight: 750;
+
+  text-align: center;
+
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-low-stock-threshold
+  input:hover,
+.familyhub-shell
+  .pantry-page
+  .pantry-restock-quantity
+  input:hover {
+  border-color:
+    rgba(255, 255, 255, 0.18);
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-low-stock-threshold
+  input:focus,
+.familyhub-shell
+  .pantry-page
+  .pantry-restock-quantity
+  input:focus {
+  border-color:
+    rgba(139, 92, 246, 0.8);
+
+  box-shadow:
+    0 0 0 3px
+      rgba(139, 92, 246, 0.14);
+
+  background:
+    rgba(255, 255, 255, 0.075);
+}
+
+/*
+ * Remove browser number arrows.
+ */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-low-stock-threshold
+  input[type="number"]::-webkit-inner-spin-button,
+.familyhub-shell
+  .pantry-page
+  .pantry-low-stock-threshold
+  input[type="number"]::-webkit-outer-spin-button,
+.familyhub-shell
+  .pantry-page
+  .pantry-restock-quantity
+  input[type="number"]::-webkit-inner-spin-button,
+.familyhub-shell
+  .pantry-page
+  .pantry-restock-quantity
+  input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.familyhub-shell
+  .pantry-page
+  .pantry-low-stock-threshold
+  input[type="number"],
+.familyhub-shell
+  .pantry-page
+  .pantry-restock-quantity
+  input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+/*
+ * Helper text.
+ */
+
+.familyhub-shell
+  .pantry-page
+  .pantry-low-stock-threshold
+  small,
+.familyhub-shell
+  .pantry-page
+  .pantry-restock-quantity
+  small {
+  color: var(--pantry-muted);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
 }

@@ -1,0 +1,132 @@
+[
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "async function searchWikimediaFreshFoodOptions(\n  name\n) {",
+    "after": "// Explicit choices remain authoritative; old automatic product matches do not.\nconst FRESH_IMAGE_SOURCE = \"wikimedia-fresh-v2\";\nconst freshImageRequests = new Map();\n\nfunction isPreferredFreshImage(image) {\n  return Boolean(image?.image_url && [\n    \"custom-upload\", \"open-food-facts-selected\",\n    \"familyhub-fresh-library\", FRESH_IMAGE_SOURCE,\n  ].includes(image.source));\n}\n\nfunction savedFreshImage(canonicalName, originalName) {\n  const library = getFreshFoodLibraryImage.get(canonicalName);\n  if (isPreferredFreshImage(library)) {\n    // Older uploads were saved with a generic library source. Keep Reset visible.\n    const cached = getCachedImage.get(canonicalName);\n    if (cached?.source === \"custom-upload\" && cached.image_url === library.image_url) {\n      return { ...library, source: \"custom-upload\" };\n    }\n    return library;\n  }\n  for (const key of new Set([canonicalName, originalName.toLowerCase()])) {\n    const cached = getCachedImage.get(key);\n    if (isPreferredFreshImage(cached)) {\n      saveFreshFoodLibraryImage.run(canonicalName, cached.image_url,\n        cached.source, cached.matched_product || canonicalName,\n        Number(cached.rotation || 0));\n      return getFreshFoodLibraryImage.get(canonicalName);\n    }\n  }\n  return null;\n}\n\nasync function resolveFreshFoodImage(name) {\n  const canonicalName = getCanonicalFreshFoodName(name);\n  let saved = savedFreshImage(canonicalName, name);\n  if (!saved) {\n    if (!freshImageRequests.has(canonicalName)) {\n      const request = (async () => {\n        const options = await searchWikimediaFreshFoodOptions(canonicalName);\n        // A user may have uploaded or selected an image during the search.\n        const current = savedFreshImage(canonicalName, name);\n        if (current || !options.length) return current;\n        const best = options[0];\n        saveFreshFoodLibraryImage.run(canonicalName, best.imageUrl,\n          FRESH_IMAGE_SOURCE, best.matchedProduct, 0);\n        return getFreshFoodLibraryImage.get(canonicalName);\n      })().finally(() => freshImageRequests.delete(canonicalName));\n      freshImageRequests.set(canonicalName, request);\n    }\n    saved = await freshImageRequests.get(canonicalName);\n  }\n  if (!saved) return null; // Retry later; never substitute a packaged product.\n  saveCachedImage.run(canonicalName, canonicalName, saved.image_url,\n    saved.source, saved.matched_product, null, Number(saved.rotation || 0));\n  return { imageUrl: saved.image_url, source: saved.source,\n    matchedProduct: saved.matched_product, barcode: null,\n    rotation: Number(saved.rotation || 0), canonicalName };\n}\n\nasync function searchWikimediaFreshFoodOptions(\n  name\n) {"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "  const rawSearchTerms =\n    new Map([",
+    "after": "  // These Commons photographs have been visually verified as raw ingredients.\n  const preferredFile = new Map([\n    [\"potato\", \"File:Potato and cross section.jpg\"],\n    [\"carrot\", \"File:Carrots.jpg\"],\n    [\"apple\", \"File:Red Apple.jpg\"],\n    [\"banana\", \"File:Banana-Single.jpg\"],\n    [\"chicken breast\", \"File:Raw chicken slices.jpg\"],\n  ]).get(canonicalName);\n\n  const rawSearchTerms =\n    new Map(["
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "    const response =\n      await fetch(\n        url,\n        {\n          headers: {\n            \"User-Agent\":\n              \"FamilyHub/0.1 (personal family dashboard)\",\n\n            Accept:\n              \"application/json\",\n          },\n\n          signal:\n            AbortSignal.timeout(\n              8000\n            ),\n        }\n      );\n\n    if (!response.ok) {\n      throw new Error(\n        `Wikimedia Commons returned ${response.status}`\n      );\n    }\n\n    const data =\n      await response.json();\n\n    const pages =\n      Object.values(\n        data?.query?.pages ||\n          {}\n      );\n\n",
+    "after": "    const urls = [url];\n    if (preferredFile) {\n      const preferredUrl = new URL(url);\n      for (const key of [\"generator\", \"gsrsearch\", \"gsrnamespace\", \"gsrlimit\"]) {\n        preferredUrl.searchParams.delete(key);\n      }\n      preferredUrl.searchParams.set(\"titles\", preferredFile);\n      urls.unshift(preferredUrl);\n    }\n    const responses = await Promise.allSettled(urls.map(async (requestUrl) => {\n      const response = await fetch(requestUrl, {\n        headers: { \"User-Agent\": \"FamilyHub/0.1 (personal family dashboard)\",\n          Accept: \"application/json\" },\n        signal: AbortSignal.timeout(8000),\n      });\n      if (!response.ok) throw new Error(\"Wikimedia returned \" + response.status);\n      const data = await response.json();\n      if (data.error) throw new Error(data.error.info || \"Wikimedia search failed\");\n      return Object.values(data?.query?.pages || {});\n    }));\n    const pages = [];\n    for (const result of responses) {\n      if (result.status === \"fulfilled\") pages.push(...result.value);\n      else console.error(\"Fresh-food source unavailable:\", result.reason.message);\n    }\n\n"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "    \"gsrlimit\",\n    \"12\"",
+    "after": "    \"gsrlimit\",\n    \"40\""
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "    \"iiprop\",\n    \"url|mime\"",
+    "after": "    \"iiprop\",\n    \"url|mime|extmetadata\""
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "        !mime.startsWith(\n          \"image/\"\n        ) ||\n        mime ===\n          \"image/svg+xml\" ||",
+    "after": "        ![\"image/jpeg\", \"image/png\", \"image/webp\"].includes(mime) ||"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "          \"cake\",\n          \"cakes\",",
+    "after": "          \"bread\", \"muffin\", \"muffins\", \"cookie\", \"cookies\",\n          \"jam\", \"sauce\", \"puree\", \"flour\", \"powder\", \"dried\",\n          \"boiled\", \"mashed\", \"roast\", \"curry\", \"stew\", \"pizza\",\n          \"nugget\", \"nuggets\", \"breaded\", \"marinated\", \"seasoned\",\n          \"packet\", \"bottle\", \"logo\", \"drawing\", \"illustration\",\n          \"orchard\", \"garden\", \"gardens\", \"blossom\", \"blossoms\", \"seedling\",\n          \"leaves\", \"foliage\", \"growing\", \"harvest\", \"truck\",\n          \"fry\", \"tempura\", \"cobbler\", \"quesadilla\", \"udon\", \"spicy\",\n          \"art\", \"poster\", \"painting\", \"handbook\", \"book\", \"diseases\",\n          \"fungus\", \"wild\", \"plantain\", \"overexposed\", \"compressed\",\n          \"cake\",\n          \"cakes\","
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "          \"sprout\",\n          \"sprouts\",\n          \"sprouting\",",
+    "after": "          \"sprouting\","
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "      const unwanted =\n        unwantedWords.some(\n          (word) =>\n            titleWords.has(\n              word\n            )\n        );",
+    "after": "      const description = normalizeFreshFoodName(\n        String(imageInfo?.extmetadata?.ImageDescription?.value || \"\")\n          .replace(/<[^>]*>/g, \" \")\n      );\n      const verified = page.title === preferredFile;\n      const descriptionWords = new Set(description.split(/\\s+/));\n      const unwanted = unwantedWords.some((word) =>\n        titleWords.has(word) || descriptionWords.has(word)\n      );"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "      if (unwanted) {",
+    "after": "      if (unwanted && !verified) {"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "      const canonicalWords =\n        canonicalName\n          .split(/\\s+/)\n          .filter(Boolean);\n\n      const matchesFood =\n        canonicalWords.every(\n          (word) =>\n            normalizedTitle.includes(\n              word\n            )\n        );\n\n",
+    "after": "      // Match whole aliases, not substrings (apple must not match pineapple).\n      const aliases = [...FRESH_FOOD_ALIASES]\n        .filter(([, canonical]) => canonical === canonicalName)\n        .map(([alias]) => alias);\n      const matchesFood = aliases.some((alias) =>\n        (\" \" + normalizedTitle + \" \").includes(\" \" + alias + \" \")\n      );\n      const meat = /\\b(chicken|beef|pork|lamb|fish|salmon|tuna|prawns|sausages)\\b/.test(canonicalName);\n      if (!verified && meat && !/\\b(raw|uncooked)\\b/.test(normalizedTitle + \" \" + description)) continue;\n      if (canonicalName === \"potato\" && /\\bsweet\\b/.test(normalizedTitle)) continue;\n      if (!verified && normalizedTitle.split(/\\s+/).length > 8) continue;\n      if (!verified && !aliases.includes(normalizedTitle) &&\n          !/\\b(raw|uncooked|fresh|whole|isolated)\\b|white background/.test(normalizedTitle)) continue;\n\n"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "      if (!matchesFood) {",
+    "after": "      if (!matchesFood && !verified) {"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "      let score =\n        2000;",
+    "after": "      let score = verified ? 10000 : 2000;\n      if (/\\b(raw|uncooked|isolated)\\b/.test(normalizedTitle)) score += 400;"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "        matchedProduct:\n          title ||\n          canonicalName,",
+    "after": "        matchedProduct:\n          verified ? canonicalName : (title || canonicalName),"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "        source:\n          \"wikimedia-commons\",",
+    "after": "        source: FRESH_IMAGE_SOURCE,"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "async function searchOpenFoodFacts(\n  name\n) {",
+    "after": "async function searchOpenFoodFacts(\n  name\n) {\n  if (getCanonicalFreshFoodName(name)) {\n    return resolveFreshFoodImage(name);\n  }"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "  const productOptions =\n    await searchSearchALiciousOptions(\n      automaticSearchName\n    );",
+    "after": "  const productOptions = canonicalFreshFood\n    ? []\n    : await searchSearchALiciousOptions(automaticSearchName);"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "      libraryImage?.image_url\n    ) {",
+    "after": "      isPreferredFreshImage(libraryImage)\n    ) {"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "let cached =\n  getCachedImage.get(\n    cacheKey\n  );",
+    "after": "// Fresh lookup bypasses stale automatic product-cache entries.\nif (canonicalFreshFood) {\n  try {\n    const wasSaved = Boolean(savedFreshImage(canonicalFreshFood, name));\n    const image = await resolveFreshFoodImage(name);\n    return res.json({ success: true, name, canonicalName: canonicalFreshFood,\n      imageUrl: null, source: null, matchedProduct: null, barcode: null,\n      rotation: 0, ...image, cached: wasSaved });\n  } catch (error) {\n    console.error(\"Fresh food image lookup failed:\", error.message);\n    return res.json({ success: true, name, canonicalName: canonicalFreshFood,\n      imageUrl: null, source: null, matchedProduct: null, barcode: null,\n      rotation: 0, cached: false });\n  }\n}\n\nlet cached =\n  getCachedImage.get(\n    cacheKey\n  );"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "      const result = {\n        success: true,\n        name,\n        imageUrl:\n          product?.imageUrl ||\n          null,\n        source:\n          product\n            ? \"open-food-facts\"\n            : null,\n        matchedProduct:\n          product?.matchedProduct ||\n          null,\n        barcode:\n          product?.barcode ||\n          null,\n      };",
+    "after": "      const result = {\n        success: true,\n        name,\n        imageUrl:\n          product?.imageUrl ||\n          null,\n        source:\n          product\n            ? (product.source || \"open-food-facts\")\n            : null,\n        matchedProduct:\n          product?.matchedProduct ||\n          null,\n        barcode:\n          product?.barcode ||\n          null,\n      };"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub-API/src/routes/foodImageRoutes.js",
+    "before": "      const result = {\n        success: true,\n        name,\n\n        imageUrl:\n          product?.imageUrl ||\n          null,\n\n        source:\n          product\n            ? \"open-food-facts\"\n            : null,\n\n        matchedProduct:\n          product?.matchedProduct ||\n          null,\n\n        barcode:\n          product?.barcode ||\n          null,\n      };",
+    "after": "      const result = {\n        success: true,\n        name,\n\n        imageUrl:\n          product?.imageUrl ||\n          null,\n\n        source:\n          product\n            ? (product.source || \"open-food-facts\")\n            : null,\n\n        matchedProduct:\n          product?.matchedProduct ||\n          null,\n\n        barcode:\n          product?.barcode ||\n          null,\n      };"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub/src/components/PantryItemModal.jsx",
+    "before": "async function handleCustomImageUrl() {\n  const cleanName =\n    name.trim();\n\n  const cleanUrl =\n    customImageUrl.trim();\n\n  if (!cleanName) {\n    setError(\n      \"Enter the item name before choosing an image.\"\n    );\n    return;\n  }\n\n  if (!cleanUrl) {\n    setError(\n      \"Paste an image URL first.\"\n    );\n    return;\n  }\n\n  setImageActionLoading(true);\n  setError(\"\");\n\n  try {\n    const response =\n      await fetch(\n        `${API_BASE_URL}/api/food-images/custom-url`,\n        {\n          method: \"POST\",\n\n          headers: {\n            \"Content-Type\":\n              \"application/json\",\n\n            \"X-FamilyHub-Key\":\n              FAMILYHUB_API_KEY,\n          },\n\n          body: JSON.stringify({\n            name: cleanName,\n            imageUrl: cleanUrl,\n          }),\n        }\n      );\n\n    const data =\n      await response.json();\n\n    if (!response.ok) {\n      throw new Error(\n        data.error ||\n          \"Unable to use image URL\"\n      );\n    }\n\n    setImageLookupName(\n      cleanName\n    );\n\n    setImageSource(\n      \"custom-upload\"\n    );\n\n    setCustomImageVersion(\n      (current) =>\n        current + 1\n    );\n\n    setCustomImageUrl(\"\");\n    setImageUrlMode(false);\n    setChangeImageOpen(false);\n  } catch (err) {\n    console.error(err);\n\n    setError(\n      err.message ||\n        \"Unable to use image URL\"\n    );\n  } finally {\n    setImageActionLoading(false);\n  }\n}\n",
+    "after": "async function handleCustomImageUrl() {\n  const cleanName =\n    name.trim();\n\n  const cleanUrl =\n    customImageUrl.trim();\n\n  if (!cleanName) {\n    setError(\n      \"Enter the item name before choosing an image.\"\n    );\n    return;\n  }\n\n  if (!cleanUrl) {\n    setError(\n      \"Paste an image URL first.\"\n    );\n    return;\n  }\n\n  setImageActionLoading(true);\n  setError(\"\");\n\n  try {\n    const response =\n      await fetch(\n        `${API_BASE_URL}/api/food-images/custom-url`,\n        {\n          method: \"POST\",\n\n          headers: {\n            \"Content-Type\":\n              \"application/json\",\n\n            \"X-FamilyHub-Key\":\n              FAMILYHUB_API_KEY,\n          },\n\n          body: JSON.stringify({\n            name: cleanName,\n            imageUrl: cleanUrl,\n          }),\n        }\n      );\n\n    const data =\n      await response.json();\n\n    if (!response.ok) {\n      throw new Error(\n        data.error ||\n          \"Unable to use image URL\"\n      );\n    }\n\n    setImageLookupName(\n      cleanName\n    );\n\n    setImageSource(\n      \"custom-upload\"\n    );\n\n    setCustomImageVersion(\n      (current) =>\n        current + 1\n    );\n\n    notifyFoodImageChanged(cleanName);\n\n    setCustomImageUrl(\"\");\n    setImageUrlMode(false);\n    setChangeImageOpen(false);\n  } catch (err) {\n    console.error(err);\n\n    setError(\n      err.message ||\n        \"Unable to use image URL\"\n    );\n  } finally {\n    setImageActionLoading(false);\n  }\n}\n"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub/src/components/PantryItemModal.jsx",
+    "before": "async function handleRotateImage(\n  direction\n) {\n  const cleanName =\n    name.trim();\n\n  if (!cleanName) {\n    setError(\n      \"Enter the item name before rotating the image.\"\n    );\n    return;\n  }\n\n  setImageActionLoading(true);\n  setError(\"\");\n\n  try {\n    const currentResponse =\n      await fetch(\n        `${API_BASE_URL}/api/food-images?name=${encodeURIComponent(\n          cleanName\n        )}`,\n        {\n          headers: {\n            \"X-FamilyHub-Key\":\n              FAMILYHUB_API_KEY,\n          },\n        }\n      );\n\n    const currentData =\n      await currentResponse.json();\n\n    if (!currentResponse.ok) {\n      throw new Error(\n        currentData.error ||\n          \"Unable to read image rotation\"\n      );\n    }\n\n    const currentRotation =\n      Number(\n        currentData.rotation || 0\n      );\n\n    const nextRotation =\n      direction === \"left\"\n        ? (currentRotation + 270) %\n          360\n        : (currentRotation + 90) %\n          360;\n\n    const response =\n      await fetch(\n        `${API_BASE_URL}/api/food-images/rotation`,\n        {\n          method: \"POST\",\n\n          headers: {\n            \"Content-Type\":\n              \"application/json\",\n\n            \"X-FamilyHub-Key\":\n              FAMILYHUB_API_KEY,\n          },\n\n          body: JSON.stringify({\n            name: cleanName,\n            rotation:\n              nextRotation,\n          }),\n        }\n      );\n\n    const data =\n      await response.json();\n\n    if (!response.ok) {\n      throw new Error(\n        data.error ||\n          \"Unable to rotate image\"\n      );\n    }\n\n    setCustomImageVersion(\n      (current) =>\n        current + 1\n    );\n  } catch (err) {\n    console.error(err);\n\n    setError(\n      err.message ||\n        \"Unable to rotate image\"\n    );\n  } finally {\n    setImageActionLoading(false);\n  }\n}\n",
+    "after": "async function handleRotateImage(\n  direction\n) {\n  const cleanName =\n    name.trim();\n\n  if (!cleanName) {\n    setError(\n      \"Enter the item name before rotating the image.\"\n    );\n    return;\n  }\n\n  setImageActionLoading(true);\n  setError(\"\");\n\n  try {\n    const currentResponse =\n      await fetch(\n        `${API_BASE_URL}/api/food-images?name=${encodeURIComponent(\n          cleanName\n        )}`,\n        {\n          headers: {\n            \"X-FamilyHub-Key\":\n              FAMILYHUB_API_KEY,\n          },\n        }\n      );\n\n    const currentData =\n      await currentResponse.json();\n\n    if (!currentResponse.ok) {\n      throw new Error(\n        currentData.error ||\n          \"Unable to read image rotation\"\n      );\n    }\n\n    const currentRotation =\n      Number(\n        currentData.rotation || 0\n      );\n\n    const nextRotation =\n      direction === \"left\"\n        ? (currentRotation + 270) %\n          360\n        : (currentRotation + 90) %\n          360;\n\n    const response =\n      await fetch(\n        `${API_BASE_URL}/api/food-images/rotation`,\n        {\n          method: \"POST\",\n\n          headers: {\n            \"Content-Type\":\n              \"application/json\",\n\n            \"X-FamilyHub-Key\":\n              FAMILYHUB_API_KEY,\n          },\n\n          body: JSON.stringify({\n            name: cleanName,\n            rotation:\n              nextRotation,\n          }),\n        }\n      );\n\n    const data =\n      await response.json();\n\n    if (!response.ok) {\n      throw new Error(\n        data.error ||\n          \"Unable to rotate image\"\n      );\n    }\n\n    setCustomImageVersion(\n      (current) =>\n        current + 1\n    );\n\n    notifyFoodImageChanged(cleanName);\n  } catch (err) {\n    console.error(err);\n\n    setError(\n      err.message ||\n        \"Unable to rotate image\"\n    );\n  } finally {\n    setImageActionLoading(false);\n  }\n}\n"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub/src/components/PantryItemModal.jsx",
+    "before": "async function handleResetImage() {\n  \n  const cleanName =\n    name.trim();\n\n  if (!cleanName) {\n    return;\n  }\n\n  setImageActionLoading(true);\n  setError(\"\");\n\n  try {\n    const response =\n      await fetch(\n        `${API_BASE_URL}/api/food-images/reset`,\n        {\n          method: \"POST\",\n\n          headers: {\n            \"Content-Type\":\n              \"application/json\",\n\n            \"X-FamilyHub-Key\":\n              FAMILYHUB_API_KEY,\n          },\n\n          body: JSON.stringify({\n            name: cleanName,\n          }),\n        }\n      );\n\n    const data =\n      await response.json();\n\n    if (!response.ok) {\n      throw new Error(\n        data.error ||\n          \"Unable to reset image\"\n      );\n    }\n\n    setImageLookupName(\n      cleanName\n    );\n\n    setImageSource(\n      data.source || null\n    );\n\n    setCustomImageVersion(\n      (current) =>\n        current + 1\n    );\n\n    setCustomImageUrl(\"\");\n    setImageUrlMode(false);\n    setChangeImageOpen(false);\n  } catch (err) {\n    console.error(err);\n\n    setError(\n      err.message ||\n        \"Unable to reset image\"\n    );\n  } finally {\n    setImageActionLoading(false);\n  }\n}\n",
+    "after": "async function handleResetImage() {\n  \n  const cleanName =\n    name.trim();\n\n  if (!cleanName) {\n    return;\n  }\n\n  setImageActionLoading(true);\n  setError(\"\");\n\n  try {\n    const response =\n      await fetch(\n        `${API_BASE_URL}/api/food-images/reset`,\n        {\n          method: \"POST\",\n\n          headers: {\n            \"Content-Type\":\n              \"application/json\",\n\n            \"X-FamilyHub-Key\":\n              FAMILYHUB_API_KEY,\n          },\n\n          body: JSON.stringify({\n            name: cleanName,\n          }),\n        }\n      );\n\n    const data =\n      await response.json();\n\n    if (!response.ok) {\n      throw new Error(\n        data.error ||\n          \"Unable to reset image\"\n      );\n    }\n\n    setImageLookupName(\n      cleanName\n    );\n\n    setImageSource(\n      data.source || null\n    );\n\n    setCustomImageVersion(\n      (current) =>\n        current + 1\n    );\n\n    notifyFoodImageChanged(cleanName);\n\n    setCustomImageUrl(\"\");\n    setImageUrlMode(false);\n    setChangeImageOpen(false);\n  } catch (err) {\n    console.error(err);\n\n    setError(\n      err.message ||\n        \"Unable to reset image\"\n    );\n  } finally {\n    setImageActionLoading(false);\n  }\n}\n"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub/src/components/PantryItemModal.jsx",
+    "before": "notifyFoodImageChanged(\n  cleanName\n);\n\n/*\n * Tell every FoodPicture currently\n * on screen that this food's image\n * has changed.\n */\n\nnotifyFoodImageChanged(\n  cleanName\n);",
+    "after": "notifyFoodImageChanged(cleanName);"
+  },
+  {
+    "file": "C:/Users/Nevpe/Documents/FamilyHub/src/components/PantryItemModal.jsx",
+    "before": "      option.imageUrl\n    }\n    alt={",
+    "after": "      option.imageUrl.startsWith(\"/uploads/\")\n        ? `${API_BASE_URL}${option.imageUrl}`\n        : option.imageUrl\n    }\n    alt={"
+  }
+]

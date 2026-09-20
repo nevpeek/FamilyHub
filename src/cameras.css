@@ -1,0 +1,116 @@
+.cameras-page { display: grid; gap: 20px; min-width: 0; }
+.cameras-page .page-title-row { margin-bottom: 0; }
+.cameras-page .page-description, .camera-list-message, .camera-setup-help p { color: var(--apple-muted); line-height: 1.5; }
+.apple-home.cameras-page .home-camera-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+@media (min-width: 701px) {
+  .apple-home.cameras-page .home-camera-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1100px) {
+  html .familyhub-shell .familyhub-main:has(.cameras-page) {
+    width: calc(100% - 48px);
+    max-width: none;
+    padding-top: 18px;
+  }
+
+  .apple-home.cameras-page .home-camera-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .apple-home.cameras-page .home-camera-frame {
+    box-sizing: border-box;
+    height: min(
+      18vw,
+      calc((100dvh - 380px) / 2)
+    );
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+
+  .apple-home.cameras-page .home-camera-frame img {
+    object-fit: contain;
+  }
+}
+.apple-home .home-camera-overlay { flex-wrap: wrap; }
+.apple-home .home-camera-overlay small { flex-basis: 100%; font-weight: 400; font-size: 0.7rem; }
+.camera-setup-help { padding: 18px 20px; }
+.camera-setup-help summary { cursor: pointer; font-weight: 600; min-height: 44px; align-content: center; }
+.camera-setup-help p { margin: 8px 0; }
+.home-camera-viewer { color: var(--apple-text); overflow-y: auto; }
+.home-camera-viewer-close { min-width: 44px; min-height: 44px; }
+.home-camera-live-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; height: 100%; min-height: 180px; color: #b6bbc5; }
+.apple-home .home-camera-placeholder { padding: 14px; text-align: center; box-sizing: border-box; }
+@media (max-width: 700px) {
+  .home-camera-viewer-backdrop { padding: 12px; }
+  .home-camera-viewer-header { padding: 12px; gap: 12px; }
+  .familyhub-shell:not(.wall-mode) .bottom-navigation { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .apple-home .home-camera-frame img { transition: none; }
+  .apple-home .home-camera-frame:hover img { transform: none; }
+}
+
+.camera-page-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+.camera-primary-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 18px; border: 0; border-radius: 12px; background: var(--familyhub-accent, #007aff); color: white; font: inherit; font-weight: 600; cursor: pointer; }
+.camera-primary-button:disabled { opacity: 0.6; cursor: wait; }
+.camera-add-form { display: grid; gap: 12px; padding: 22px; max-width: 640px; width: 100%; box-sizing: border-box; }
+.camera-add-form h3 { margin: 0; font-size: 1.2rem; }
+.camera-add-form p { margin: 0; color: var(--apple-muted); line-height: 1.5; font-size: 0.9rem; }
+.camera-add-form label { font-weight: 600; margin-top: 8px; }
+.camera-add-form input { width: 100%; min-width: 0; box-sizing: border-box; min-height: 46px; border: 1px solid var(--apple-border); border-radius: 10px; padding: 10px 12px; background: var(--home-inset); color: var(--apple-text); font: inherit; font-size: 16px; }
+.camera-add-form input:focus-visible { outline: 2px solid var(--home-link); outline-offset: 2px; }
+.camera-url-input { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.camera-url-input .text-button { flex-shrink: 0; }
+.camera-form-actions { display: flex; justify-content: flex-end; align-items: center; gap: 18px; margin-top: 8px; }
+.camera-add-form .camera-form-error { color: #c33030; }
+html[data-theme="dark"] .camera-add-form .camera-form-error { color: #ff9d9d; }
+.camera-save-notice { margin: 0; padding: 14px 18px; border: 1px solid var(--apple-border); border-radius: 14px; background: var(--apple-surface); color: var(--apple-text); }
+
+
+/* Large live camera viewer, with the close button always visible. */
+.home-camera-viewer-backdrop {
+  box-sizing: border-box;
+  padding: 16px;
+}
+
+.home-camera-viewer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: none;
+  height: calc(100dvh - 32px);
+  max-height: calc(100dvh - 32px);
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+.home-camera-viewer-header {
+  flex: 0 0 auto;
+  padding: 12px 16px;
+}
+
+.home-camera-viewer-close {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+}
+
+.home-camera-viewer-image {
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  aspect-ratio: auto;
+}
+
+.home-camera-viewer-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

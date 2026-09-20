@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../config/api";
+import { startAutoRefresh } from "../utils/startAutoRefresh";
 import { useEffect, useMemo, useState } from "react";
 import {
   CheckCircle2,
@@ -165,110 +166,177 @@ async function redeemReward(
 }
 
   useEffect(() => {
-  async function loadRewardSummary() {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/tasks/rewards/summary`
-      );
+    let cancelled = false;
+    let inFlight = false;
+    const controller = new AbortController();
 
-      if (!response.ok) {
-        throw new Error(
-          "Failed to load rewards"
+    async function loadRewardSummary() {
+      if (cancelled || inFlight) return;
+
+      inFlight = true;
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/tasks/rewards/summary`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
         );
+
+        if (!response.ok) {
+          throw new Error("Failed to load rewards");
+        }
+
+        const data = await response.json();
+
+        if (cancelled) return;
+
+        setRewardSummary(data.members || []);
+      } catch (err) {
+        if (cancelled || err.name === "AbortError") return;
+
+        console.error("Reward summary refresh error:", err);
+      } finally {
+        inFlight = false;
       }
-
-      const data =
-        await response.json();
-
-      setRewardSummary(
-        data.members || []
-      );
-    } catch (err) {
-      console.error(err);
     }
-  }
 
-  loadRewardSummary();
-}, [taskRefreshKey]);
+    loadRewardSummary();
+
+    const stopAutoRefresh = startAutoRefresh(loadRewardSummary);
+
+    return () => {
+      cancelled = true;
+      stopAutoRefresh();
+      controller.abort();
+    };
+  }, [taskRefreshKey]);
 
 useEffect(() => {
-  async function loadRewards() {
-    if (taskView !== "rewards") {
-      return;
-    }
+  if (taskView !== "rewards") return;
 
-    setRewardsLoading(true);
-    setRewardsError("");
+  let cancelled = false;
+  let inFlight = false;
+  let hasLoaded = false;
+  const controller = new AbortController();
+
+  setRewardsLoading(true);
+  setRewardsError("");
+
+  async function loadRewards() {
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/tasks/rewards`
+        `${API_BASE_URL}/api/tasks/rewards`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
       );
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.error ||
-            "Failed to load rewards"
+          data.error || "Failed to load rewards"
         );
       }
 
-      setRewards(
-        data.rewards || []
-      );
-    } catch (err) {
-      console.error(err);
+      if (cancelled) return;
 
-      setRewardsError(
-        err.message ||
-          "Unable to load rewards"
-      );
+      setRewards(data.rewards || []);
+      setRewardsError("");
+      hasLoaded = true;
+    } catch (err) {
+      if (cancelled || err.name === "AbortError") return;
+
+      console.error("Rewards refresh error:", err);
+
+      if (!hasLoaded) {
+        setRewardsError(
+          "Unable to load rewards. Retrying…"
+        );
+      }
     } finally {
-      setRewardsLoading(false);
+      inFlight = false;
+
+      if (!cancelled) {
+        setRewardsLoading(false);
+      }
     }
   }
 
   loadRewards();
+
+  const stopAutoRefresh = startAutoRefresh(loadRewards);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
 }, [taskView, taskRefreshKey]);
 
 useEffect(() => {
-  async function loadRewardHistory() {
-    if (taskView !== "rewards") {
-      return;
-    }
+  if (taskView !== "rewards") return;
 
-    setRewardHistoryLoading(true);
+  let cancelled = false;
+  let inFlight = false;
+  const controller = new AbortController();
+
+  setRewardHistoryLoading(true);
+
+  async function loadRewardHistory() {
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/tasks/rewards/history`
+        `${API_BASE_URL}/api/tasks/rewards/history`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
       );
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.error ||
-            "Unable to load reward history"
+          data.error || "Unable to load reward history"
         );
       }
 
-      setRewardHistory(
-        data.history || []
-      );
-    } catch (err) {
-      console.error(err);
+      if (cancelled) return;
 
-      setRewardHistory([]);
+      setRewardHistory(data.history || []);
+    } catch (err) {
+      if (cancelled || err.name === "AbortError") return;
+
+      console.error("Reward history refresh error:", err);
     } finally {
-      setRewardHistoryLoading(false);
+      inFlight = false;
+
+      if (!cancelled) {
+        setRewardHistoryLoading(false);
+      }
     }
   }
 
   loadRewardHistory();
+
+  const stopAutoRefresh = startAutoRefresh(loadRewardHistory);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
 }, [
   taskView,
   taskRefreshKey,
@@ -276,41 +344,61 @@ useEffect(() => {
 ]);
 
 useEffect(() => {
-  async function loadRewardGoals() {
-    if (taskView !== "rewards") {
-      return;
-    }
+  if (taskView !== "rewards") return;
 
-    setRewardGoalsLoading(true);
+  let cancelled = false;
+  let inFlight = false;
+  const controller = new AbortController();
+
+  setRewardGoalsLoading(true);
+
+  async function loadRewardGoals() {
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/tasks/rewards/goals`
+        `${API_BASE_URL}/api/tasks/rewards/goals`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
       );
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.error ||
-            "Unable to load reward goals"
+          data.error || "Unable to load reward goals"
         );
       }
 
-      setRewardGoals(
-        data.goals || []
-      );
-    } catch (err) {
-      console.error(err);
+      if (cancelled) return;
 
-      setRewardGoals([]);
+      setRewardGoals(data.goals || []);
+    } catch (err) {
+      if (cancelled || err.name === "AbortError") return;
+
+      console.error("Reward goals refresh error:", err);
     } finally {
-      setRewardGoalsLoading(false);
+      inFlight = false;
+
+      if (!cancelled) {
+        setRewardGoalsLoading(false);
+      }
     }
   }
 
   loadRewardGoals();
+
+  const stopAutoRefresh = startAutoRefresh(loadRewardGoals);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
 }, [
   taskView,
   taskRefreshKey,
@@ -318,56 +406,85 @@ useEffect(() => {
 ]);
 
   useEffect(() => {
+    let cancelled = false;
+    let inFlight = false;
+    let hasLoaded = false;
+    const controller = new AbortController();
+
+    setLoading(true);
+    setError("");
+
     async function loadTasks() {
-      setLoading(true);
-      setError("");
+      if (cancelled || inFlight) return;
+
+      inFlight = true;
 
       try {
         const params = new URLSearchParams();
 
         if (selectedMemberId !== "all") {
-          params.set(
-            "memberId",
-            String(selectedMemberId)
-          );
+          params.set("memberId", String(selectedMemberId));
         }
 
-if (!showCompleted && taskView !== "routines") {
-  params.set("completed", "false");
-}
+        if (!showCompleted && taskView !== "routines") {
+          params.set("completed", "false");
+        }
 
         const query = params.toString();
 
         const response = await fetch(
           `${API_BASE_URL}/api/tasks${
             query ? `?${query}` : ""
-          }`
+          }`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
         );
 
         if (!response.ok) {
-          throw new Error(
-            "Failed to load tasks"
-          );
+          throw new Error("Failed to load tasks");
         }
 
         const data = await response.json();
 
+        if (cancelled) return;
+
         setTasks(data.tasks || []);
+        setError("");
+        hasLoaded = true;
       } catch (err) {
-        console.error(err);
-        setError("Unable to load tasks");
+        if (cancelled || err.name === "AbortError") return;
+
+        console.error("Tasks refresh error:", err);
+
+        if (!hasLoaded) {
+          setError("Unable to load tasks. Retrying…");
+        }
       } finally {
-        setLoading(false);
+        inFlight = false;
+
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     loadTasks();
-}, [
-  selectedMemberId,
-  showCompleted,
-  taskView,
-  taskRefreshKey,
-]);
+
+    const stopAutoRefresh = startAutoRefresh(loadTasks);
+
+    return () => {
+      cancelled = true;
+      stopAutoRefresh();
+      controller.abort();
+    };
+  }, [
+    selectedMemberId,
+    showCompleted,
+    taskView,
+    taskRefreshKey,
+  ]);
 
   const activeTasks = useMemo(
     () =>

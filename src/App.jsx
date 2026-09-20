@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "./config/api";
+import { startAutoRefresh } from "./utils/startAutoRefresh";
 import {
   useEffect,
   useMemo,
@@ -7,6 +8,7 @@ import {
 } from "react";
 import {
   CalendarDays,
+  Camera,
   CheckSquare,
   Cloud,
   CloudDrizzle,
@@ -33,6 +35,10 @@ import "./pantry-polish.css";
 import "./settings-polish.css";
 import "./home-polish.css";
 import "./responsive-polish.css";
+import "./wall-mode.css";
+import "./tablet-polish.css";
+import CamerasPage from "./pages/CamerasPage";
+import "./cameras.css";
 import HomePage from "./pages/HomePage";
 import CalendarPage from "./pages/CalendarPage";
 import TasksPage from "./pages/TasksPage";
@@ -58,6 +64,11 @@ const navigationItems = [
     id: "home",
     label: "Home",
     icon: Home,
+  },
+  {
+    id: "cameras",
+    label: "Cameras",
+    icon: Camera,
   },
   {
     id: "calendar",
@@ -407,6 +418,68 @@ const [selectedRecipe, setSelectedRecipe] = useState(null);
 const [recipeDetailsOpen, setRecipeDetailsOpen] = useState(false);
 const [recipeDetailsRecipe, setRecipeDetailsRecipe] = useState(null);
 
+const recipeDetailsId = recipeDetailsRecipe?.id;
+
+useEffect(() => {
+  if (!recipeDetailsOpen || recipeDetailsId == null) return;
+
+  let cancelled = false;
+  let inFlight = false;
+  const controller = new AbortController();
+
+  async function loadOpenRecipe() {
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/recipes/${recipeDetailsId}`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
+      );
+
+      if (cancelled) return;
+
+      if (response.status === 404) {
+        setRecipeDetailsOpen(false);
+        setRecipeDetailsRecipe(null);
+        return;
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Unable to load recipe"
+        );
+      }
+
+      if (cancelled) return;
+
+      setRecipeDetailsRecipe(data.recipe);
+    } catch (err) {
+      if (cancelled || err.name === "AbortError") return;
+
+      console.error("Open recipe refresh error:", err);
+    } finally {
+      inFlight = false;
+    }
+  }
+
+  loadOpenRecipe();
+
+  const stopAutoRefresh = startAutoRefresh(loadOpenRecipe);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
+}, [recipeDetailsOpen, recipeDetailsId]);
+
 const [recipeRefreshKey, setRecipeRefreshKey] = useState(0);
 
 const [shoppingRefreshKey, setShoppingRefreshKey] = useState(0);
@@ -480,9 +553,27 @@ const notification = new Notification(
 
 
   useEffect(() => {
+    let cancelled = false;
+    let inFlight = false;
+    let hasLoaded = false;
+    const controller = new AbortController();
+
+    setLoading(true);
+    setError("");
+
     async function loadFamilyMembers() {
+      if (cancelled || inFlight) return;
+
+      inFlight = true;
+
       try {
-        const response = await fetch(`${API_BASE_URL}/api/family`);
+        const response = await fetch(
+          `${API_BASE_URL}/api/family`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to load family members");
@@ -490,18 +581,60 @@ const notification = new Notification(
 
         const data = await response.json();
 
-        setMembers(data.members || []);
+        if (cancelled) return;
+
+        const nextMembers = data.members || [];
+
+        setMembers((current) =>
+          JSON.stringify(current) === JSON.stringify(nextMembers)
+            ? current
+            : nextMembers
+        );
+
+        setSelectedMemberId((current) => {
+          if (
+            current === "all" ||
+            nextMembers.some(
+              (member) => String(member.id) === String(current)
+            )
+          ) {
+            return current;
+          }
+
+          return "all";
+        });
+
+        setError("");
+        hasLoaded = true;
       } catch (err) {
-        console.error(err);
-        setError("Unable to connect to FamilyHub API");
+        if (cancelled || err.name === "AbortError") return;
+
+        console.error("Family members refresh error:", err);
+
+        if (!hasLoaded) {
+          setError(
+            "Unable to connect to FamilyHub API. Retrying…"
+          );
+        }
       } finally {
-        setLoading(false);
+        inFlight = false;
+
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     loadFamilyMembers();
-  }, []);
 
+    const stopAutoRefresh = startAutoRefresh(loadFamilyMembers);
+
+    return () => {
+      cancelled = true;
+      stopAutoRefresh();
+      controller.abort();
+    };
+  }, []);
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
@@ -509,6 +642,56 @@ const notification = new Notification(
 
     return () => clearInterval(interval);
   }, []);
+
+  /* Refresh household data when returning or reconnecting. */
+useEffect(() => {
+  let lastRefreshAt = 0;
+
+  function refreshHouseholdData() {
+    if (document.visibilityState !== "visible") {
+      return;
+    }
+
+    setCurrentTime(new Date());
+
+    if (!navigator.onLine) {
+      return;
+    }
+
+    const now = Date.now();
+
+    // Returning to the browser can fire several events together.
+    if (now - lastRefreshAt < 5000) {
+      return;
+    }
+
+    lastRefreshAt = now;
+
+    setEventRefreshKey((value) => value + 1);
+    setTaskRefreshKey((value) => value + 1);
+    setMealRefreshKey((value) => value + 1);
+    setShoppingRefreshKey((value) => value + 1);
+    setCountdownRefreshKey((value) => value + 1);
+  }
+
+  document.addEventListener(
+    "visibilitychange",
+    refreshHouseholdData
+  );
+
+  window.addEventListener("focus", refreshHouseholdData);
+  window.addEventListener("online", refreshHouseholdData);
+
+  return () => {
+    document.removeEventListener(
+      "visibilitychange",
+      refreshHouseholdData
+    );
+
+    window.removeEventListener("focus", refreshHouseholdData);
+    window.removeEventListener("online", refreshHouseholdData);
+  };
+}, []);
 
   useEffect(() => {
   localStorage.setItem(
@@ -592,41 +775,53 @@ useEffect(() => {
 }, [wallMode]);
 
 useEffect(() => {
+  let cancelled = false;
+  let inFlight = false;
+  const controller = new AbortController();
+
   async function loadAmbientWeather() {
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
+
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/weather`
+        `${API_BASE_URL}/api/weather`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
       );
 
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.error ||
-            "Unable to load weather"
+          data.error || "Unable to load weather"
         );
       }
 
+      if (cancelled) return;
+
       setAmbientWeather(data);
     } catch (err) {
-      console.error(
-        "Ambient weather error:",
-        err
-      );
+      if (cancelled || err.name === "AbortError") return;
 
-      setAmbientWeather(null);
+      console.error("Ambient weather refresh error:", err);
+    } finally {
+      inFlight = false;
     }
   }
 
   loadAmbientWeather();
 
-  const interval = window.setInterval(
-    loadAmbientWeather,
-    15 * 60 * 1000
-  );
+  const stopAutoRefresh = startAutoRefresh(loadAmbientWeather);
 
-  return () =>
-    window.clearInterval(interval);
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
 }, []);
 
 useEffect(() => {
@@ -640,6 +835,23 @@ useEffect(() => {
     return;
   }
 
+    if (ambientMode) {
+    const previousFocus = document.activeElement;
+
+    document.querySelector(".ambient-display")?.focus({
+      preventScroll: true,
+    });
+
+    return () => {
+      if (
+        previousFocus instanceof HTMLElement &&
+        previousFocus.isConnected
+      ) {
+        previousFocus.focus({ preventScroll: true });
+      }
+    };
+  }
+
   let inactivityTimer;
 
   function resetAmbientTimer() {
@@ -647,16 +859,41 @@ useEffect(() => {
 
     clearTimeout(inactivityTimer);
 
-inactivityTimer = setTimeout(() => {
-  setAmbientMode(true);
-}, 10 * 1000);
+inactivityTimer = window.setTimeout(() => {
+  const openDialog = Array.from(
+    document.querySelectorAll(
+      [
+        ".event-modal-backdrop",
+        ".modal-backdrop",
+        ".settings-confirm-overlay",
+        ".settings-calendar-source-form",
+        '[role="dialog"]',
+      ].join(",")
+    )
+  ).some((element) => element.getClientRects().length > 0);
+
+  const editingField = document.activeElement?.matches(
+    'input, textarea, select, [contenteditable="true"]'
+  );
+
+  if (openDialog || editingField) {
+    resetAmbientTimer();
+    return;
   }
 
-  const activityEvents = [
-    "pointerdown",
-    "keydown",
-    "touchstart",
-  ];
+  setAmbientMode(true);
+}, 2 * 60 * 1000);
+  }
+
+const activityEvents = [
+  "pointerdown",
+  "pointermove",
+  "keydown",
+  "touchstart",
+  "touchmove",
+  "wheel",
+  "input",
+];
 
   activityEvents.forEach((eventName) => {
     window.addEventListener(
@@ -677,9 +914,27 @@ inactivityTimer = setTimeout(() => {
       );
     });
   };
-}, [wallMode, activeReminder]);
+}, [wallMode, activeReminder, ambientMode]);
 
-  const todayKey = formatDateKey(currentTime);
+const todayKey = formatDateKey(currentTime);
+
+const ambientHour = currentTime.getHours();
+
+const ambientGreeting =
+  ambientHour < 12
+    ? "Good morning"
+    : ambientHour < 18
+      ? "Good afternoon"
+      : "Good evening";
+
+const ambientTomorrow = new Date(currentTime);
+ambientTomorrow.setDate(ambientTomorrow.getDate() + 1);
+
+const ambientTomorrowKey = formatDateKey(ambientTomorrow);
+
+const ambientTomorrowEvents = homeEvents.filter(
+  (event) => event.start_date === ambientTomorrowKey
+);  
 
 const ambientRemainingEvents =
   homeEvents.filter((event) => {
@@ -761,9 +1016,18 @@ const ambientNextEvent =
     })[0] || null;
 
 useEffect(() => {
+  let cancelled = false;
+  let inFlight = false;
+  let hasLoaded = false;
+  const controller = new AbortController();
+
+  setHomeEventsLoading(true);
+  setHomeEventsError("");
+
   async function loadHomeEvents() {
-    setHomeEventsLoading(true);
-    setHomeEventsError("");
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
 
     try {
       const startDate = new Date();
@@ -778,36 +1042,55 @@ useEffect(() => {
       });
 
       if (selectedMemberId !== "all") {
-        params.set(
-          "memberId",
-          String(selectedMemberId)
-        );
+        params.set("memberId", String(selectedMemberId));
       }
 
       const response = await fetch(
-        `${API_BASE_URL}/api/events?${params.toString()}`
+        `${API_BASE_URL}/api/events?${params.toString()}`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
       );
 
       if (!response.ok) {
-        throw new Error(
-          "Failed to load home events"
-        );
+        throw new Error("Failed to load home events");
       }
 
       const data = await response.json();
 
+      if (cancelled) return;
+
       setHomeEvents(data.events || []);
+      setHomeEventsError("");
+      hasLoaded = true;
     } catch (err) {
+      if (cancelled || err.name === "AbortError") return;
+
       console.error(err);
-      setHomeEventsError(
-        "Unable to load calendar events"
-      );
+
+      if (!hasLoaded) {
+        setHomeEventsError(
+          "Unable to load calendar events. Retrying…"
+        );
+      }
     } finally {
-      setHomeEventsLoading(false);
+      inFlight = false;
+
+      if (!cancelled) {
+        setHomeEventsLoading(false);
+      }
     }
   }
 
   loadHomeEvents();
+  const stopAutoRefresh = startAutoRefresh(loadHomeEvents);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
 }, [
   todayKey,
   selectedMemberId,
@@ -815,9 +1098,17 @@ useEffect(() => {
 ]);
 
 useEffect(() => {
+  let cancelled = false;
+  let inFlight = false;
+  const controller = new AbortController();
+
   async function loadReminderEvents() {
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
+
     try {
-      const startDate = new Date(currentTime);
+      const startDate = new Date();
       startDate.setHours(0, 0, 0, 0);
 
       const endDate = new Date(startDate);
@@ -829,40 +1120,57 @@ useEffect(() => {
       });
 
       const response = await fetch(
-        `${API_BASE_URL}/api/events?${params.toString()}`
+        `${API_BASE_URL}/api/events?${params.toString()}`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
       );
 
       if (!response.ok) {
-        throw new Error(
-          "Failed to load reminder events"
-        );
+        throw new Error("Failed to load reminder events");
       }
 
       const data = await response.json();
 
-      setReminderEvents(
-        data.events || []
-      );
-    } catch (err) {
-      console.error(
-        "Event reminder load error:",
-        err
-      );
+      if (cancelled) return;
 
-      setReminderEvents([]);
+      setReminderEvents(data.events || []);
+    } catch (err) {
+      if (cancelled || err.name === "AbortError") return;
+
+      console.error("Event reminder load error:", err);
+    } finally {
+      inFlight = false;
     }
   }
 
   loadReminderEvents();
+
+  const stopAutoRefresh = startAutoRefresh(loadReminderEvents);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
 }, [
   todayKey,
   eventRefreshKey,
 ]);
-
 useEffect(() => {
+  let cancelled = false;
+  let inFlight = false;
+  let hasLoaded = false;
+  const controller = new AbortController();
+
+  setHomeMealsLoading(true);
+  setHomeMealsError("");
+
   async function loadHomeMeals() {
-    setHomeMealsLoading(true);
-    setHomeMealsError("");
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
 
     try {
       const params = new URLSearchParams({
@@ -872,37 +1180,56 @@ useEffect(() => {
       });
 
       if (selectedMemberId !== "all") {
-        params.set(
-          "memberId",
-          String(selectedMemberId)
-        );
+        params.set("memberId", String(selectedMemberId));
       }
 
       const response = await fetch(
-        `${API_BASE_URL}/api/meals?${params.toString()}`
+        `${API_BASE_URL}/api/meals?${params.toString()}`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
       );
 
       if (!response.ok) {
-        throw new Error(
-          "Failed to load tonight's meal"
-        );
+        throw new Error("Failed to load tonight's meal");
       }
 
       const data = await response.json();
 
+      if (cancelled) return;
+
       setHomeMeals(data.meals || []);
+      setHomeMealsError("");
+      hasLoaded = true;
     } catch (err) {
+      if (cancelled || err.name === "AbortError") return;
+
       console.error(err);
 
-      setHomeMealsError(
-        "Unable to load tonight's meal"
-      );
+      if (!hasLoaded) {
+        setHomeMealsError(
+          "Unable to load tonight's meal. Retrying…"
+        );
+      }
     } finally {
-      setHomeMealsLoading(false);
+      inFlight = false;
+
+      if (!cancelled) {
+        setHomeMealsLoading(false);
+      }
     }
   }
 
   loadHomeMeals();
+
+  const stopAutoRefresh = startAutoRefresh(loadHomeMeals);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
 }, [
   todayKey,
   selectedMemberId,
@@ -910,9 +1237,17 @@ useEffect(() => {
 ]);
 
 useEffect(() => {
+  let cancelled = false;
+  let inFlight = false;
+  const controller = new AbortController();
+
   async function loadReminderMeals() {
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
+
     try {
-      const startDate = new Date(currentTime);
+      const startDate = new Date();
       startDate.setHours(0, 0, 0, 0);
 
       const endDate = new Date(startDate);
@@ -924,40 +1259,58 @@ useEffect(() => {
       });
 
       const response = await fetch(
-        `${API_BASE_URL}/api/meals?${params.toString()}`
+        `${API_BASE_URL}/api/meals?${params.toString()}`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
       );
 
       if (!response.ok) {
-        throw new Error(
-          "Failed to load reminder meals"
-        );
+        throw new Error("Failed to load reminder meals");
       }
 
       const data = await response.json();
 
-      setReminderMeals(
-        data.meals || []
-      );
-    } catch (err) {
-      console.error(
-        "Meal reminder load error:",
-        err
-      );
+      if (cancelled) return;
 
-      setReminderMeals([]);
+      setReminderMeals(data.meals || []);
+    } catch (err) {
+      if (cancelled || err.name === "AbortError") return;
+
+      console.error("Meal reminder load error:", err);
+    } finally {
+      inFlight = false;
     }
   }
 
   loadReminderMeals();
+
+  const stopAutoRefresh = startAutoRefresh(loadReminderMeals);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
 }, [
   todayKey,
   mealRefreshKey,
 ]);
 
 useEffect(() => {
+  let cancelled = false;
+  let inFlight = false;
+  let hasLoaded = false;
+  const controller = new AbortController();
+
+  setHomeShoppingLoading(true);
+  setHomeShoppingError("");
+
   async function loadHomeShopping() {
-    setHomeShoppingLoading(true);
-    setHomeShoppingError("");
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
 
     try {
       const params = new URLSearchParams({
@@ -965,48 +1318,73 @@ useEffect(() => {
       });
 
       if (selectedMemberId !== "all") {
-        params.set(
-          "memberId",
-          String(selectedMemberId)
-        );
+        params.set("memberId", String(selectedMemberId));
       }
 
       const response = await fetch(
-        `${API_BASE_URL}/api/shopping?${params.toString()}`
+        `${API_BASE_URL}/api/shopping?${params.toString()}`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
       );
 
       if (!response.ok) {
-        throw new Error(
-          "Failed to load shopping list"
-        );
+        throw new Error("Failed to load shopping list");
       }
 
       const data = await response.json();
 
-      setHomeShoppingItems(
-        data.items || []
-      );
+      if (cancelled) return;
+
+      setHomeShoppingItems(data.items || []);
+      setHomeShoppingError("");
+      hasLoaded = true;
     } catch (err) {
+      if (cancelled || err.name === "AbortError") return;
+
       console.error(err);
 
-      setHomeShoppingError(
-        "Unable to load shopping list"
-      );
+      if (!hasLoaded) {
+        setHomeShoppingError(
+          "Unable to load shopping list. Retrying…"
+        );
+      }
     } finally {
-      setHomeShoppingLoading(false);
+      inFlight = false;
+
+      if (!cancelled) {
+        setHomeShoppingLoading(false);
+      }
     }
   }
 
   loadHomeShopping();
+  const stopAutoRefresh = startAutoRefresh(loadHomeShopping);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
 }, [
   selectedMemberId,
   shoppingRefreshKey,
 ]);
 
 useEffect(() => {
+  let cancelled = false;
+  let inFlight = false;
+  let hasLoaded = false;
+  const controller = new AbortController();
+
+  setHomeTasksLoading(true);
+  setHomeTasksError("");
+
   async function loadHomeTasks() {
-    setHomeTasksLoading(true);
-    setHomeTasksError("");
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
 
     try {
       const params = new URLSearchParams({
@@ -1016,37 +1394,55 @@ useEffect(() => {
       });
 
       if (selectedMemberId !== "all") {
-        params.set(
-          "memberId",
-          String(selectedMemberId)
-        );
+        params.set("memberId", String(selectedMemberId));
       }
 
       const response = await fetch(
-        `${API_BASE_URL}/api/tasks?${params.toString()}`
+        `${API_BASE_URL}/api/tasks?${params.toString()}`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
       );
 
       if (!response.ok) {
-        throw new Error(
-          "Failed to load home tasks"
-        );
+        throw new Error("Failed to load home tasks");
       }
 
       const data = await response.json();
 
+      if (cancelled) return;
+
       setHomeTasks(data.tasks || []);
+      setHomeTasksError("");
+      hasLoaded = true;
     } catch (err) {
+      if (cancelled || err.name === "AbortError") return;
+
       console.error(err);
 
-      setHomeTasksError(
-        "Unable to load today's tasks"
-      );
+      if (!hasLoaded) {
+        setHomeTasksError(
+          "Unable to load today's tasks. Retrying…"
+        );
+      }
     } finally {
-      setHomeTasksLoading(false);
+      inFlight = false;
+
+      if (!cancelled) {
+        setHomeTasksLoading(false);
+      }
     }
   }
 
   loadHomeTasks();
+  const stopAutoRefresh = startAutoRefresh(loadHomeTasks);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
 }, [
   todayKey,
   selectedMemberId,
@@ -1054,9 +1450,17 @@ useEffect(() => {
 ]);
 
 useEffect(() => {
+  let cancelled = false;
+  let inFlight = false;
+  const controller = new AbortController();
+
   async function loadReminderTasks() {
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
+
     try {
-      const startDate = new Date(currentTime);
+      const startDate = new Date();
       startDate.setHours(0, 0, 0, 0);
 
       const endDate = new Date(startDate);
@@ -1069,31 +1473,40 @@ useEffect(() => {
       });
 
       const response = await fetch(
-        `${API_BASE_URL}/api/tasks?${params.toString()}`
+        `${API_BASE_URL}/api/tasks?${params.toString()}`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
       );
 
       if (!response.ok) {
-        throw new Error(
-          "Failed to load reminder tasks"
-        );
+        throw new Error("Failed to load reminder tasks");
       }
 
       const data = await response.json();
 
-      setReminderTasks(
-        data.tasks || []
-      );
-    } catch (err) {
-      console.error(
-        "Task reminder load error:",
-        err
-      );
+      if (cancelled) return;
 
-      setReminderTasks([]);
+      setReminderTasks(data.tasks || []);
+    } catch (err) {
+      if (cancelled || err.name === "AbortError") return;
+
+      console.error("Task reminder load error:", err);
+    } finally {
+      inFlight = false;
     }
   }
 
   loadReminderTasks();
+
+  const stopAutoRefresh = startAutoRefresh(loadReminderTasks);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
 }, [
   todayKey,
   taskRefreshKey,
@@ -1101,44 +1514,81 @@ useEffect(() => {
 
 
 useEffect(() => {
+  let cancelled = false;
+  let inFlight = false;
+  let hasLoaded = false;
+  const controller = new AbortController();
+
+  setHomeCountdownsLoading(true);
+  setHomeCountdownsError("");
+
   async function loadHomeCountdowns() {
-    setHomeCountdownsLoading(true);
-    setHomeCountdownsError("");
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/countdowns`
+        `${API_BASE_URL}/api/countdowns`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
       );
 
       if (!response.ok) {
-        throw new Error(
-          "Failed to load countdowns"
-        );
+        throw new Error("Failed to load countdowns");
       }
 
       const data = await response.json();
 
-      setHomeCountdowns(
-        data.countdowns || []
-      );
+      if (cancelled) return;
+
+      setHomeCountdowns(data.countdowns || []);
+      setHomeCountdownsError("");
+      hasLoaded = true;
     } catch (err) {
+      if (cancelled || err.name === "AbortError") return;
+
       console.error(err);
 
-      setHomeCountdownsError(
-        "Unable to load countdowns"
-      );
+      if (!hasLoaded) {
+        setHomeCountdownsError(
+          "Unable to load countdowns. Retrying…"
+        );
+      }
     } finally {
-      setHomeCountdownsLoading(false);
+      inFlight = false;
+
+      if (!cancelled) {
+        setHomeCountdownsLoading(false);
+      }
     }
   }
 
   loadHomeCountdowns();
+
+  const stopAutoRefresh = startAutoRefresh(loadHomeCountdowns);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
 }, [countdownRefreshKey, activePage]);
 
 useEffect(() => {
+  let cancelled = false;
+  let inFlight = false;
+  const controller = new AbortController();
+
   async function loadUpcomingHomeData() {
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
+
     try {
-      const startDate = new Date(currentTime);
+      const startDate = new Date();
       startDate.setHours(0, 0, 0, 0);
       startDate.setDate(startDate.getDate() + 1);
 
@@ -1158,55 +1608,57 @@ useEffect(() => {
       });
 
       if (selectedMemberId !== "all") {
-        mealParams.set(
-          "memberId",
-          String(selectedMemberId)
-        );
-
-        taskParams.set(
-          "memberId",
-          String(selectedMemberId)
-        );
+        mealParams.set("memberId", String(selectedMemberId));
+        taskParams.set("memberId", String(selectedMemberId));
       }
 
-      const [mealResponse, taskResponse] =
-        await Promise.all([
-          fetch(
-            `${API_BASE_URL}/api/meals?${mealParams.toString()}`
-          ),
-          fetch(
-            `${API_BASE_URL}/api/tasks?${taskParams.toString()}`
-          ),
-        ]);
+      const requestOptions = {
+        signal: controller.signal,
+        cache: "no-store",
+      };
+
+      const [mealResponse, taskResponse] = await Promise.all([
+        fetch(
+          `${API_BASE_URL}/api/meals?${mealParams.toString()}`,
+          requestOptions
+        ),
+        fetch(
+          `${API_BASE_URL}/api/tasks?${taskParams.toString()}`,
+          requestOptions
+        ),
+      ]);
 
       if (!mealResponse.ok || !taskResponse.ok) {
-        throw new Error(
-          "Failed to load upcoming home data"
-        );
+        throw new Error("Failed to load upcoming home data");
       }
 
-      const [mealData, taskData] =
-        await Promise.all([
-          mealResponse.json(),
-          taskResponse.json(),
-        ]);
+      const [mealData, taskData] = await Promise.all([
+        mealResponse.json(),
+        taskResponse.json(),
+      ]);
 
-      setHomeUpcomingMeals(
-        mealData.meals || []
-      );
+      if (cancelled) return;
 
-      setHomeUpcomingTasks(
-        taskData.tasks || []
-      );
+      setHomeUpcomingMeals(mealData.meals || []);
+      setHomeUpcomingTasks(taskData.tasks || []);
     } catch (err) {
-      console.error(err);
+      if (cancelled || err.name === "AbortError") return;
 
-      setHomeUpcomingMeals([]);
-      setHomeUpcomingTasks([]);
+      console.error(err);
+    } finally {
+      inFlight = false;
     }
   }
 
   loadUpcomingHomeData();
+
+  const stopAutoRefresh = startAutoRefresh(loadUpcomingHomeData);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
 }, [
   todayKey,
   selectedMemberId,
@@ -1433,7 +1885,24 @@ return (
   >
 
 {ambientMode && (
-  <div className="ambient-display">
+  <div
+    className="ambient-display"
+    role="button"
+    tabIndex={0}
+    aria-label="Return to FamilyHub"
+    onClick={(event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setAmbientMode(false);
+    }}
+    onKeyDown={(event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        event.stopPropagation();
+        setAmbientMode(false);
+      }
+    }}
+  >
     <div className="ambient-clock">
       {formatClock(currentTime)}
     </div>
@@ -1441,6 +1910,34 @@ return (
     <div className="ambient-date">
       {formatLongDate(currentTime)}
     </div>
+
+  <div className="ambient-household-focus">
+  <strong>{ambientGreeting}</strong>
+
+  <span>
+    {ambientHour < 12
+      ? "Your day at a glance"
+      : ambientHour < 18
+        ? "The rest of your day"
+        : "Tonight and tomorrow"}
+  </span>
+
+  {ambientHour >= 18 && (
+    <small>
+      {homeEventsLoading
+        ? "Checking tomorrow’s calendar…"
+        : homeEventsError
+          ? "Tomorrow’s calendar is unavailable"
+          : ambientTomorrowEvents.length === 0
+            ? "Nothing on the calendar tomorrow"
+            : `${ambientTomorrowEvents.length} ${
+                ambientTomorrowEvents.length === 1
+                  ? "event"
+                  : "events"
+              } on the calendar tomorrow`}
+    </small>
+  )}
+</div>  
 
     {ambientWeather?.current && (
   <div className="ambient-weather">
@@ -1645,6 +2142,7 @@ onClick={async () => {
       </header>
 
       <main className="familyhub-main">
+{activePage === "cameras" && <CamerasPage />}
 {activePage === "home" && (
   <HomePage
     members={members}
@@ -1912,6 +2410,21 @@ onPlanRecipe={async (
 
 {activePage === "settings" && (
 <SettingsPage
+  wallMode={wallMode}
+  onWallModeChange={async (enabled) => {
+    setWallMode(enabled);
+    setAmbientMode(false);
+
+    try {
+      if (enabled && !document.fullscreenElement) {
+        await document.documentElement.requestFullscreen?.();
+      } else if (!enabled && document.fullscreenElement) {
+        await document.exitFullscreen?.();
+      }
+    } catch (error) {
+      console.warn("Unable to change fullscreen mode:", error);
+    }
+  }}
   members={members}
   accentColour={accentColour}
   setAccentColour={setAccentColour}
@@ -2044,7 +2557,7 @@ return `Started ${minutesAgo} ${
 
 <MotionConfig reducedMotion="user">
   <nav
-    className="bottom-navigation"
+    className="bottom-navigation" style={{ "--navigation-count": navigationItems.length }}
     aria-label="Primary navigation"
   >
     {navigationItems.map((item) => {

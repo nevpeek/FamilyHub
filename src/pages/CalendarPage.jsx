@@ -16,6 +16,7 @@ import CalendarMonthView from "../components/CalendarMonthView";
 import CalendarDayView from "../components/CalendarDayView";
 import CalendarWeekView from "../components/CalendarWeekView";
 import { API_BASE_URL } from "../config/api";
+import { startAutoRefresh } from "../utils/startAutoRefresh";
 import {
   WEEK_START_HOUR,
   WEEK_HOUR_HEIGHT,
@@ -67,13 +68,21 @@ useEffect(() => {
 
 useEffect(() => {
   let cancelled = false;
+  let inFlight = false;
+  const controller = new AbortController();
 
   async function loadWeather() {
+    if (cancelled || inFlight) return;
 
+    inFlight = true;
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/weather`
+        `${API_BASE_URL}/api/weather`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
       );
 
       if (!response.ok) {
@@ -82,18 +91,26 @@ useEffect(() => {
 
       const data = await response.json();
 
-      if (!cancelled) {
-        setWeather(data);
-      }
+      if (cancelled) return;
+
+      setWeather(data);
     } catch (err) {
-      console.error(err);
+      if (cancelled || err.name === "AbortError") return;
+
+      console.error("Calendar weather refresh error:", err);
+    } finally {
+      inFlight = false;
     }
   }
 
   loadWeather();
 
+  const stopAutoRefresh = startAutoRefresh(loadWeather);
+
   return () => {
     cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
   };
 }, []);
 
@@ -273,22 +290,35 @@ const visibleEndDate =
         : gridEndDate;
 
   useEffect(() => {
+    let cancelled = false;
+    let inFlight = false;
+    let hasLoaded = false;
+    const controller = new AbortController();
+
+    setEventsLoading(true);
+    setEventsError("");
+
     async function loadEvents() {
-      setEventsLoading(true);
-      setEventsError("");
+      if (cancelled || inFlight) return;
+
+      inFlight = true;
 
       try {
-const params = new URLSearchParams({
-  start: visibleStartDate,
-  end: visibleEndDate,
-});
+        const params = new URLSearchParams({
+          start: visibleStartDate,
+          end: visibleEndDate,
+        });
 
         if (selectedMemberId !== "all") {
           params.set("memberId", String(selectedMemberId));
         }
 
         const response = await fetch(
-          `${API_BASE_URL}/api/events?${params.toString()}`
+          `${API_BASE_URL}/api/events?${params.toString()}`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
         );
 
         if (!response.ok) {
@@ -297,22 +327,70 @@ const params = new URLSearchParams({
 
         const data = await response.json();
 
-        setEvents(data.events || []);
+        if (cancelled) return;
+
+        const nextEvents = data.events || [];
+
+        setEvents(nextEvents);
+
+        setSelectedEvent((current) => {
+          if (!current) return null;
+
+          const updatedEvent = nextEvents.find((event) => {
+            if (current.is_occurrence) {
+              return (
+                event.is_occurrence &&
+                String(event.series_event_id ?? event.id) ===
+                  String(current.series_event_id ?? current.id) &&
+                event.occurrence_date === current.occurrence_date
+              );
+            }
+
+            return (
+              !event.is_occurrence &&
+              String(event.id) === String(current.id)
+            );
+          });
+
+          return updatedEvent || null;
+        });
+
+        setEventsError("");
+        hasLoaded = true;
       } catch (err) {
-        console.error(err);
-        setEventsError("Unable to load calendar events");
+        if (cancelled || err.name === "AbortError") return;
+
+        console.error("Calendar refresh error:", err);
+
+        if (!hasLoaded) {
+          setEventsError(
+            "Unable to load calendar events. Retrying…"
+          );
+        }
       } finally {
-        setEventsLoading(false);
+        inFlight = false;
+
+        if (!cancelled) {
+          setEventsLoading(false);
+        }
       }
     }
 
     loadEvents();
-}, [
-  visibleStartDate,
-  visibleEndDate,
-  selectedMemberId,
-  eventRefreshKey,
-]);
+
+    const stopAutoRefresh = startAutoRefresh(loadEvents);
+
+    return () => {
+      cancelled = true;
+      stopAutoRefresh();
+      controller.abort();
+    };
+  }, [
+    visibleStartDate,
+    visibleEndDate,
+    selectedMemberId,
+    eventRefreshKey,
+  ]);
   const eventsByDate = useMemo(() => {
     const map = new Map();
 

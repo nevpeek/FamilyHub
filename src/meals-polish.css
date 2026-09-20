@@ -239,3 +239,9372 @@ html .familyhub-shell .meals-page .recipe-library-search {
 @media (prefers-reduced-motion: reduce) {
   .familyhub-shell .meals-page :is(.recipe-card, .recipe-card-photo img, .meal-week-meal, .meal-view-switcher button) { transition: none; }
 }
+
+/* =========================================================
+   DINNER PLANNER — LARGE WEEK CARDS
+   ========================================================= */
+
+.familyhub-shell .meals-page .meal-week-grid {
+  gap: 16px;
+  align-items: stretch;
+}
+
+.familyhub-shell .meals-page .meal-week-day {
+  min-height: 360px;
+  overflow: hidden;
+  border-radius: 22px;
+}
+
+.familyhub-shell .meals-page .meal-week-day-heading {
+  min-height: 66px;
+  padding: 16px 18px;
+}
+
+.familyhub-shell .meals-page .meal-week-day-heading span {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.familyhub-shell .meals-page .meal-week-day-heading strong {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.familyhub-shell .meals-page .meal-week-slots {
+  height: 100%;
+}
+
+.familyhub-shell .meals-page .meal-week-slot {
+  min-height: 290px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.familyhub-shell .meals-page .meal-week-slot-heading {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.familyhub-shell .meals-page .meal-week-meal {
+  padding: 14px;
+  border-radius: 16px;
+  flex: 1;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-heading {
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.familyhub-shell .meals-page .meal-week-meal strong {
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.familyhub-shell .meals-page .meal-week-add-slot {
+  min-height: 100px;
+  border-radius: 14px;
+  font-size: 14px;
+}
+
+.familyhub-shell .meals-page .meal-week-choose-recipe {
+  min-height: 50px;
+  margin-top: 10px;
+  border-radius: 14px;
+}
+
+.familyhub-shell .meals-page .meal-week-meal .meal-week-copy,
+.familyhub-shell .meals-page .meal-week-meal .meal-week-recipe {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  border-radius: 12px;
+}
+
+.familyhub-shell .meals-page .meal-week-member-avatar {
+  width: 32px;
+  height: 32px;
+}
+
+@media (hover: hover) {
+  .familyhub-shell .meals-page .meal-week-day {
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      transform 160ms ease;
+  }
+
+  .familyhub-shell .meals-page .meal-week-day:hover {
+    border-color: color-mix(
+      in srgb,
+      var(--familyhub-accent, #007aff) 35%,
+      var(--meals-border)
+    );
+
+    box-shadow:
+      0 12px 32px rgba(0, 0, 0, 0.14);
+  }
+
+  .familyhub-shell .meals-page .meal-week-add-slot:hover,
+  .familyhub-shell .meals-page .meal-week-choose-recipe:hover {
+    border-color: color-mix(
+      in srgb,
+      var(--familyhub-accent, #007aff) 40%,
+      var(--meals-border)
+    );
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — EMPTY DAY CARD
+   ========================================================= */
+
+.familyhub-shell .meals-page .meal-week-slot {
+  gap: 12px;
+}
+
+.familyhub-shell .meals-page .meal-week-add-slot {
+  flex: 1;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--meals-border);
+  border-radius: 16px;
+  background: color-mix(
+    in srgb,
+    var(--meals-inset) 55%,
+    transparent
+  );
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.familyhub-shell .meals-page .meal-week-choose-recipe {
+  flex: 0 0 auto;
+  min-height: 52px;
+  margin-top: 0;
+  border-radius: 14px;
+  font-weight: 600;
+}
+
+@media (hover: hover) {
+  .familyhub-shell .meals-page .meal-week-add-slot:hover {
+    background: color-mix(
+      in srgb,
+      var(--familyhub-accent, #007aff) 10%,
+      var(--meals-inset)
+    );
+
+    border-color: color-mix(
+      in srgb,
+      var(--familyhub-accent, #007aff) 55%,
+      var(--meals-border)
+    );
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — FULL EMPTY DINNER AREA
+   ========================================================= */
+
+.familyhub-shell .meals-page .meal-week-empty-actions {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 220px;
+}
+
+.familyhub-shell .meals-page .meal-week-empty-actions .meal-week-add-slot {
+  flex: 1;
+  width: 100%;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  border: 1px dashed var(--meals-border);
+  border-radius: 16px;
+
+  background: color-mix(
+    in srgb,
+    var(--meals-inset) 45%,
+    transparent
+  );
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.familyhub-shell .meals-page .meal-week-empty-actions .meal-week-add-slot svg {
+  width: 24px;
+  height: 24px;
+}
+
+.familyhub-shell .meals-page .meal-week-empty-actions .meal-week-choose-recipe {
+  flex: 0 0 52px;
+  width: 100%;
+  min-height: 52px;
+  margin: 0;
+
+  border-radius: 14px;
+  font-weight: 600;
+}
+
+@media (hover: hover) {
+  .familyhub-shell .meals-page
+    .meal-week-empty-actions
+    .meal-week-add-slot:hover {
+    background: color-mix(
+      in srgb,
+      var(--familyhub-accent, #007aff) 12%,
+      var(--meals-inset)
+    );
+
+    border-color: color-mix(
+      in srgb,
+      var(--familyhub-accent, #007aff) 55%,
+      var(--meals-border)
+    );
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — PLANNED DINNER CARD
+   ========================================================= */
+
+.familyhub-shell .meals-page .meal-week-slot-meals {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+}
+
+.familyhub-shell .meals-page .meal-week-slot-meals .meal-week-meal {
+  flex: 1;
+  min-height: 220px;
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+
+  border-radius: 16px;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-heading strong {
+  flex: 1;
+
+  font-size: 16px;
+  line-height: 1.3;
+  font-weight: 700;
+
+  letter-spacing: -0.02em;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-actions {
+  display: flex;
+  gap: 7px;
+  margin-left: auto;
+}
+
+.familyhub-shell .meals-page .meal-week-members {
+  margin-top: auto;
+  padding-top: 16px;
+
+  display: flex;
+  align-items: center;
+}
+
+.familyhub-shell .meals-page .meal-week-member {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  overflow: hidden;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  border: 2px solid var(--meals-inset);
+}
+
+.familyhub-shell .meals-page .meal-week-member + .meal-week-member {
+  margin-left: -6px;
+}
+
+.familyhub-shell .meals-page .meal-week-member img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.familyhub-shell .meals-page .meal-week-meal .meal-week-copy,
+.familyhub-shell .meals-page .meal-week-meal .meal-week-recipe {
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+}
+
+@media (hover: hover) {
+  .familyhub-shell .meals-page .meal-week-meal:hover {
+    border-color: color-mix(
+      in srgb,
+      var(--familyhub-accent, #007aff) 35%,
+      var(--meals-border)
+    );
+
+    box-shadow:
+      0 10px 28px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — RECIPE PHOTO CARDS
+   ========================================================= */
+
+.familyhub-shell .meals-page .meal-week-meal {
+  padding: 8px;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-photo {
+  position: relative;
+
+  width: 100%;
+  height: 118px;
+  flex: 0 0 118px;
+
+  overflow: hidden;
+  border-radius: 12px;
+
+  background: var(--meals-track);
+}
+
+.familyhub-shell .meals-page .meal-week-meal-photo img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition: transform 180ms ease;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-heading {
+  padding: 2px 4px 0;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-heading strong {
+  min-width: 0;
+
+  font-size: 15px;
+  line-height: 1.25;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-actions {
+  flex: 0 0 auto;
+}
+
+.familyhub-shell .meals-page .meal-week-meal .meal-week-copy,
+.familyhub-shell .meals-page .meal-week-meal .meal-week-recipe {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+}
+
+.familyhub-shell .meals-page .meal-week-members {
+  padding: 0 4px 4px;
+  margin-top: auto;
+}
+
+@media (hover: hover) {
+  .familyhub-shell .meals-page .meal-week-meal:hover
+    .meal-week-meal-photo img {
+    transform: scale(1.035);
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — DINNER RECIPE PHOTO
+   ========================================================= */
+
+.familyhub-shell .meals-page .meal-week-meal {
+  padding: 8px;
+  gap: 9px;
+  overflow: hidden;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-photo {
+  position: relative;
+
+  width: 100%;
+  height: 120px;
+  min-height: 120px;
+
+  overflow: hidden;
+  border-radius: 12px;
+
+  background: var(--meals-track);
+}
+
+.familyhub-shell .meals-page .meal-week-meal-photo img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-heading {
+  width: 100%;
+  padding: 2px 4px 0;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-heading strong {
+  flex: 1;
+  min-width: 0;
+
+  font-size: 14px;
+  line-height: 1.3;
+  font-weight: 700;
+
+  overflow: hidden;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 5px;
+}
+
+.familyhub-shell .meals-page .meal-week-meal .meal-week-copy,
+.familyhub-shell .meals-page .meal-week-meal .meal-week-recipe {
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+
+  border-radius: 10px;
+}
+
+.familyhub-shell .meals-page .meal-week-members {
+  width: 100%;
+  margin-top: auto;
+  padding: 2px 4px 4px;
+}
+
+@media (hover: hover) {
+  .familyhub-shell .meals-page .meal-week-meal-photo img {
+    transition: transform 180ms ease;
+  }
+
+  .familyhub-shell .meals-page
+    .meal-week-meal:hover
+    .meal-week-meal-photo
+    img {
+    transform: scale(1.035);
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — POLISHED PLANNED DINNER
+   ========================================================= */
+
+.familyhub-shell .meals-page .meal-week-meal {
+  padding: 9px;
+  gap: 8px;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-photo {
+  width: 100%;
+  height: 132px;
+  min-height: 132px;
+  border-radius: 13px;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-heading {
+  width: 100%;
+  padding: 2px 3px 0;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-heading strong {
+  width: 100%;
+  min-width: 0;
+
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-actions {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.familyhub-shell .meals-page .meal-week-meal .meal-week-recipe,
+.familyhub-shell .meals-page .meal-week-meal .meal-week-copy {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+}
+
+.familyhub-shell .meals-page .meal-week-members {
+  width: 100%;
+  margin-top: auto;
+  padding: 3px 3px 2px;
+
+  display: flex;
+  align-items: center;
+}
+
+.familyhub-shell .meals-page .meal-week-member {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+}
+
+.familyhub-shell .meals-page .meal-week-member + .meal-week-member {
+  margin-left: -5px;
+}
+
+/* =========================================================
+   DINNER PLANNER — MEAL NAME IN SLOT HEADER
+   ========================================================= */
+
+.familyhub-shell .meals-page
+  .meal-week-slot-heading.has-meal {
+  color: var(--meals-text);
+}
+
+.familyhub-shell .meals-page
+  .meal-week-slot-heading.has-meal span {
+  min-width: 0;
+
+  font-size: 14px;
+  line-height: 1.25;
+  font-weight: 800;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* =========================================================
+   DINNER PLANNER — CLEAN PLANNED DINNER CONTROLS
+   ========================================================= */
+
+.familyhub-shell .meals-page
+  .meal-week-meal-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  padding: 0;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-meal-actions {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-recipe,
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-copy {
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+
+  border-radius: 11px;
+}
+
+/* =========================================================
+   DINNER PLANNER — PREMIUM WEEK CARD REDESIGN
+   ========================================================= */
+
+/* ---------- WEEK ---------- */
+
+.familyhub-shell .meals-page .meal-week-grid {
+  gap: 14px;
+  align-items: stretch;
+}
+
+.familyhub-shell .meals-page .meal-week-day {
+  min-height: 390px;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.035),
+      rgba(255, 255, 255, 0.012)
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+/* ---------- DAY / DATE HEADER ---------- */
+
+.familyhub-shell .meals-page .meal-week-day-heading {
+  min-height: 68px;
+  padding: 15px 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.familyhub-shell .meals-page .meal-week-day-heading span {
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 800;
+
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+
+  opacity: 0.62;
+}
+
+.familyhub-shell .meals-page .meal-week-day-heading strong {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 34px;
+  height: 34px;
+
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 800;
+
+  border-radius: 50%;
+}
+
+/* ---------- TODAY ---------- */
+
+.familyhub-shell .meals-page .meal-week-day.today {
+  border-color: rgba(139, 68, 255, 0.85);
+
+  box-shadow:
+    0 0 0 1px rgba(139, 68, 255, 0.14),
+    0 16px 42px rgba(0, 0, 0, 0.16);
+}
+
+.familyhub-shell .meals-page
+  .meal-week-day.today
+  .meal-week-day-heading {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(139, 68, 255, 0.20),
+      rgba(139, 68, 255, 0.07)
+    );
+}
+
+.familyhub-shell .meals-page
+  .meal-week-day.today
+  .meal-week-day-heading strong {
+  color: white;
+  background: var(--familyhub-accent, #8b44ff);
+
+  box-shadow:
+    0 4px 14px rgba(139, 68, 255, 0.32);
+}
+
+/* ---------- SLOT ---------- */
+
+.familyhub-shell .meals-page .meal-week-slots {
+  flex: 1;
+  display: flex;
+}
+
+.familyhub-shell .meals-page .meal-week-slot {
+  flex: 1;
+
+  min-height: 0;
+  padding: 14px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ---------- MEAL NAME ---------- */
+
+.familyhub-shell .meals-page .meal-week-slot-heading {
+  min-height: 42px;
+
+  padding: 0 2px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: rgba(255, 255, 255, 0.60);
+}
+
+.familyhub-shell .meals-page .meal-week-slot-heading svg {
+  flex: 0 0 auto;
+  opacity: 0.70;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-slot-heading span {
+  min-width: 0;
+
+  font-size: 13px;
+  line-height: 1.25;
+  font-weight: 650;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-slot-heading.has-meal {
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.familyhub-shell .meals-page
+  .meal-week-slot-heading.has-meal span {
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 800;
+
+  letter-spacing: -0.015em;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* =========================================================
+   PLANNED DINNER
+   ========================================================= */
+
+.familyhub-shell .meals-page .meal-week-slot-meals {
+  flex: 1;
+
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.familyhub-shell .meals-page .meal-week-meal {
+  position: relative;
+
+  flex: 1;
+  min-height: 260px;
+
+  padding: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.055);
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* ---------- BIG FOOD PHOTO ---------- */
+
+.familyhub-shell .meals-page .meal-week-meal-photo {
+  position: relative;
+
+  width: 100%;
+  height: 180px;
+  min-height: 180px;
+
+  overflow: hidden;
+
+  border-radius: 0;
+
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.familyhub-shell .meals-page .meal-week-meal-photo::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      180deg,
+      transparent 55%,
+      rgba(0, 0, 0, 0.28) 100%
+    );
+}
+
+.familyhub-shell .meals-page .meal-week-meal-photo img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+/* ---------- ACTION BUTTONS ---------- */
+
+.familyhub-shell .meals-page .meal-week-meal-heading {
+  position: absolute;
+
+  top: 132px;
+  right: 10px;
+
+  z-index: 3;
+
+  width: auto;
+  padding: 0;
+
+  display: block;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-actions {
+  width: auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 6px;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-recipe,
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-copy {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  color: white;
+
+  background: rgba(15, 15, 18, 0.74);
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 5px 14px rgba(0, 0, 0, 0.20);
+}
+
+/* ---------- DESCRIPTION ---------- */
+
+.familyhub-shell .meals-page
+  .meal-week-meal > span {
+  padding: 12px 13px 0;
+
+  font-size: 12px;
+  line-height: 1.4;
+
+  color: rgba(255, 255, 255, 0.58);
+}
+
+/* ---------- FAMILY ---------- */
+
+.familyhub-shell .meals-page .meal-week-members {
+  width: 100%;
+
+  margin-top: auto;
+
+  padding: 13px;
+
+  display: flex;
+  align-items: center;
+
+  min-height: 58px;
+}
+
+.familyhub-shell .meals-page .meal-week-member {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 50%;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  border: 2px solid rgba(25, 25, 28, 0.96);
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.familyhub-shell .meals-page
+  .meal-week-member + .meal-week-member {
+  margin-left: -7px;
+}
+
+.familyhub-shell .meals-page .meal-week-member img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+/* =========================================================
+   EMPTY DINNER
+   ========================================================= */
+
+.familyhub-shell .meals-page .meal-week-empty-actions {
+  flex: 1;
+
+  min-height: 260px;
+
+  display: grid;
+  grid-template-rows: 1fr 54px;
+
+  gap: 10px;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-empty-actions
+  .meal-week-add-slot {
+  width: 100%;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 11px;
+
+  border-radius: 18px;
+
+  color: rgba(255, 255, 255, 0.64);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.045),
+      rgba(255, 255, 255, 0.018)
+    );
+
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-empty-actions
+  .meal-week-add-slot svg {
+  width: 28px;
+  height: 28px;
+
+  opacity: 0.72;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-empty-actions
+  .meal-week-choose-recipe {
+  width: 100%;
+  height: 54px;
+  min-height: 54px;
+
+  margin: 0;
+
+  border-radius: 14px;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   INTERACTION
+   ========================================================= */
+
+@media (hover: hover) {
+  .familyhub-shell .meals-page .meal-week-meal {
+    transition:
+      transform 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  .familyhub-shell .meals-page .meal-week-meal:hover {
+    transform: translateY(-2px);
+
+    border-color: rgba(255, 255, 255, 0.18);
+
+    box-shadow:
+      0 14px 34px rgba(0, 0, 0, 0.20);
+  }
+
+  .familyhub-shell .meals-page
+    .meal-week-meal-photo img {
+    transition: transform 240ms ease;
+  }
+
+  .familyhub-shell .meals-page
+    .meal-week-meal:hover
+    .meal-week-meal-photo img {
+    transform: scale(1.045);
+  }
+
+  .familyhub-shell .meals-page
+    .meal-week-empty-actions
+    .meal-week-add-slot {
+    transition:
+      background 160ms ease,
+      border-color 160ms ease,
+      color 160ms ease;
+  }
+
+  .familyhub-shell .meals-page
+    .meal-week-empty-actions
+    .meal-week-add-slot:hover {
+    color: white;
+
+    background:
+      linear-gradient(
+        145deg,
+        rgba(139, 68, 255, 0.13),
+        rgba(139, 68, 255, 0.045)
+      );
+
+    border-color: rgba(139, 68, 255, 0.55);
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — CLEAN DINNER CARD FOOTER
+   ========================================================= */
+
+/* Give the photo the full visual focus */
+.familyhub-shell .meals-page .meal-week-meal-photo {
+  height: 190px;
+  min-height: 190px;
+
+  border-radius: 16px 16px 0 0;
+}
+
+/* Controls no longer float over the image */
+.familyhub-shell .meals-page .meal-week-meal-heading {
+  position: static;
+
+  width: 100%;
+  height: 0;
+  padding: 0;
+
+  display: block;
+}
+
+/* Put actions at bottom-right */
+.familyhub-shell .meals-page .meal-week-meal-actions {
+  position: absolute;
+
+  right: 12px;
+  bottom: 11px;
+
+  z-index: 3;
+
+  width: auto;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Smaller, quieter footer controls */
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-recipe,
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-copy {
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+
+  border-radius: 10px;
+
+  color: rgba(255, 255, 255, 0.82);
+
+  background: rgba(255, 255, 255, 0.055);
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+
+  box-shadow: none;
+
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Footer containing the family */
+.familyhub-shell .meals-page .meal-week-members {
+  position: relative;
+
+  width: 100%;
+  min-height: 58px;
+
+  margin-top: auto;
+  padding: 12px 88px 12px 12px;
+
+  display: flex;
+  align-items: center;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.025),
+      rgba(255, 255, 255, 0.045)
+    );
+
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Slightly larger family faces */
+.familyhub-shell .meals-page .meal-week-member {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+
+  border: 2px solid #242426;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.20);
+}
+
+.familyhub-shell .meals-page
+  .meal-week-member + .meal-week-member {
+  margin-left: -7px;
+}
+
+/* Cleaner hover */
+@media (hover: hover) {
+  .familyhub-shell .meals-page
+    .meal-week-meal
+    .meal-week-recipe:hover,
+  .familyhub-shell .meals-page
+    .meal-week-meal
+    .meal-week-copy:hover {
+    color: white;
+
+    background: rgba(255, 255, 255, 0.10);
+
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — FINAL CARD PROPORTIONS + FOOTER
+   ========================================================= */
+
+/* Give the inner dinner card a little more usable width */
+.familyhub-shell .meals-page .meal-week-slot {
+  padding: 12px 10px 10px;
+}
+
+/* Planned card */
+.familyhub-shell .meals-page .meal-week-meal {
+  min-height: 270px;
+  border-radius: 18px;
+}
+
+/* Wider-feeling landscape food image */
+.familyhub-shell .meals-page .meal-week-meal-photo {
+  width: 100%;
+  height: 165px;
+  min-height: 165px;
+
+  border-radius: 16px 16px 0 0;
+}
+
+/* Remove the old invisible heading from layout entirely */
+.familyhub-shell .meals-page .meal-week-meal-heading {
+  position: static;
+  width: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* Proper footer */
+.familyhub-shell .meals-page .meal-week-members {
+  position: static;
+
+  width: 100%;
+  min-height: 58px;
+
+  margin-top: auto;
+  padding: 11px 82px 11px 11px;
+
+  display: flex;
+  align-items: center;
+
+  overflow: visible;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Family avatars */
+.familyhub-shell .meals-page .meal-week-member {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+
+  border: 2px solid #242426;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-member + .meal-week-member {
+  margin-left: -6px;
+}
+
+/* Actions sit neatly on the right side of footer */
+.familyhub-shell .meals-page .meal-week-meal-actions {
+  position: absolute;
+
+  right: 10px;
+  bottom: 10px;
+
+  z-index: 5;
+
+  width: auto;
+
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-recipe,
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-copy {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  color: rgba(255, 255, 255, 0.78);
+
+  background: rgba(255, 255, 255, 0.055);
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+
+  box-shadow: none;
+}
+
+/* Empty cards keep the same proportions as planned cards */
+.familyhub-shell .meals-page .meal-week-empty-actions {
+  min-height: 270px;
+}
+
+/* Meal name gets more visual importance */
+.familyhub-shell .meals-page
+  .meal-week-slot-heading.has-meal {
+  min-height: 42px;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-slot-heading.has-meal span {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* Empty Dinner heading stays quieter */
+.familyhub-shell .meals-page
+  .meal-week-slot-heading:not(.has-meal) {
+  opacity: 0.72;
+}
+
+/* =========================================================
+   DINNER PLANNER — CORRECT PLANNED CARD LAYOUT
+   ========================================================= */
+
+/*
+ * Previous polish passes positioned the action controls
+ * absolutely. Reset that behaviour and give each part of
+ * the card its own row.
+ */
+
+.familyhub-shell .meals-page .meal-week-meal {
+  position: relative;
+
+  min-height: 270px;
+
+  padding: 8px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  overflow: hidden;
+
+  border-radius: 18px;
+}
+
+/* ---------- FOOD PHOTO ---------- */
+
+.familyhub-shell .meals-page .meal-week-meal-photo {
+  width: 100%;
+
+  height: 170px;
+  min-height: 170px;
+
+  flex: 0 0 170px;
+
+  overflow: hidden;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.familyhub-shell .meals-page .meal-week-meal-photo::after {
+  display: none;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-photo img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+/* ---------- FAMILY ROW ---------- */
+
+.familyhub-shell .meals-page .meal-week-members {
+  position: static;
+
+  order: 2;
+
+  width: 100%;
+  min-height: 38px;
+
+  margin: 0;
+  padding: 0 4px;
+
+  display: flex;
+  align-items: center;
+
+  overflow: visible;
+
+  background: transparent;
+  border: 0;
+}
+
+.familyhub-shell .meals-page .meal-week-member {
+  width: 30px;
+  height: 30px;
+
+  flex: 0 0 30px;
+
+  margin: 0;
+
+  border-radius: 50%;
+
+  border: 2px solid #2a2a2d;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-member + .meal-week-member {
+  margin-left: -5px;
+}
+
+/* ---------- ACTION ROW ---------- */
+
+.familyhub-shell .meals-page .meal-week-meal-actions {
+  position: static;
+
+  order: 3;
+
+  z-index: auto;
+
+  width: 100%;
+
+  margin: 0;
+  padding: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    38px;
+
+  gap: 7px;
+}
+
+/* View Recipe becomes the useful primary action */
+
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-recipe {
+  position: static;
+
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+
+  padding: 0 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  border-radius: 10px;
+
+  color: rgba(255, 255, 255, 0.90);
+
+  background: rgba(255, 255, 255, 0.065);
+
+  border: 1px solid rgba(255, 255, 255, 0.11);
+
+  box-shadow: none;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Copy stays a compact secondary action */
+
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-copy {
+  position: static;
+
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  background: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  box-shadow: none;
+}
+
+/* ---------- REMOVE OLD HEADING FOOTPRINT ---------- */
+
+.familyhub-shell .meals-page .meal-week-meal-heading {
+  display: none;
+}
+
+/* ---------- DESCRIPTION, IF A MEAL HAS ONE ---------- */
+
+.familyhub-shell .meals-page
+  .meal-week-meal > span {
+  order: 1;
+
+  padding: 0 4px;
+
+  font-size: 11px;
+  line-height: 1.35;
+
+  color: rgba(255, 255, 255, 0.56);
+}
+
+/* ---------- HOVER ---------- */
+
+@media (hover: hover) {
+  .familyhub-shell .meals-page
+    .meal-week-meal
+    .meal-week-recipe:hover {
+    color: white;
+
+    background: rgba(255, 255, 255, 0.11);
+
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .familyhub-shell .meals-page
+    .meal-week-meal
+    .meal-week-copy:hover {
+    color: white;
+
+    background: rgba(255, 255, 255, 0.09);
+
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — CORRECT PLANNED CARD LAYOUT
+   ========================================================= */
+
+/*
+ * Previous polish passes positioned the action controls
+ * absolutely. Reset that behaviour and give each part of
+ * the card its own row.
+ */
+
+.familyhub-shell .meals-page .meal-week-meal {
+  position: relative;
+
+  min-height: 270px;
+
+  padding: 8px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  overflow: hidden;
+
+  border-radius: 18px;
+}
+
+/* ---------- FOOD PHOTO ---------- */
+
+.familyhub-shell .meals-page .meal-week-meal-photo {
+  width: 100%;
+
+  height: 170px;
+  min-height: 170px;
+
+  flex: 0 0 170px;
+
+  overflow: hidden;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.familyhub-shell .meals-page .meal-week-meal-photo::after {
+  display: none;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-photo img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+/* ---------- FAMILY ROW ---------- */
+
+.familyhub-shell .meals-page .meal-week-members {
+  position: static;
+
+  order: 2;
+
+  width: 100%;
+  min-height: 38px;
+
+  margin: 0;
+  padding: 0 4px;
+
+  display: flex;
+  align-items: center;
+
+  overflow: visible;
+
+  background: transparent;
+  border: 0;
+}
+
+.familyhub-shell .meals-page .meal-week-member {
+  width: 30px;
+  height: 30px;
+
+  flex: 0 0 30px;
+
+  margin: 0;
+
+  border-radius: 50%;
+
+  border: 2px solid #2a2a2d;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-member + .meal-week-member {
+  margin-left: -5px;
+}
+
+/* ---------- ACTION ROW ---------- */
+
+.familyhub-shell .meals-page .meal-week-meal-actions {
+  position: static;
+
+  order: 3;
+
+  z-index: auto;
+
+  width: 100%;
+
+  margin: 0;
+  padding: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    38px;
+
+  gap: 7px;
+}
+
+/* View Recipe becomes the useful primary action */
+
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-recipe {
+  position: static;
+
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+
+  padding: 0 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  border-radius: 10px;
+
+  color: rgba(255, 255, 255, 0.90);
+
+  background: rgba(255, 255, 255, 0.065);
+
+  border: 1px solid rgba(255, 255, 255, 0.11);
+
+  box-shadow: none;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Copy stays a compact secondary action */
+
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-copy {
+  position: static;
+
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  background: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  box-shadow: none;
+}
+
+/* ---------- REMOVE OLD HEADING FOOTPRINT ---------- */
+
+.familyhub-shell .meals-page .meal-week-meal-heading {
+  display: none;
+}
+
+/* ---------- DESCRIPTION, IF A MEAL HAS ONE ---------- */
+
+.familyhub-shell .meals-page
+  .meal-week-meal > span {
+  order: 1;
+
+  padding: 0 4px;
+
+  font-size: 11px;
+  line-height: 1.35;
+
+  color: rgba(255, 255, 255, 0.56);
+}
+
+/* ---------- HOVER ---------- */
+
+@media (hover: hover) {
+  .familyhub-shell .meals-page
+    .meal-week-meal
+    .meal-week-recipe:hover {
+    color: white;
+
+    background: rgba(255, 255, 255, 0.11);
+
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .familyhub-shell .meals-page
+    .meal-week-meal
+    .meal-week-copy:hover {
+    color: white;
+
+    background: rgba(255, 255, 255, 0.09);
+
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — POLISHED CARD FOOTER
+   ========================================================= */
+
+/* Let the photo use more of the card width */
+.familyhub-shell .meals-page .meal-week-meal {
+  padding: 7px;
+  gap: 7px;
+}
+
+/* Stronger, slightly larger food image */
+.familyhub-shell .meals-page .meal-week-meal-photo {
+  height: 176px;
+  min-height: 176px;
+  flex-basis: 176px;
+
+  border-radius: 13px;
+}
+
+/* Family gets a clean dedicated row */
+.familyhub-shell .meals-page .meal-week-members {
+  min-height: 36px;
+
+  padding: 0 3px;
+
+  display: flex;
+  align-items: center;
+}
+
+/* Make family faces a touch easier to see */
+.familyhub-shell .meals-page .meal-week-member {
+  width: 31px;
+  height: 31px;
+  flex-basis: 31px;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-member + .meal-week-member {
+  margin-left: -5px;
+}
+
+/* Proper two-control footer */
+.familyhub-shell .meals-page .meal-week-meal-actions {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: 1fr 38px;
+
+  gap: 7px;
+}
+
+/* Recipe becomes a proper labelled action */
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-recipe {
+  width: 100%;
+  height: 38px;
+
+  padding: 0 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+
+  color: rgba(255, 255, 255, 0.88);
+
+  background: rgba(255, 255, 255, 0.055);
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+
+  border-radius: 10px;
+}
+
+/* Copy remains the smaller secondary action */
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-copy {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+
+  border-radius: 10px;
+}
+
+/* Better touch/hover feedback */
+@media (hover: hover) {
+  .familyhub-shell .meals-page
+    .meal-week-meal
+    .meal-week-recipe:hover,
+  .familyhub-shell .meals-page
+    .meal-week-meal
+    .meal-week-copy:hover {
+    transform: translateY(-1px);
+
+    background: rgba(255, 255, 255, 0.10);
+
+    border-color: rgba(255, 255, 255, 0.17);
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — PREMIUM MEAL ACTION BAR
+   ========================================================= */
+
+.familyhub-shell .meals-page .meal-week-meal-actions {
+  position: static;
+
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+
+  gap: 7px;
+
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- VIEW RECIPE ---------- */
+
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-recipe {
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+
+  padding: 0 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  border-radius: 11px;
+
+  color: rgba(255, 255, 255, 0.94);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.085),
+      rgba(255, 255, 255, 0.045)
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 750;
+
+  white-space: nowrap;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-recipe svg {
+  flex: 0 0 auto;
+
+  width: 15px;
+  height: 15px;
+
+  opacity: 0.82;
+}
+
+/* ---------- COPY ---------- */
+
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-copy {
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  color: rgba(255, 255, 255, 0.66);
+
+  background: rgba(255, 255, 255, 0.025);
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  box-shadow: none;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-copy svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- INTERACTION ---------- */
+
+@media (hover: hover) {
+  .familyhub-shell .meals-page
+    .meal-week-meal
+    .meal-week-recipe {
+    transition:
+      background 150ms ease,
+      border-color 150ms ease,
+      transform 150ms ease;
+  }
+
+  .familyhub-shell .meals-page
+    .meal-week-meal
+    .meal-week-recipe:hover {
+    transform: translateY(-1px);
+
+    background:
+      linear-gradient(
+        180deg,
+        rgba(139, 68, 255, 0.22),
+        rgba(139, 68, 255, 0.11)
+      );
+
+    border-color: rgba(139, 68, 255, 0.40);
+  }
+
+  .familyhub-shell .meals-page
+    .meal-week-meal
+    .meal-week-copy {
+    transition:
+      color 150ms ease,
+      background 150ms ease,
+      border-color 150ms ease,
+      transform 150ms ease;
+  }
+
+  .familyhub-shell .meals-page
+    .meal-week-meal
+    .meal-week-copy:hover {
+    transform: translateY(-1px);
+
+    color: rgba(255, 255, 255, 0.95);
+
+    background: rgba(255, 255, 255, 0.075);
+
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — CLEAN RECIPE CARD CONTROLS
+   ========================================================= */
+
+/* ---------- PHOTO IS NOW THE RECIPE BUTTON ---------- */
+
+.familyhub-shell .meals-page .meal-week-meal-photo {
+  position: relative;
+
+  display: block;
+
+  width: 100%;
+  height: 176px;
+  min-height: 176px;
+  flex: 0 0 176px;
+
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+
+  border: 0;
+  border-radius: 13px;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.familyhub-shell .meals-page .meal-week-meal-photo img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+/* Small Recipe hint over the photo */
+
+.familyhub-shell .meals-page .meal-week-photo-recipe-hint {
+  position: absolute;
+
+  left: 8px;
+  bottom: 8px;
+
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  height: 28px;
+
+  padding: 0 9px;
+
+  border-radius: 9px;
+
+  color: rgba(255, 255, 255, 0.94);
+
+  background: rgba(18, 18, 20, 0.72);
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 700;
+
+  opacity: 0;
+
+  transform: translateY(3px);
+
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+/* ---------- FAMILY ROW ---------- */
+
+.familyhub-shell .meals-page .meal-week-members {
+  position: static;
+
+  width: 100%;
+  min-height: 38px;
+
+  margin: 0;
+  padding: 0 46px 0 3px;
+
+  display: flex;
+  align-items: center;
+
+  overflow: visible;
+
+  background: transparent;
+  border: 0;
+}
+
+/* ---------- COPY ONLY ---------- */
+
+.familyhub-shell .meals-page .meal-week-meal-actions {
+  position: absolute;
+
+  right: 8px;
+  bottom: 8px;
+
+  z-index: 4;
+
+  display: block;
+
+  width: 36px;
+  height: 36px;
+
+  margin: 0;
+  padding: 0;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-meal
+  .meal-week-copy {
+  position: static;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+
+  margin: 0;
+  padding: 0;
+
+  border-radius: 10px;
+
+  color: rgba(255, 255, 255, 0.70);
+
+  background: rgba(255, 255, 255, 0.045);
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+
+  box-shadow: none;
+
+  transform: none;
+}
+
+/* Kill any remaining old Recipe-button layout */
+
+.familyhub-shell .meals-page .meal-week-recipe {
+  display: none !important;
+}
+
+/* ---------- INTERACTION ---------- */
+
+@media (hover: hover) {
+  .familyhub-shell .meals-page
+    .meal-week-meal-photo:hover
+    .meal-week-photo-recipe-hint {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .familyhub-shell .meals-page
+    .meal-week-meal-photo:hover img {
+    transform: scale(1.035);
+  }
+
+  .familyhub-shell .meals-page
+    .meal-week-meal
+    .meal-week-copy:hover {
+    color: white;
+
+    background: rgba(255, 255, 255, 0.10);
+
+    border-color: rgba(255, 255, 255, 0.17);
+
+    transform: translateY(-1px);
+  }
+}
+
+/* Touchscreens don't rely on hover */
+@media (hover: none) {
+  .familyhub-shell .meals-page
+    .meal-week-photo-recipe-hint {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — PHOTO RECIPE BADGE
+   ========================================================= */
+
+.familyhub-shell .meals-page
+  .meal-week-photo-recipe-hint {
+  position: absolute;
+
+  left: 8px;
+  bottom: 8px;
+
+  z-index: 3;
+
+  width: 30px;
+  height: 30px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 0;
+
+  border-radius: 9px;
+
+  color: rgba(255, 255, 255, 0.92);
+
+  background: rgba(15, 15, 17, 0.68);
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.22);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  opacity: 1;
+  transform: none;
+}
+
+/* Hide the word "Recipe" — keep only the book */
+.familyhub-shell .meals-page
+  .meal-week-photo-recipe-hint {
+  font-size: 0;
+}
+
+.familyhub-shell .meals-page
+  .meal-week-photo-recipe-hint svg {
+  width: 15px;
+  height: 15px;
+
+  flex: 0 0 auto;
+}
+
+/* Slight feedback when the photo is hovered */
+@media (hover: hover) {
+  .familyhub-shell .meals-page
+    .meal-week-meal-photo:hover
+    .meal-week-photo-recipe-hint {
+    width: 30px;
+    height: 30px;
+
+    opacity: 1;
+    transform: scale(1.06);
+
+    color: white;
+
+    background: rgba(126, 52, 246, 0.82);
+
+    border-color: rgba(167, 112, 255, 0.55);
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — CLEAN EMPTY DAY
+   ========================================================= */
+
+/* Remove the heavy "card inside a card" appearance */
+.familyhub-shell .meals-page .meal-week-empty-actions {
+  min-height: 250px;
+
+  padding: 10px 8px 8px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  gap: 10px;
+
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+/* Main Add Dinner area */
+.familyhub-shell .meals-page .meal-week-add {
+  width: 100%;
+  min-height: 176px;
+
+  margin: 0;
+  padding: 18px 10px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  border-radius: 15px;
+
+  color: rgba(255, 255, 255, 0.58);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.035),
+      rgba(255, 255, 255, 0.018)
+    );
+
+  border: 1px dashed rgba(255, 255, 255, 0.11);
+
+  box-shadow: none;
+}
+
+/* Larger, cleaner plus */
+.familyhub-shell .meals-page .meal-week-add svg {
+  width: 24px;
+  height: 24px;
+
+  opacity: 0.68;
+}
+
+.familyhub-shell .meals-page .meal-week-add span {
+  font-size: 12px;
+  font-weight: 700;
+
+  color: rgba(255, 255, 255, 0.64);
+}
+
+/* Choose Recipe becomes the quieter alternative */
+.familyhub-shell .meals-page .meal-week-choose-recipe {
+  width: 100%;
+  min-height: 40px;
+
+  margin: 0;
+  padding: 0 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  border-radius: 11px;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  background: transparent;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow: none;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Hover — subtle FamilyHub purple rather than a huge highlight */
+@media (hover: hover) {
+  .familyhub-shell .meals-page .meal-week-add,
+  .familyhub-shell .meals-page .meal-week-choose-recipe {
+    transition:
+      color 150ms ease,
+      background 150ms ease,
+      border-color 150ms ease,
+      transform 150ms ease;
+  }
+
+  .familyhub-shell .meals-page .meal-week-add:hover {
+    color: white;
+
+    background:
+      linear-gradient(
+        180deg,
+        rgba(126, 52, 246, 0.10),
+        rgba(126, 52, 246, 0.035)
+      );
+
+    border-color: rgba(139, 68, 255, 0.32);
+
+    transform: translateY(-1px);
+  }
+
+  .familyhub-shell .meals-page
+    .meal-week-choose-recipe:hover {
+    color: white;
+
+    background: rgba(255, 255, 255, 0.055);
+
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — COMPACT WEEK NAVIGATION
+   ========================================================= */
+
+/* Bring the entire navigation together */
+.familyhub-shell .meals-page .meal-week-toolbar {
+  position: relative;
+
+  width: 100%;
+  min-height: 58px;
+
+  margin: 26px 0 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Centre section becomes one compact navigator */
+.familyhub-shell .meals-page .meal-week-range {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  min-height: 44px;
+
+  padding: 4px;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+/* Date itself */
+.familyhub-shell .meals-page .meal-week-range strong {
+  min-width: 190px;
+
+  padding: 0 8px;
+
+  text-align: center;
+
+  color: rgba(255, 255, 255, 0.94);
+
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: -0.015em;
+}
+
+/* Previous / Next move beside the date */
+.familyhub-shell .meals-page .meal-week-previous,
+.familyhub-shell .meals-page .meal-week-next {
+  position: absolute;
+
+  top: 50%;
+
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 11px;
+
+  color: rgba(255, 255, 255, 0.76);
+
+  background: rgba(255, 255, 255, 0.035);
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  transform: translateY(-50%);
+
+  font-size: 0;
+}
+
+/* Position both arrows directly around the centre navigator */
+.familyhub-shell .meals-page .meal-week-previous {
+  left: calc(50% - 190px);
+}
+
+.familyhub-shell .meals-page .meal-week-next {
+  right: calc(50% - 190px);
+}
+
+/* Replace the button text visually with clean arrows */
+.familyhub-shell .meals-page .meal-week-previous::after {
+  content: "‹";
+
+  font-size: 25px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.familyhub-shell .meals-page .meal-week-next::after {
+  content: "›";
+
+  font-size: 25px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+/* This week becomes a small secondary control */
+.familyhub-shell .meals-page .meal-week-current {
+  min-height: 34px;
+
+  padding: 0 11px;
+
+  border-radius: 9px;
+
+  color: rgba(255, 255, 255, 0.70);
+
+  background: rgba(255, 255, 255, 0.035);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Interaction */
+@media (hover: hover) {
+  .familyhub-shell .meals-page .meal-week-previous,
+  .familyhub-shell .meals-page .meal-week-next,
+  .familyhub-shell .meals-page .meal-week-current {
+    transition:
+      color 150ms ease,
+      background 150ms ease,
+      border-color 150ms ease,
+      transform 150ms ease;
+  }
+
+  .familyhub-shell .meals-page .meal-week-previous:hover,
+  .familyhub-shell .meals-page .meal-week-next:hover {
+    color: white;
+
+    background: rgba(126, 52, 246, 0.15);
+
+    border-color: rgba(139, 68, 255, 0.30);
+  }
+
+  .familyhub-shell .meals-page .meal-week-previous:hover {
+    transform:
+      translateY(-50%)
+      translateX(-2px);
+  }
+
+  .familyhub-shell .meals-page .meal-week-next:hover {
+    transform:
+      translateY(-50%)
+      translateX(2px);
+  }
+
+  .familyhub-shell .meals-page .meal-week-current:hover {
+    color: white;
+
+    background: rgba(255, 255, 255, 0.07);
+
+    border-color: rgba(255, 255, 255, 0.13);
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — TIGHTER PLANNER SPACING
+   ========================================================= */
+
+/*
+  Pull the week navigator closer to the planner controls.
+  Keep the navigator itself unchanged.
+*/
+.familyhub-shell .meals-page .meal-week-toolbar {
+  min-height: 50px;
+
+  margin-top: 14px;
+  margin-bottom: 14px;
+}
+
+/*
+  Pull the seven-day grid closer to the navigator.
+*/
+.familyhub-shell .meals-page .meal-week-grid {
+  margin-top: 0;
+}
+
+/*
+  Planner view doesn't need a large gap after
+  the Dinner Planner / Recipe Library toolbar.
+*/
+.familyhub-shell .meals-page .meals-toolbar {
+  margin-bottom: 8px;
+}
+
+/* =========================================================
+   RECIPE LIBRARY — COMPACT 4-COLUMN CARD GRID
+   ========================================================= */
+
+/*
+  Four useful recipe cards across on the FamilyHub
+  wall display instead of the oversized 3-column layout.
+*/
+.familyhub-shell .meals-page .recipe-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 16px;
+
+  align-items: stretch;
+}
+
+/*
+  Recipe card becomes a compact library tile.
+*/
+.familyhub-shell .meals-page .recipe-card {
+  min-width: 0;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.10);
+}
+
+/*
+  Reduce the huge recipe photographs.
+
+  16:10 keeps them visually strong without letting
+  the photo consume most of the screen.
+*/
+.familyhub-shell .meals-page .recipe-card-photo {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+
+  min-height: 0;
+  height: auto;
+
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.familyhub-shell .meals-page .recipe-card-photo img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+/*
+  Tighten the information area beneath the photo.
+*/
+.familyhub-shell .meals-page .recipe-card-body {
+  flex: 1;
+
+  padding: 14px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 9px;
+}
+
+/*
+  Recipe title remains the strongest text in the card.
+*/
+.familyhub-shell .meals-page .recipe-card h3 {
+  margin: 0;
+
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 750;
+
+  letter-spacing: -0.02em;
+
+  color: rgba(255, 255, 255, 0.96);
+}
+
+/*
+  "SAVED RECIPE" is useful as a tiny eyebrow,
+  but it doesn't need much visual weight.
+*/
+.familyhub-shell .meals-page .recipe-card .section-kicker {
+  margin: 0;
+
+  font-size: 9px;
+  line-height: 1;
+  font-weight: 750;
+
+  letter-spacing: 0.08em;
+
+  color: rgba(255, 255, 255, 0.42);
+}
+
+/*
+  Keep tags compact.
+*/
+.familyhub-shell .meals-page .recipe-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 5px;
+
+  margin: 0;
+}
+
+.familyhub-shell .meals-page .recipe-card-tags span {
+  min-height: 22px;
+
+  padding: 0 8px;
+
+  display: inline-flex;
+  align-items: center;
+
+  border-radius: 999px;
+
+  font-size: 9px;
+  font-weight: 650;
+
+  color: rgba(255, 255, 255, 0.64);
+
+  background: rgba(255, 255, 255, 0.055);
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/*
+  Descriptions shouldn't make one grid card twice as tall
+  as all the others.
+
+  For now clamp them heavily. We'll decide in the next
+  step whether to remove them from cards entirely.
+*/
+.familyhub-shell .meals-page .recipe-card-description {
+  display: -webkit-box;
+
+  overflow: hidden;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+
+  margin: 0;
+
+  font-size: 11px;
+  line-height: 1.4;
+
+  color: rgba(255, 255, 255, 0.52);
+}
+
+/*
+  Push the primary action to the bottom so every card
+  has a consistent footer.
+*/
+.familyhub-shell .meals-page .recipe-card-actions {
+  margin-top: auto;
+
+  padding-top: 4px;
+}
+
+/*
+  Compact Plan this meal button.
+*/
+.familyhub-shell .meals-page .recipe-card-actions button {
+  min-height: 38px;
+
+  border-radius: 11px;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/*
+  Edit remains secondary.
+*/
+.familyhub-shell .meals-page .recipe-card-edit {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+
+  padding: 0;
+
+  border-radius: 10px;
+}
+
+/*
+  Subtle interaction rather than making the cards flashy.
+*/
+@media (hover: hover) {
+  .familyhub-shell .meals-page .recipe-card {
+    transition:
+      transform 160ms ease,
+      border-color 160ms ease,
+      background 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .familyhub-shell .meals-page .recipe-card:hover {
+    transform: translateY(-2px);
+
+    background: rgba(255, 255, 255, 0.045);
+
+    border-color: rgba(255, 255, 255, 0.14);
+
+    box-shadow:
+      0 12px 30px rgba(0, 0, 0, 0.16);
+  }
+}
+
+/*
+  Responsive fallback.
+*/
+@media (max-width: 1200px) {
+  .familyhub-shell .meals-page .recipe-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 850px) {
+  .familyhub-shell .meals-page .recipe-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .familyhub-shell .meals-page .recipe-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   FAMILYHUB RECIPE LIBRARY — COMPACT 4-COLUMN CARDS
+   ========================================================= */
+
+.recipe-card-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+  align-items: stretch !important;
+}
+
+.recipe-card {
+  min-width: 0 !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+
+.recipe-card-photo {
+  width: 100% !important;
+  height: 210px !important;
+  min-height: 210px !important;
+  max-height: 210px !important;
+  aspect-ratio: auto !important;
+  overflow: hidden !important;
+}
+
+.recipe-card-photo img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+.recipe-card-photo-empty {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.recipe-card-content {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 !important;
+  padding: 16px !important;
+  gap: 10px !important;
+}
+
+/* Hide the long recipe description from the library card.
+   It still remains available when the recipe is opened. */
+.recipe-card-content > p {
+  display: none !important;
+}
+
+.recipe-card-heading {
+  margin: 0 !important;
+  align-items: flex-start !important;
+}
+
+.recipe-card-heading h3 {
+  margin: 3px 0 0 !important;
+  font-size: 17px !important;
+  line-height: 1.2 !important;
+}
+
+.recipe-card-kicker {
+  font-size: 10px !important;
+  letter-spacing: 0.08em !important;
+}
+
+.recipe-card-meta {
+  margin: 0 !important;
+  gap: 6px !important;
+}
+
+.recipe-card-ingredient-count {
+  margin: 0 !important;
+}
+
+.recipe-card-plan {
+  margin-top: auto !important;
+  min-height: 40px !important;
+}
+
+/* Keep cards sensible on smaller displays */
+@media (max-width: 1300px) {
+  .recipe-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 950px) {
+  .recipe-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 620px) {
+  .recipe-card-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* =========================================================
+   RECIPE LIBRARY — COMPACT SEARCH + FILTER BAR
+   ========================================================= */
+
+.recipe-library-filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 26px;
+}
+
+.recipe-search {
+  width: 300px;
+  min-width: 240px;
+  flex: 0 0 300px;
+}
+
+.recipe-search input {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 12px;
+}
+
+.recipe-filter-button {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.recipe-library-filters::after {
+  content: "";
+  display: block;
+  flex-basis: 100%;
+  height: 0;
+}
+
+.recipe-result-count {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.58;
+}
+
+/* =========================================================
+   RECIPE LIBRARY — TIGHTER VERTICAL RHYTHM
+   ========================================================= */
+
+.recipe-library-filters {
+  margin-bottom: 12px;
+}
+
+.recipe-result-count {
+  margin: 0 0 14px;
+  line-height: 1;
+}
+
+.recipe-grid {
+  margin-top: 0;
+}
+
+/* =========================================================
+   RECIPE LIBRARY — POLISHED FILTER TOOLBAR
+   ========================================================= */
+
+.recipe-library-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.recipe-search {
+  width: 300px;
+  min-width: 300px;
+  flex: 0 0 300px;
+  margin-right: 2px;
+}
+
+.recipe-search input {
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.recipe-search input:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.8);
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.recipe-filter-button {
+  height: 42px;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.recipe-filter-button:hover {
+  background: rgba(255, 255, 255, 0.075);
+  transform: translateY(-1px);
+}
+
+.recipe-filter-button.active,
+.recipe-filter-button.selected {
+  border-color: rgba(139, 92, 246, 0.9);
+  background: rgba(124, 58, 237, 0.18);
+}
+
+.recipe-result-count {
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.62;
+}
+
+/* =========================================================
+   RECIPE LIBRARY — PREMIUM RECIPE CARD POLISH
+   ========================================================= */
+
+.recipe-card-content {
+  padding: 16px 16px 15px !important;
+  gap: 10px !important;
+}
+
+/* Saved Recipe becomes a quiet eyebrow */
+.recipe-card-kicker {
+  display: block;
+
+  margin-bottom: 5px;
+
+  font-size: 9px !important;
+  line-height: 1 !important;
+  font-weight: 750 !important;
+
+  letter-spacing: 0.11em !important;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.38) !important;
+}
+
+/* Recipe name is now the main information */
+.recipe-card-heading h3 {
+  margin: 0 !important;
+
+  font-size: 18px !important;
+  line-height: 1.18 !important;
+  font-weight: 800 !important;
+
+  letter-spacing: -0.025em !important;
+
+  color: rgba(255, 255, 255, 0.97) !important;
+}
+
+/* Give the title room while keeping edit tucked away */
+.recipe-card-heading {
+  display: flex;
+  align-items: flex-start !important;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.recipe-card-heading > div {
+  min-width: 0;
+  flex: 1;
+}
+
+/* Cleaner edit control */
+.recipe-card-edit {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+
+  padding: 0 !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px !important;
+
+  color: rgba(255, 255, 255, 0.52) !important;
+
+  background: rgba(255, 255, 255, 0.035) !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+
+/* Metadata becomes a clean secondary row */
+.recipe-card-meta {
+  display: flex !important;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 6px !important;
+
+  margin-top: 1px !important;
+}
+
+.recipe-card-meta span {
+  min-height: 24px;
+
+  padding: 0 9px !important;
+
+  display: inline-flex;
+  align-items: center;
+
+  border-radius: 999px !important;
+
+  font-size: 10px !important;
+  line-height: 1 !important;
+  font-weight: 650 !important;
+
+  color: rgba(255, 255, 255, 0.64) !important;
+
+  background: rgba(255, 255, 255, 0.045) !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.065) !important;
+}
+
+/* Ingredient count gets its own subtle line */
+.recipe-card-ingredient-count {
+  margin: 0 !important;
+
+  font-size: 10px !important;
+  line-height: 1.3 !important;
+  font-weight: 650 !important;
+
+  color: rgba(255, 255, 255, 0.46) !important;
+}
+
+/* Primary card action */
+.recipe-card-plan {
+  width: 100%;
+
+  min-height: 42px !important;
+
+  margin-top: auto !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px !important;
+
+  font-size: 11px !important;
+  font-weight: 750 !important;
+
+  color: rgba(255, 255, 255, 0.88) !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(139, 92, 246, 0.16),
+      rgba(124, 58, 237, 0.09)
+    ) !important;
+
+  border: 1px solid rgba(139, 92, 246, 0.24) !important;
+}
+
+/* Keep the card interaction restrained */
+@media (hover: hover) {
+  .recipe-card-edit,
+  .recipe-card-plan {
+    transition:
+      color 150ms ease,
+      background 150ms ease,
+      border-color 150ms ease,
+      transform 150ms ease;
+  }
+
+  .recipe-card-edit:hover {
+    color: white !important;
+
+    background: rgba(255, 255, 255, 0.08) !important;
+
+    border-color: rgba(255, 255, 255, 0.13) !important;
+  }
+
+  .recipe-card-plan:hover {
+    color: white !important;
+
+    background:
+      linear-gradient(
+        180deg,
+        rgba(139, 92, 246, 0.25),
+        rgba(124, 58, 237, 0.15)
+      ) !important;
+
+    border-color: rgba(139, 92, 246, 0.42) !important;
+
+    transform: translateY(-1px);
+  }
+}
+
+/* =========================================================
+   RECIPE DETAILS — FAMILYHUB PREMIUM VIEW
+   ========================================================= */
+
+.recipe-details-modal {
+  width: min(920px, calc(100vw - 48px)) !important;
+  max-height: min(860px, calc(100vh - 48px)) !important;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  border-radius: 24px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(31, 31, 34, 0.99),
+      rgba(22, 22, 25, 0.99)
+    ) !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.015) !important;
+}
+
+/* Large hero recipe image */
+.recipe-details-photo {
+  width: 100%;
+  height: 330px !important;
+
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.recipe-details-photo img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+/* Floating close button over the hero */
+.recipe-details-close {
+  position: absolute !important;
+  top: 16px !important;
+  right: 16px !important;
+  z-index: 10;
+
+  width: 38px !important;
+  height: 38px !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 !important;
+
+  border-radius: 50% !important;
+
+  color: rgba(255, 255, 255, 0.9) !important;
+
+  background: rgba(18, 18, 20, 0.72) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+
+  backdrop-filter: blur(16px);
+}
+
+/* Main recipe content */
+.recipe-details-content {
+  padding: 28px 30px 30px !important;
+}
+
+/* Recipe title area */
+.recipe-details-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  margin-bottom: 22px;
+}
+
+.recipe-details-heading > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.recipe-details-heading h2 {
+  margin: 0 !important;
+
+  font-size: 30px !important;
+  line-height: 1.08 !important;
+  font-weight: 800 !important;
+
+  letter-spacing: -0.035em !important;
+
+  color: rgba(255, 255, 255, 0.98) !important;
+}
+
+.recipe-details-heading > div > p {
+  max-width: 650px;
+
+  margin: 9px 0 0 !important;
+
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* Edit becomes a restrained utility button */
+.recipe-details-edit {
+  min-height: 38px;
+
+  padding: 0 14px !important;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  border-radius: 11px !important;
+
+  font-size: 11px !important;
+  font-weight: 700 !important;
+
+  color: rgba(255, 255, 255, 0.72) !important;
+
+  background: rgba(255, 255, 255, 0.045) !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Prep / Cook / Serves / Category */
+.recipe-details-meta {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 10px !important;
+
+  margin: 0 0 28px !important;
+}
+
+.recipe-details-meta-item {
+  min-height: 66px;
+
+  display: flex !important;
+  align-items: center;
+
+  gap: 11px !important;
+
+  padding: 12px 14px !important;
+
+  border-radius: 14px !important;
+
+  background: rgba(255, 255, 255, 0.035) !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.065) !important;
+}
+
+.recipe-details-meta-item > svg {
+  flex: 0 0 auto;
+
+  color: rgba(167, 139, 250, 0.9);
+}
+
+.recipe-details-meta-item div {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.recipe-details-meta-item span {
+  font-size: 9px !important;
+  line-height: 1 !important;
+
+  font-weight: 700 !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.38) !important;
+}
+
+.recipe-details-meta-item strong {
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+
+  font-weight: 750 !important;
+
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Ingredients / Method sections */
+.recipe-details-section {
+  padding: 22px 0 !important;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.065);
+}
+
+.recipe-details-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  margin-bottom: 16px;
+}
+
+.recipe-details-section-heading h3 {
+  margin: 0 !important;
+
+  font-size: 17px !important;
+  font-weight: 800 !important;
+
+  letter-spacing: -0.015em;
+
+  color: rgba(255, 255, 255, 0.94) !important;
+}
+
+.recipe-details-section-heading > span {
+  font-size: 10px !important;
+  font-weight: 650 !important;
+
+  color: rgba(255, 255, 255, 0.42) !important;
+}
+
+/* Ingredients */
+.recipe-details-ingredients {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 8px 12px !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  list-style: none !important;
+}
+
+.recipe-details-ingredients li {
+  position: relative;
+
+  min-height: 40px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 9px 12px 9px 30px !important;
+
+  border-radius: 11px;
+
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+
+  color: rgba(255, 255, 255, 0.72) !important;
+
+  background: rgba(255, 255, 255, 0.028);
+
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.recipe-details-ingredients li::before {
+  content: "";
+
+  position: absolute;
+  left: 13px;
+
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: rgba(139, 92, 246, 0.9);
+
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.35);
+}
+
+/* Method */
+.recipe-details-method {
+  display: flex !important;
+  flex-direction: column;
+
+  gap: 10px !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  list-style: none !important;
+}
+
+.recipe-details-method li {
+  display: grid !important;
+  grid-template-columns: 32px minmax(0, 1fr);
+
+  gap: 12px !important;
+
+  align-items: flex-start;
+
+  padding: 12px !important;
+
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  border: 1px solid rgba(255, 255, 255, 0.045);
+}
+
+.recipe-method-number {
+  width: 30px !important;
+  height: 30px !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px !important;
+
+  font-size: 11px !important;
+  font-weight: 800 !important;
+
+  color: rgba(221, 214, 254, 0.95) !important;
+
+  background: rgba(124, 58, 237, 0.17) !important;
+
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.recipe-details-method li p {
+  margin: 5px 0 0 !important;
+
+  font-size: 12px !important;
+  line-height: 1.55 !important;
+
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Bottom actions */
+.recipe-details-actions {
+  position: sticky;
+  bottom: -30px;
+  z-index: 5;
+
+  display: flex !important;
+  align-items: center;
+
+  gap: 9px !important;
+
+  margin: 8px -30px -30px !important;
+  padding: 16px 30px 20px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(22, 22, 25, 0.7),
+      rgba(22, 22, 25, 0.98) 32%
+    );
+
+  backdrop-filter: blur(18px);
+
+  border-top: 1px solid rgba(255, 255, 255, 0.065);
+}
+
+.recipe-details-shopping,
+.recipe-details-link,
+.recipe-details-plan {
+  min-height: 42px !important;
+
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 15px !important;
+
+  border-radius: 11px !important;
+
+  font-size: 11px !important;
+  font-weight: 750 !important;
+}
+
+/* Plan Dinner is the primary action */
+.recipe-details-plan {
+  margin-left: auto;
+
+  color: white !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(139, 92, 246, 0.96),
+      rgba(124, 58, 237, 0.96)
+    ) !important;
+
+  border: 1px solid rgba(167, 139, 250, 0.45) !important;
+
+  box-shadow:
+    0 7px 20px rgba(124, 58, 237, 0.2);
+}
+
+/* Responsive wall/tablet behaviour */
+@media (max-width: 760px) {
+  .recipe-details-modal {
+    width: calc(100vw - 24px) !important;
+  }
+
+  .recipe-details-photo {
+    height: 240px !important;
+  }
+
+  .recipe-details-content {
+    padding: 22px 20px !important;
+  }
+
+  .recipe-details-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .recipe-details-ingredients {
+    grid-template-columns: 1fr;
+  }
+
+  .recipe-details-actions {
+    margin:
+      8px -20px -22px !important;
+
+    padding: 14px 20px 18px !important;
+
+    flex-wrap: wrap;
+  }
+
+  .recipe-details-plan {
+    margin-left: 0;
+  }
+}
+
+/* =========================================================
+   RECIPE DETAILS — FINAL SPACING + COUNT FIX
+   ========================================================= */
+
+/* Reduce the large gap below the information tiles */
+.recipe-details-meta {
+  margin-bottom: 18px !important;
+}
+
+.recipe-details-section {
+  padding: 18px 0 !important;
+}
+
+/* Fix Ingredients / Method count badge */
+.recipe-details-section-heading > span {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 26px;
+
+  padding: 0 10px !important;
+
+  border-radius: 999px;
+
+  font-size: 10px !important;
+  line-height: 1 !important;
+  font-weight: 700 !important;
+
+  color: rgba(255, 255, 255, 0.58) !important;
+
+  background: rgba(255, 255, 255, 0.055) !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.075) !important;
+}
+
+/* Keep ingredient rows subtle rather than blue boxes */
+.recipe-details-ingredients li {
+  background: rgba(255, 255, 255, 0.03) !important;
+
+  border-color: rgba(255, 255, 255, 0.065) !important;
+}
+
+/* Slightly more breathing room above the bottom actions */
+.recipe-details-actions {
+  margin-top: 12px !important;
+}
+
+/* =========================================================
+   RECIPE EDITOR — PREMIUM MODAL FOUNDATION
+   ========================================================= */
+
+.event-modal:has(.recipe-photo-editor) {
+  width: min(780px, calc(100vw - 48px)) !important;
+  max-height: min(880px, calc(100vh - 48px)) !important;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  border-radius: 24px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(31, 31, 34, 0.99),
+      rgba(22, 22, 25, 0.99)
+    ) !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Header */
+.event-modal:has(.recipe-photo-editor)
+.event-modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  padding: 22px 24px 18px !important;
+
+  background: rgba(28, 28, 31, 0.92);
+
+  backdrop-filter: blur(18px);
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.06);
+}
+
+.event-modal:has(.recipe-photo-editor)
+.event-modal-header h2 {
+  margin-top: 3px !important;
+
+  font-size: 24px !important;
+  line-height: 1.1 !important;
+  font-weight: 800 !important;
+
+  letter-spacing: -0.03em;
+}
+
+/* Main form */
+.event-modal:has(.recipe-photo-editor)
+.event-form {
+  padding: 22px 24px 24px !important;
+
+  gap: 18px !important;
+}
+
+/* Recipe photo becomes the visual hero */
+.recipe-photo-editor {
+  position: relative;
+
+  width: 100%;
+  height: 250px !important;
+
+  overflow: hidden;
+
+  border-radius: 16px !important;
+
+  background: rgba(255, 255, 255, 0.03) !important;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.075) !important;
+}
+
+.recipe-photo-editor > img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+.recipe-photo-editor-empty {
+  width: 100%;
+  height: 100%;
+
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  color: rgba(255, 255, 255, 0.38) !important;
+}
+
+/* Change/Add photo floats over the image */
+.recipe-photo-upload-button {
+  position: absolute !important;
+  right: 12px;
+  bottom: 12px;
+
+  min-height: 38px;
+
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 13px !important;
+
+  border-radius: 11px !important;
+
+  font-size: 11px !important;
+  font-weight: 750 !important;
+
+  color: white !important;
+
+  background: rgba(18, 18, 20, 0.78) !important;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.14) !important;
+
+  backdrop-filter: blur(14px);
+
+  cursor: pointer;
+}
+
+/* Cleaner field labels */
+.event-modal:has(.recipe-photo-editor)
+.event-form-field > span {
+  margin-bottom: 7px !important;
+
+  font-size: 10px !important;
+  line-height: 1 !important;
+  font-weight: 750 !important;
+
+  letter-spacing: 0.04em;
+
+  color: rgba(255, 255, 255, 0.58) !important;
+}
+
+/* Inputs */
+.event-modal:has(.recipe-photo-editor)
+.event-form-field input,
+.event-modal:has(.recipe-photo-editor)
+.event-form-field textarea,
+.event-modal:has(.recipe-photo-editor)
+.event-form-field select {
+  border-radius: 12px !important;
+
+  background: rgba(255, 255, 255, 0.035) !important;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.075) !important;
+
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.event-modal:has(.recipe-photo-editor)
+.event-form-field input:focus,
+.event-modal:has(.recipe-photo-editor)
+.event-form-field textarea:focus,
+.event-modal:has(.recipe-photo-editor)
+.event-form-field select:focus {
+  outline: none;
+
+  background: rgba(255, 255, 255, 0.05) !important;
+
+  border-color:
+    rgba(139, 92, 246, 0.7) !important;
+
+  box-shadow:
+    0 0 0 3px rgba(139, 92, 246, 0.09);
+}
+
+/* Time / serving / category rows */
+.event-modal:has(.recipe-photo-editor)
+.event-form-grid {
+  gap: 12px !important;
+}
+
+/* Ingredients and method get more useful editing space */
+.event-modal:has(.recipe-photo-editor)
+textarea[placeholder*="One item per line"] {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.event-modal:has(.recipe-photo-editor)
+textarea[placeholder*="One step per line"] {
+  min-height: 190px;
+  resize: vertical;
+}
+
+/* Recipe URL importer */
+.recipe-import-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+
+  gap: 9px !important;
+}
+
+.recipe-import-button {
+  min-height: 42px;
+
+  padding: 0 15px !important;
+
+  border-radius: 11px !important;
+
+  font-size: 11px !important;
+  font-weight: 750 !important;
+}
+
+.recipe-import-help {
+  display: block;
+
+  margin-top: 7px;
+
+  font-size: 10px !important;
+  line-height: 1.45;
+
+  color: rgba(255, 255, 255, 0.38) !important;
+}
+
+/* Bottom Save / Cancel area */
+.event-modal:has(.recipe-photo-editor)
+.event-modal-actions {
+  position: sticky;
+  bottom: -24px;
+  z-index: 9;
+
+  margin:
+    8px -24px -24px !important;
+
+  padding:
+    16px 24px 20px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(22, 22, 25, 0.72),
+      rgba(22, 22, 25, 0.98) 30%
+    );
+
+  backdrop-filter: blur(18px);
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.065);
+}
+
+.event-modal:has(.recipe-photo-editor)
+.event-save-button {
+  min-height: 42px;
+
+  border-radius: 11px !important;
+
+  font-weight: 750 !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(139, 92, 246, 0.98),
+      rgba(124, 58, 237, 0.98)
+    ) !important;
+}
+
+.event-modal:has(.recipe-photo-editor)
+.event-cancel-button,
+.event-modal:has(.recipe-photo-editor)
+.event-delete-button {
+  min-height: 42px;
+
+  border-radius: 11px !important;
+}
+
+/* =========================================================
+   RECIPE EDITOR — COMPACT WALL / DESKTOP LAYOUT
+   ========================================================= */
+
+/* Use more screen width so we need less vertical space */
+.event-modal:has(.recipe-photo-editor) {
+  width: min(920px, calc(100vw - 48px)) !important;
+  max-height: min(820px, calc(100vh - 36px)) !important;
+}
+
+/* Smaller header */
+.event-modal:has(.recipe-photo-editor)
+.event-modal-header {
+  padding: 16px 22px 14px !important;
+}
+
+.event-modal:has(.recipe-photo-editor)
+.event-modal-header h2 {
+  font-size: 22px !important;
+}
+
+/* Tighter form */
+.event-modal:has(.recipe-photo-editor)
+.event-form {
+  padding: 16px 22px 20px !important;
+  gap: 12px !important;
+}
+
+/* Photo does not need to dominate while editing */
+.recipe-photo-editor {
+  height: 160px !important;
+}
+
+/* Compact labels */
+.event-modal:has(.recipe-photo-editor)
+.event-form-field > span {
+  margin-bottom: 5px !important;
+}
+
+/* Standard compact controls */
+.event-modal:has(.recipe-photo-editor)
+.event-form-field input,
+.event-modal:has(.recipe-photo-editor)
+.event-form-field select {
+  min-height: 40px !important;
+  height: 40px !important;
+}
+
+/* Description only needs a small editing area */
+.event-modal:has(.recipe-photo-editor)
+.event-form-field textarea[rows="3"] {
+  min-height: 68px !important;
+  height: 68px !important;
+}
+
+/* Keep paired fields tight */
+.event-modal:has(.recipe-photo-editor)
+.event-form-grid {
+  gap: 10px !important;
+}
+
+/* Ingredients */
+.event-modal:has(.recipe-photo-editor)
+textarea[placeholder*="One item per line"] {
+  min-height: 110px !important;
+  height: 110px;
+}
+
+/* Method */
+.event-modal:has(.recipe-photo-editor)
+textarea[placeholder*="One step per line"] {
+  min-height: 130px !important;
+  height: 130px;
+}
+
+/* URL area */
+.recipe-import-help {
+  margin-top: 5px !important;
+}
+
+/* Compact sticky footer */
+.event-modal:has(.recipe-photo-editor)
+.event-modal-actions {
+  bottom: -20px;
+
+  margin:
+    4px -22px -20px !important;
+
+  padding:
+    12px 22px 14px !important;
+}
+
+.event-modal:has(.recipe-photo-editor)
+.event-save-button,
+.event-modal:has(.recipe-photo-editor)
+.event-cancel-button,
+.event-modal:has(.recipe-photo-editor)
+.event-delete-button {
+  min-height: 38px !important;
+}
+
+/* =========================================================
+   RECIPE EDITOR — SINGLE SCROLL AREA
+   ========================================================= */
+
+/* Ingredients should never have its own scrollbar */
+.event-modal:has(.recipe-photo-editor)
+textarea[placeholder*="One item per line"] {
+  height: 96px !important;
+  min-height: 96px !important;
+
+  overflow-y: hidden !important;
+  resize: none !important;
+}
+
+/* Method gets a useful compact editing area */
+.event-modal:has(.recipe-photo-editor)
+textarea[placeholder*="One step per line"] {
+  height: 112px !important;
+  min-height: 112px !important;
+
+  overflow-y: auto;
+  resize: vertical;
+}
+
+/* Give the last fields enough clearance above sticky actions */
+.event-modal:has(.recipe-photo-editor)
+.event-form {
+  padding-bottom: 72px !important;
+}
+
+/* Footer sits cleanly over the bottom edge */
+.event-modal:has(.recipe-photo-editor)
+.event-modal-actions {
+  margin-bottom: -72px !important;
+}
+
+/* =========================================================
+   RECIPE EDITOR — TRUE DESKTOP / WALL LAYOUT
+   ========================================================= */
+
+.recipe-editor-overview {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 20px;
+
+  align-items: stretch;
+}
+
+.recipe-editor-photo-column,
+.recipe-editor-details-column {
+  min-width: 0;
+}
+
+.recipe-editor-photo-column .event-form-field {
+  height: 100%;
+}
+
+.recipe-editor-details-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Photo now occupies the left column rather than full width */
+.recipe-editor-photo-column .recipe-photo-editor {
+  height: 100% !important;
+  min-height: 218px !important;
+}
+
+/* Description fits naturally beside the photo */
+.recipe-editor-details-column textarea {
+  height: 68px !important;
+  min-height: 68px !important;
+
+  resize: none !important;
+}
+
+/* Prep / Cook / Serves / Category all on one row */
+.recipe-editor-meta-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 0.72fr))
+    minmax(0, 1.25fr);
+
+  gap: 9px;
+
+  align-items: end;
+}
+
+.recipe-editor-meta-grid input,
+.recipe-editor-meta-grid select {
+  width: 100%;
+}
+
+/* Remove the excessive bottom padding from the previous patch */
+.event-modal:has(.recipe-photo-editor)
+.event-form {
+  padding-bottom: 20px !important;
+}
+
+/* Restore the footer so it does not overlap form content */
+.event-modal:has(.recipe-photo-editor)
+.event-modal-actions {
+  position: static !important;
+
+  margin:
+    6px -22px -20px !important;
+
+  padding:
+    14px 22px 16px !important;
+}
+
+/* Tablet/mobile falls back to vertical layout */
+@media (max-width: 760px) {
+  .recipe-editor-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .recipe-editor-photo-column
+  .recipe-photo-editor {
+    height: 180px !important;
+    min-height: 180px !important;
+  }
+
+  .recipe-editor-meta-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   RECIPE EDITOR — INGREDIENTS + METHOD SIDE BY SIDE
+   ========================================================= */
+
+.recipe-editor-cooking-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 0.85fr)
+    minmax(0, 1.15fr);
+
+  gap: 14px;
+
+  align-items: stretch;
+}
+
+.recipe-editor-cooking-grid
+.event-form-field {
+  min-width: 0;
+}
+
+/* Both cooking fields share one clean height */
+.recipe-editor-cooking-grid textarea {
+  width: 100% !important;
+
+  height: 190px !important;
+  min-height: 190px !important;
+
+  overflow-y: auto !important;
+  resize: none !important;
+
+  line-height: 1.5 !important;
+}
+
+/* Kill the old individual textarea height overrides */
+.event-modal:has(.recipe-photo-editor)
+.recipe-editor-cooking-grid
+textarea[placeholder*="One item per line"],
+.event-modal:has(.recipe-photo-editor)
+.recipe-editor-cooking-grid
+textarea[placeholder*="One step per line"] {
+  height: 190px !important;
+  min-height: 190px !important;
+}
+
+/* Compact spacing between major editor sections */
+.event-modal:has(.recipe-photo-editor)
+.event-form {
+  row-gap: 14px !important;
+}
+
+@media (max-width: 760px) {
+  .recipe-editor-cooking-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .recipe-editor-cooking-grid textarea {
+    height: 150px !important;
+    min-height: 150px !important;
+  }
+}
+
+/* =========================================================
+   RECIPE EDITOR — LARGE DESKTOP / WALL MODE
+   ========================================================= */
+
+/* Use almost all available desktop space */
+.event-modal:has(.recipe-photo-editor) {
+  width: min(1180px, calc(100vw - 64px)) !important;
+  max-width: 1180px !important;
+
+  height: min(820px, calc(100vh - 48px)) !important;
+  max-height: calc(100vh - 48px) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  overflow: hidden !important;
+}
+
+/* Header stays compact */
+.event-modal:has(.recipe-photo-editor)
+.event-modal-header {
+  position: relative !important;
+  flex: 0 0 auto;
+
+  padding: 16px 24px 14px !important;
+}
+
+/* The form owns the available space */
+.event-modal:has(.recipe-photo-editor)
+.event-form {
+  flex: 1 1 auto;
+
+  min-height: 0;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  gap: 12px !important;
+
+  padding: 16px 24px 0 !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* =========================================================
+   TOP — PHOTO + BASIC DETAILS
+   ========================================================= */
+
+.recipe-editor-overview {
+  flex: 0 0 auto;
+
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(300px, 0.9fr)
+    minmax(0, 1.6fr) !important;
+
+  gap: 22px !important;
+
+  align-items: stretch !important;
+}
+
+.recipe-editor-photo-column {
+  min-width: 0;
+}
+
+.recipe-editor-photo-column
+.event-form-field {
+  height: 100%;
+}
+
+.recipe-editor-photo-column
+.recipe-photo-editor {
+  width: 100% !important;
+
+  height: 250px !important;
+  min-height: 250px !important;
+
+  border-radius: 15px !important;
+}
+
+.recipe-editor-photo-column
+.recipe-photo-editor img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+/* Right-hand details */
+.recipe-editor-details-column {
+  min-width: 0;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  gap: 12px !important;
+}
+
+.recipe-editor-details-column
+.event-form-field {
+  min-width: 0;
+}
+
+/* Name */
+.recipe-editor-details-column
+input[type="text"] {
+  width: 100% !important;
+}
+
+/* Description */
+.recipe-editor-details-column
+textarea {
+  width: 100% !important;
+
+  height: 78px !important;
+  min-height: 78px !important;
+
+  overflow-y: auto !important;
+
+  resize: none !important;
+}
+
+/* Four metadata fields across one row */
+.recipe-editor-meta-grid {
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(90px, 0.7fr)
+    minmax(90px, 0.7fr)
+    minmax(90px, 0.7fr)
+    minmax(160px, 1.25fr) !important;
+
+  gap: 10px !important;
+
+  align-items: end !important;
+}
+
+.recipe-editor-meta-grid
+.event-form-field {
+  min-width: 0;
+}
+
+.recipe-editor-meta-grid input,
+.recipe-editor-meta-grid select {
+  width: 100% !important;
+
+  min-width: 0 !important;
+
+  height: 42px !important;
+}
+
+/* =========================================================
+   MIDDLE — INGREDIENTS + METHOD
+   ========================================================= */
+
+.recipe-editor-cooking-grid {
+  flex: 0 0 auto;
+
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(0, 1.1fr) !important;
+
+  gap: 16px !important;
+
+  align-items: stretch !important;
+}
+
+.recipe-editor-cooking-grid
+.event-form-field {
+  min-width: 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.event-modal:has(.recipe-photo-editor)
+.recipe-editor-cooking-grid textarea,
+.event-modal:has(.recipe-photo-editor)
+.recipe-editor-cooking-grid
+textarea[placeholder*="One item per line"],
+.event-modal:has(.recipe-photo-editor)
+.recipe-editor-cooking-grid
+textarea[placeholder*="One step per line"] {
+  width: 100% !important;
+
+  height: 180px !important;
+  min-height: 180px !important;
+  max-height: 180px !important;
+
+  padding: 12px 14px !important;
+
+  overflow-y: auto !important;
+
+  resize: none !important;
+
+  line-height: 1.45 !important;
+
+  white-space: pre-wrap !important;
+}
+
+/* Make sure typed text never gets clipped */
+.event-modal:has(.recipe-photo-editor)
+textarea {
+  box-sizing: border-box !important;
+
+  white-space: pre-wrap !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+}
+
+/* =========================================================
+   IMPORT FROM WEBSITE
+   ========================================================= */
+
+.event-modal:has(.recipe-photo-editor)
+.recipe-import-row {
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto !important;
+
+  gap: 10px !important;
+}
+
+.event-modal:has(.recipe-photo-editor)
+.recipe-import-row input {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.event-modal:has(.recipe-photo-editor)
+.recipe-import-button {
+  min-width: 135px;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   FOOTER — NEVER COVER THE FORM
+   ========================================================= */
+
+.event-modal:has(.recipe-photo-editor)
+.event-modal-actions {
+  position: sticky !important;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  flex: 0 0 auto;
+
+  margin:
+    4px -24px 0 !important;
+
+  padding:
+    12px 24px 14px !important;
+
+  background:
+    rgba(24, 24, 27, 0.97) !important;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  backdrop-filter: blur(18px);
+
+  z-index: 20;
+}
+
+/* Give the last normal field clearance */
+.event-modal:has(.recipe-photo-editor)
+.recipe-import-help {
+  margin-bottom: 4px !important;
+}
+
+/* =========================================================
+   RESPONSIVE FALLBACK
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .event-modal:has(.recipe-photo-editor) {
+    width: calc(100vw - 28px) !important;
+  }
+
+  .recipe-editor-overview {
+    grid-template-columns: 1fr !important;
+  }
+
+  .recipe-editor-photo-column
+  .recipe-photo-editor {
+    height: 190px !important;
+    min-height: 190px !important;
+  }
+
+  .recipe-editor-meta-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .recipe-editor-cooking-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* =========================================================
+   RECIPE EDITOR — FORCE COOKING FIELDS INTO 2 COLUMNS
+   Must remain at the bottom of this file.
+   ========================================================= */
+
+.event-modal
+.event-form
+.recipe-editor-cooking-grid {
+  width: 100% !important;
+
+  display: grid !important;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr) !important;
+
+  gap: 16px !important;
+
+  align-items: stretch !important;
+}
+
+.event-modal
+.event-form
+.recipe-editor-cooking-grid
+.event-form-field {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  grid-column: auto !important;
+}
+
+.event-modal
+.event-form
+.recipe-editor-cooking-grid
+.event-form-field:first-child {
+  grid-column: 1 !important;
+}
+
+.event-modal
+.event-form
+.recipe-editor-cooking-grid
+.event-form-field:last-child {
+  grid-column: 2 !important;
+}
+
+.event-modal
+.event-form
+.recipe-editor-cooking-grid
+textarea {
+  box-sizing: border-box !important;
+
+  width: 100% !important;
+
+  height: 150px !important;
+  min-height: 150px !important;
+  max-height: 150px !important;
+
+  padding: 12px 14px !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  resize: none !important;
+
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+
+  line-height: 1.45 !important;
+}
+
+/* Prevent generic full-width form rules from affecting this grid */
+.event-modal
+.event-form
+.recipe-editor-cooking-grid
+> * {
+  grid-column: auto !important;
+}
+
+/* Keep the editor large */
+.event-modal:has(.recipe-photo-editor) {
+  width: min(1240px, calc(100vw - 48px)) !important;
+  max-width: 1240px !important;
+
+  height: min(860px, calc(100vh - 32px)) !important;
+  max-height: calc(100vh - 32px) !important;
+}
+
+/* Slightly reduce the photo so the whole editor fits vertically */
+.recipe-editor-photo-column
+.recipe-photo-editor {
+  height: 230px !important;
+  min-height: 230px !important;
+}
+
+/* Keep footer buttons fully visible */
+.event-modal:has(.recipe-photo-editor)
+.event-modal-actions {
+  min-height: 62px;
+
+  box-sizing: border-box !important;
+
+  padding:
+    11px 24px 13px !important;
+}
+
+/* Only collapse on genuinely narrow screens */
+@media (max-width: 760px) {
+  .event-modal
+  .event-form
+  .recipe-editor-cooking-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .event-modal
+  .event-form
+  .recipe-editor-cooking-grid
+  .event-form-field:first-child,
+  .event-modal
+  .event-form
+  .recipe-editor-cooking-grid
+  .event-form-field:last-child {
+    grid-column: 1 !important;
+  }
+}
+
+/* =========================================================
+   RECIPE EDITOR — TIME INPUT UNITS
+   ========================================================= */
+
+.recipe-time-input {
+  position: relative;
+  width: 100%;
+}
+
+.recipe-time-input input {
+  width: 100% !important;
+
+  padding-right: 42px !important;
+}
+
+.recipe-time-input > span {
+  position: absolute;
+
+  top: 50%;
+  right: 13px;
+
+  transform: translateY(-50%);
+
+  margin: 0 !important;
+
+  font-size: 11px !important;
+  font-weight: 650 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+
+  color: rgba(255, 255, 255, 0.4) !important;
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   RECIPE EDITOR — CATEGORY FIELD POLISH
+   ========================================================= */
+
+/* Better proportions:
+   Prep | Cook | Serves | Category
+*/
+.recipe-editor-meta-grid {
+  grid-template-columns:
+    minmax(110px, 0.75fr)
+    minmax(110px, 0.75fr)
+    minmax(110px, 0.75fr)
+    minmax(180px, 1.15fr) !important;
+
+  gap: 10px !important;
+}
+
+/* Category select */
+.recipe-editor-meta-grid select {
+  width: 100% !important;
+  height: 42px !important;
+
+  padding:
+    0 38px
+    0 14px !important;
+
+  border-radius: 11px !important;
+
+  color: rgba(255, 255, 255, 0.92) !important;
+
+  background-color:
+    rgba(255, 255, 255, 0.035) !important;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.08) !important;
+
+  font-size: 13px !important;
+  font-weight: 600 !important;
+
+  cursor: pointer;
+
+  color-scheme: dark;
+}
+
+/* Hover */
+.recipe-editor-meta-grid select:hover {
+  background-color:
+    rgba(255, 255, 255, 0.055) !important;
+
+  border-color:
+    rgba(255, 255, 255, 0.13) !important;
+}
+
+/* Focus */
+.recipe-editor-meta-grid select:focus {
+  outline: none !important;
+
+  border-color:
+    rgba(139, 92, 246, 0.85) !important;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(139, 92, 246, 0.10) !important;
+}
+
+/* Fix the native dropdown list on browsers that honour it */
+.recipe-editor-meta-grid select option {
+  color: #f4f4f5 !important;
+  background: #202024 !important;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Disabled placeholder */
+.recipe-editor-meta-grid select option[value=""] {
+  color: rgba(255, 255, 255, 0.42) !important;
+}
+
+/* =========================================================
+   RECIPE EDITOR — EDITABLE INGREDIENT ROWS
+   ========================================================= */
+
+.recipe-ingredients-field {
+  min-width: 0;
+}
+
+.recipe-ingredients-heading {
+  min-height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.recipe-ingredients-heading > span {
+  margin: 0 !important;
+
+  font-size: 10px !important;
+  line-height: 1 !important;
+  font-weight: 750 !important;
+
+  letter-spacing: 0.04em;
+
+  color:
+    rgba(255, 255, 255, 0.58) !important;
+}
+
+.recipe-add-ingredient-button {
+  min-height: 26px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  padding: 0 9px;
+
+  border-radius: 8px;
+
+  border:
+    1px solid rgba(139, 92, 246, 0.22);
+
+  background:
+    rgba(139, 92, 246, 0.08);
+
+  color:
+    rgba(196, 181, 253, 0.95);
+
+  font-size: 10px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.recipe-add-ingredient-button:hover {
+  background:
+    rgba(139, 92, 246, 0.14);
+
+  border-color:
+    rgba(139, 92, 246, 0.38);
+}
+
+.recipe-ingredient-list {
+  height: 150px;
+  min-height: 150px;
+  max-height: 150px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+
+  padding: 7px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  border-radius: 12px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.075);
+
+  background:
+    rgba(255, 255, 255, 0.025);
+}
+
+.recipe-ingredient-row {
+  flex: 0 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    22px
+    minmax(0, 1fr)
+    28px;
+
+  gap: 6px;
+
+  align-items: center;
+}
+
+.recipe-ingredient-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 9px;
+  font-weight: 750;
+
+  color:
+    rgba(255, 255, 255, 0.28);
+}
+
+.event-modal
+.recipe-ingredient-row
+input {
+  width: 100% !important;
+  height: 29px !important;
+  min-height: 29px !important;
+
+  box-sizing: border-box;
+
+  padding:
+    0 9px !important;
+
+  border-radius:
+    8px !important;
+
+  font-size:
+    11px !important;
+
+  background:
+    rgba(255, 255, 255, 0.025) !important;
+}
+
+.recipe-remove-ingredient-button {
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: transparent;
+
+  color:
+    rgba(255, 255, 255, 0.3);
+
+  cursor: pointer;
+}
+
+.recipe-remove-ingredient-button:hover {
+  color:
+    rgba(248, 113, 113, 0.95);
+
+  background:
+    rgba(239, 68, 68, 0.08);
+}
+
+.recipe-empty-ingredient-button {
+  flex: 1;
+
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  border: 0;
+
+  background: transparent;
+
+  color:
+    rgba(255, 255, 255, 0.4);
+
+  font-size: 11px;
+  font-weight: 650;
+
+  cursor: pointer;
+}
+
+.recipe-empty-ingredient-button:hover {
+  color:
+    rgba(196, 181, 253, 0.95);
+}
+
+/* =========================================================
+   RECIPE EDITOR — EDITABLE METHOD STEPS
+   ========================================================= */
+
+.recipe-method-field {
+  min-width: 0;
+}
+
+.recipe-method-heading {
+  min-height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.recipe-method-heading > span {
+  margin: 0 !important;
+
+  font-size: 10px !important;
+  line-height: 1 !important;
+  font-weight: 750 !important;
+
+  letter-spacing: 0.04em;
+
+  color:
+    rgba(255, 255, 255, 0.58) !important;
+}
+
+.recipe-add-method-button {
+  min-height: 26px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  padding: 0 9px;
+
+  border-radius: 8px;
+
+  border:
+    1px solid rgba(139, 92, 246, 0.22);
+
+  background:
+    rgba(139, 92, 246, 0.08);
+
+  color:
+    rgba(196, 181, 253, 0.95);
+
+  font-size: 10px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.recipe-add-method-button:hover {
+  background:
+    rgba(139, 92, 246, 0.14);
+
+  border-color:
+    rgba(139, 92, 246, 0.38);
+}
+
+.recipe-method-list {
+  height: 150px !important;
+  min-height: 150px !important;
+  max-height: 150px !important;
+
+  box-sizing: border-box;
+
+  display: block !important;
+
+  padding: 7px;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  border-radius: 12px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.075);
+
+  background:
+    rgba(255, 255, 255, 0.025);
+}
+
+.recipe-method-row {
+  width: 100%;
+
+  display: grid !important;
+
+  grid-template-columns:
+    24px
+    minmax(0, 1fr)
+    28px;
+
+  gap: 6px;
+
+  align-items: start !important;
+
+  min-height: 0 !important;
+  height: auto !important;
+
+  margin: 0 0 6px 0;
+}
+
+.recipe-method-row:last-child {
+  margin-bottom: 0;
+}
+
+.recipe-method-number {
+  width: 22px;
+  height: 22px;
+
+  margin-top: 4px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    rgba(139, 92, 246, 0.1);
+
+  color:
+    rgba(196, 181, 253, 0.9);
+
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.event-modal
+.recipe-method-list
+.recipe-method-row
+textarea {
+  display: block !important;
+
+  width: 100% !important;
+
+  height: 58px !important;
+  min-height: 58px !important;
+  max-height: 58px !important;
+
+  box-sizing: border-box !important;
+
+  margin: 0 !important;
+  padding: 7px 9px !important;
+
+  resize: none !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  border-radius: 8px !important;
+
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+
+  background:
+    rgba(255, 255, 255, 0.025) !important;
+}
+
+.recipe-remove-method-button {
+  width: 28px;
+  height: 28px;
+
+  margin-top: 2px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: transparent;
+
+  color:
+    rgba(255, 255, 255, 0.3);
+
+  cursor: pointer;
+}
+
+.recipe-remove-method-button:hover {
+  color:
+    rgba(248, 113, 113, 0.95);
+
+  background:
+    rgba(239, 68, 68, 0.08);
+}
+
+.recipe-empty-method-button {
+  width: 100%;
+  height: 134px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  border: 0;
+
+  background: transparent;
+
+  color:
+    rgba(255, 255, 255, 0.4);
+
+  font-size: 11px;
+  font-weight: 650;
+
+  cursor: pointer;
+}
+
+.recipe-empty-method-button:hover {
+  color:
+    rgba(196, 181, 253, 0.95);
+}
+
+/* =========================================================
+   RECIPE EDITOR — LARGE FITTED RECIPE PHOTO
+   ========================================================= */
+
+.recipe-editor-overview {
+  grid-template-columns:
+    minmax(430px, 0.9fr)
+    minmax(0, 1.6fr) !important;
+
+  gap: 24px !important;
+}
+
+.recipe-editor-photo-column {
+  min-width: 0;
+}
+
+.recipe-editor-photo-column .recipe-photo-editor {
+  position: relative;
+
+  width: 100% !important;
+
+  height: 260px !important;
+  min-height: 260px !important;
+  max-height: 260px !important;
+
+  overflow: hidden !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border-radius: 14px;
+
+  background:
+    #17171a !important;
+}
+
+/* Blurred copy fills the unused space */
+
+.recipe-editor-photo-column
+.recipe-photo-editor
+.recipe-photo-background {
+  position: absolute !important;
+
+  inset: -20px !important;
+
+  width: calc(100% + 40px) !important;
+  height: calc(100% + 40px) !important;
+
+  object-fit: cover !important;
+
+  filter:
+    blur(22px)
+    brightness(0.55)
+    saturate(0.85);
+
+  transform: scale(1.08);
+
+  opacity: 0.75;
+
+  border-radius: 0 !important;
+
+  pointer-events: none;
+
+  z-index: 0;
+}
+
+/* Real photo stays completely visible */
+
+.recipe-editor-photo-column
+.recipe-photo-editor
+.recipe-photo-main {
+  position: relative !important;
+
+  z-index: 1;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  object-fit: contain !important;
+  object-position: center center !important;
+
+  border-radius: 0 !important;
+}
+
+/* Keep Change Photo above both images */
+
+.recipe-editor-photo-column
+.recipe-photo-editor
+button {
+  position: absolute;
+
+  z-index: 3;
+}
+
+/* =========================================================
+   WEEKLY SHOPPING — PANTRY STATUS BADGES
+   ========================================================= */
+
+.recipe-shopping-stock-badge {
+  flex: 0 0 auto;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 24px;
+
+  padding: 4px 9px;
+
+  border-radius: 999px;
+
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 750;
+
+  white-space: nowrap;
+}
+
+.recipe-shopping-stock-badge.in-pantry {
+  color: rgba(134, 239, 172, 0.95);
+
+  background:
+    rgba(34, 197, 94, 0.10);
+
+  border:
+    1px solid rgba(34, 197, 94, 0.22);
+}
+
+.recipe-shopping-stock-badge.need-to-buy {
+  color: rgba(196, 181, 253, 0.98);
+
+  background:
+    rgba(139, 92, 246, 0.10);
+
+  border:
+    1px solid rgba(139, 92, 246, 0.22);
+}
+
+.recipe-shopping-picker-item.already-have {
+  opacity: 0.72;
+}
+
+.recipe-shopping-picker-item.already-have
+.recipe-shopping-picker-text strong {
+  color:
+    rgba(255, 255, 255, 0.62);
+}
+
+/* =========================================================
+   RECIPE — ADD INGREDIENTS TO SHOPPING POPUP
+   ========================================================= */
+
+.recipe-shopping-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 32px;
+
+  background: rgba(10, 14, 24, 0.58);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.recipe-shopping-picker-modal {
+  width: min(920px, calc(100vw - 64px));
+  max-height: min(760px, calc(100vh - 80px));
+
+  display: flex;
+  flex-direction: column;
+
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+
+  border-radius: 24px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+
+  background: rgba(248, 250, 252, 0.98);
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.34),
+    0 8px 30px rgba(0, 0, 0, 0.18);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-heading {
+  flex: 0 0 auto;
+
+  padding: 22px 24px 18px;
+
+  border-bottom:
+    1px solid rgba(148, 163, 184, 0.18);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-heading h3 {
+  margin: 0;
+
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 750;
+
+  color: #111827;
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-heading p {
+  margin: 5px 0 0;
+
+  font-size: 13px;
+
+  color: #64748b;
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-close {
+  width: 34px;
+  height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: rgba(148, 163, 184, 0.12);
+  color: #475569;
+
+  cursor: pointer;
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-tools {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 14px 24px;
+
+  border-bottom:
+    1px solid rgba(148, 163, 184, 0.16);
+
+  background: rgba(248, 250, 252, 0.96);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-tools span {
+  margin-left: auto;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  color: #2563eb;
+
+  background: rgba(37, 99, 235, 0.08);
+
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-list {
+  flex: 1 1 auto;
+
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  padding: 14px 24px 18px;
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-footer {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  padding: 16px 24px 18px;
+
+  border-top:
+    1px solid rgba(148, 163, 184, 0.18);
+
+  background: rgba(248, 250, 252, 0.98);
+
+  box-shadow:
+    0 -10px 30px rgba(15, 23, 42, 0.04);
+}
+
+@media (max-width: 760px) {
+  .recipe-shopping-picker-backdrop {
+    padding: 16px;
+  }
+
+  .recipe-shopping-picker-modal {
+    width: 100%;
+    max-height: calc(100vh - 32px);
+    border-radius: 20px;
+  }
+
+  .recipe-shopping-picker-modal
+  .recipe-shopping-picker-heading,
+  .recipe-shopping-picker-modal
+  .recipe-shopping-picker-tools,
+  .recipe-shopping-picker-modal
+  .recipe-shopping-picker-footer {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .recipe-shopping-picker-modal
+  .recipe-shopping-picker-list {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+
+/* =========================================================
+   RECIPE SHOPPING POPUP — FAMILYHUB DARK STYLE
+   ========================================================= */
+
+.recipe-shopping-picker-backdrop {
+  background: rgba(5, 9, 18, 0.72);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.recipe-shopping-picker-modal {
+  color: rgba(255, 255, 255, 0.92);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(25, 31, 45, 0.98) 0%,
+      rgba(16, 21, 32, 0.99) 100%
+    );
+
+  border:
+    1px solid rgba(255, 255, 255, 0.10);
+
+  box-shadow:
+    0 32px 90px rgba(0, 0, 0, 0.52),
+    0 12px 36px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+
+/* ---------- HEADER ---------- */
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-heading {
+  background: rgba(255, 255, 255, 0.018);
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.07);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-heading h3 {
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-heading p {
+  color: rgba(203, 213, 225, 0.62);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-close {
+  color: rgba(226, 232, 240, 0.78);
+
+  background:
+    rgba(255, 255, 255, 0.055);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.06);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-close:hover {
+  color: #ffffff;
+
+  background:
+    rgba(255, 255, 255, 0.10);
+}
+
+
+/* ---------- TOOLBAR ---------- */
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-tools {
+  background:
+    rgba(255, 255, 255, 0.012);
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.065);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-tools button {
+  min-height: 34px;
+
+  padding: 7px 12px;
+
+  border-radius: 9px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.09);
+
+  color: rgba(226, 232, 240, 0.88);
+
+  background:
+    rgba(255, 255, 255, 0.045);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-tools button:hover {
+  background:
+    rgba(255, 255, 255, 0.08);
+
+  border-color:
+    rgba(255, 255, 255, 0.14);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-tools span {
+  color: #a5b4fc;
+
+  background:
+    rgba(124, 58, 237, 0.14);
+
+  border:
+    1px solid rgba(139, 92, 246, 0.16);
+}
+
+
+/* ---------- INGREDIENT AREA ---------- */
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-list {
+  background:
+    rgba(5, 9, 18, 0.14);
+
+  scrollbar-color:
+    rgba(148, 163, 184, 0.35)
+    transparent;
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-item {
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  border-color:
+    rgba(255, 255, 255, 0.065);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-item:hover {
+  background:
+    rgba(255, 255, 255, 0.045);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-item:has(
+  input:checked
+) {
+  background:
+    rgba(79, 70, 229, 0.085);
+
+  border-color:
+    rgba(99, 102, 241, 0.28);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-text {
+  color:
+    rgba(226, 232, 240, 0.88);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-item.already-have
+.recipe-shopping-picker-text {
+  color:
+    rgba(203, 213, 225, 0.52);
+}
+
+
+/* ---------- CHECKBOX ---------- */
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-item input[type="checkbox"] {
+  accent-color: #6366f1;
+}
+
+
+/* ---------- STATUS PILLS ---------- */
+
+.recipe-shopping-picker-modal
+.recipe-shopping-stock-badge.in-pantry {
+  color: #86efac;
+
+  background:
+    rgba(34, 197, 94, 0.10);
+
+  border:
+    1px solid rgba(34, 197, 94, 0.20);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-stock-badge.need-to-buy {
+  color: #c4b5fd;
+
+  background:
+    rgba(139, 92, 246, 0.11);
+
+  border:
+    1px solid rgba(139, 92, 246, 0.22);
+}
+
+
+/* ---------- FOOTER ---------- */
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-footer {
+  background:
+    rgba(14, 19, 30, 0.98);
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  box-shadow:
+    0 -12px 30px rgba(0, 0, 0, 0.16);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-cancel {
+  color:
+    rgba(226, 232, 240, 0.84);
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.09);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-cancel:hover {
+  background:
+    rgba(255, 255, 255, 0.08);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-add {
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #6366f1
+    );
+
+  border:
+    1px solid rgba(167, 139, 250, 0.28);
+
+  box-shadow:
+    0 8px 22px rgba(99, 102, 241, 0.22);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-add:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 26px rgba(99, 102, 241, 0.30);
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-add:disabled {
+  opacity: 0.45;
+}
+
+
+/* ---------- SCROLLBAR ---------- */
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-list::-webkit-scrollbar {
+  width: 9px;
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-list::-webkit-scrollbar-thumb {
+  background:
+    rgba(148, 163, 184, 0.26);
+
+  border-radius: 999px;
+
+  border:
+    2px solid transparent;
+
+  background-clip: padding-box;
+}
+
+.recipe-shopping-picker-modal
+.recipe-shopping-picker-list::-webkit-scrollbar-thumb:hover {
+  background:
+    rgba(148, 163, 184, 0.40);
+
+  background-clip: padding-box;
+}
+
+/* =========================================================
+   RECIPE SHOPPING — SUCCESS TOAST
+   ========================================================= */
+
+.recipe-shopping-success {
+  position: fixed;
+  left: 50%;
+  bottom: 34px;
+  z-index: 7000;
+
+  width: min(420px, calc(100vw - 40px));
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 13px 14px;
+
+  transform: translateX(-50%);
+
+  border-radius: 16px;
+
+  border:
+    1px solid rgba(74, 222, 128, 0.18);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(20, 30, 31, 0.98),
+      rgba(15, 23, 32, 0.98)
+    );
+
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.42),
+    0 4px 16px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  animation:
+    recipeShoppingSuccessIn 220ms
+    ease-out both;
+}
+
+
+/* ---------- CHECK ---------- */
+
+.recipe-shopping-success-icon {
+  flex: 0 0 auto;
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  color: #86efac;
+
+  background:
+    rgba(34, 197, 94, 0.13);
+
+  border:
+    1px solid rgba(74, 222, 128, 0.20);
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+
+/* ---------- MESSAGE ---------- */
+
+.recipe-shopping-success-copy {
+  min-width: 0;
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.recipe-shopping-success-copy strong {
+  color:
+    rgba(255, 255, 255, 0.96);
+
+  font-size: 13px;
+  line-height: 1.3;
+  font-weight: 750;
+}
+
+.recipe-shopping-success-copy span {
+  color:
+    rgba(203, 213, 225, 0.68);
+
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+
+/* ---------- CLOSE ---------- */
+
+.recipe-shopping-success-close {
+  flex: 0 0 auto;
+
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 50%;
+
+  color:
+    rgba(203, 213, 225, 0.65);
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  cursor: pointer;
+
+  transition:
+    background 150ms ease,
+    color 150ms ease;
+}
+
+.recipe-shopping-success-close:hover {
+  color: #ffffff;
+
+  background:
+    rgba(255, 255, 255, 0.09);
+}
+
+
+/* ---------- ENTRANCE ---------- */
+
+@keyframes recipeShoppingSuccessIn {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(-50%)
+      translateY(14px)
+      scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(-50%)
+      translateY(0)
+      scale(1);
+  }
+}
+
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 640px) {
+  .recipe-shopping-success {
+    bottom: 20px;
+
+    width:
+      calc(100vw - 28px);
+  }
+}
+
+/* =========================================================
+   WEEKLY SHOPPING PICKER — FAMILYHUB DARK STYLE
+   ========================================================= */
+
+.weekly-shopping-modal {
+  color: rgba(255, 255, 255, 0.94);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(27, 28, 33, 0.99) 0%,
+      rgba(17, 21, 30, 0.99) 100%
+    );
+
+  border:
+    1px solid rgba(255, 255, 255, 0.10);
+
+  box-shadow:
+    0 32px 90px rgba(0, 0, 0, 0.52),
+    0 12px 36px rgba(0, 0, 0, 0.30);
+}
+
+
+/* ---------------------------------------------------------
+   MAIN INGREDIENT PANEL
+   --------------------------------------------------------- */
+
+.weekly-shopping-modal
+.weekly-shopping-picker {
+  color: rgba(255, 255, 255, 0.92);
+
+  background:
+    rgba(11, 16, 26, 0.72);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+
+/* ---------------------------------------------------------
+   TOOLBAR
+   --------------------------------------------------------- */
+
+.weekly-shopping-modal
+.weekly-shopping-picker-tools {
+  background:
+    rgba(255, 255, 255, 0.018);
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.07);
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-tools button {
+  min-height: 34px;
+
+  padding: 7px 12px;
+
+  color:
+    rgba(226, 232, 240, 0.88);
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.09);
+
+  border-radius: 9px;
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-tools button:hover {
+  color: #ffffff;
+
+  background:
+    rgba(255, 255, 255, 0.08);
+
+  border-color:
+    rgba(255, 255, 255, 0.14);
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-tools span {
+  color: #a5b4fc;
+
+  background:
+    rgba(124, 58, 237, 0.14);
+
+  border:
+    1px solid rgba(139, 92, 246, 0.16);
+
+  border-radius: 999px;
+}
+
+
+/* ---------------------------------------------------------
+   INGREDIENT LIST
+   --------------------------------------------------------- */
+
+.weekly-shopping-modal
+.weekly-shopping-picker-list {
+  background:
+    rgba(5, 9, 18, 0.18);
+
+  scrollbar-color:
+    rgba(148, 163, 184, 0.35)
+    transparent;
+}
+
+
+/* ---------------------------------------------------------
+   INGREDIENT ROWS
+   --------------------------------------------------------- */
+
+.weekly-shopping-modal
+.weekly-shopping-picker-item {
+  color:
+    rgba(226, 232, 240, 0.90);
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  border-color:
+    rgba(255, 255, 255, 0.065);
+
+  transition:
+    background 150ms ease,
+    border-color 150ms ease;
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-item:hover {
+  background:
+    rgba(255, 255, 255, 0.045);
+}
+
+
+/* Selected ingredient */
+
+.weekly-shopping-modal
+.weekly-shopping-picker-item:has(
+  input:checked
+) {
+  background:
+    rgba(79, 70, 229, 0.10);
+
+  border-color:
+    rgba(99, 102, 241, 0.32);
+}
+
+
+/* ---------------------------------------------------------
+   INGREDIENT TEXT
+   --------------------------------------------------------- */
+
+.weekly-shopping-modal
+.weekly-shopping-picker-text {
+  color:
+    rgba(241, 245, 249, 0.92);
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-item strong {
+  color:
+    rgba(248, 250, 252, 0.94);
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-item small {
+  color:
+    rgba(148, 163, 184, 0.70);
+}
+
+
+/* Pantry ingredients */
+
+.weekly-shopping-modal
+.weekly-shopping-picker-item.already-have {
+  background:
+    rgba(255, 255, 255, 0.012);
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-item.already-have
+.weekly-shopping-picker-text,
+
+.weekly-shopping-modal
+.weekly-shopping-picker-item.already-have strong {
+  color:
+    rgba(203, 213, 225, 0.48);
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-item.already-have small {
+  color:
+    rgba(148, 163, 184, 0.46);
+}
+
+
+/* ---------------------------------------------------------
+   CHECKBOXES
+   --------------------------------------------------------- */
+
+.weekly-shopping-modal
+.weekly-shopping-picker-item
+input[type="checkbox"] {
+  accent-color: #6366f1;
+}
+
+
+/* ---------------------------------------------------------
+   STATUS BADGES
+   --------------------------------------------------------- */
+
+.weekly-shopping-modal
+.weekly-shopping-stock-badge.in-pantry {
+  color: #86efac;
+
+  background:
+    rgba(34, 197, 94, 0.10);
+
+  border:
+    1px solid rgba(34, 197, 94, 0.20);
+}
+
+.weekly-shopping-modal
+.weekly-shopping-stock-badge.need-to-buy {
+  color: #c4b5fd;
+
+  background:
+    rgba(139, 92, 246, 0.11);
+
+  border:
+    1px solid rgba(139, 92, 246, 0.22);
+}
+
+
+/* ---------------------------------------------------------
+   SCROLLBAR
+   --------------------------------------------------------- */
+
+.weekly-shopping-modal
+.weekly-shopping-picker-list::-webkit-scrollbar {
+  width: 9px;
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-list::-webkit-scrollbar-thumb {
+  background:
+    rgba(148, 163, 184, 0.26);
+
+  border-radius: 999px;
+
+  border: 2px solid transparent;
+
+  background-clip: padding-box;
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-list::-webkit-scrollbar-thumb:hover {
+  background:
+    rgba(148, 163, 184, 0.40);
+
+  background-clip: padding-box;
+}
+
+
+/* ---------------------------------------------------------
+   FOOTER
+   --------------------------------------------------------- */
+
+.weekly-shopping-modal
+.weekly-shopping-picker-footer {
+  background:
+    rgba(14, 19, 30, 0.98);
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  box-shadow:
+    0 -12px 30px rgba(0, 0, 0, 0.16);
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-cancel {
+  color:
+    rgba(226, 232, 240, 0.84);
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.09);
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-cancel:hover {
+  background:
+    rgba(255, 255, 255, 0.08);
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-add {
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #6366f1
+    );
+
+  border:
+    1px solid rgba(167, 139, 250, 0.28);
+
+  box-shadow:
+    0 8px 22px rgba(99, 102, 241, 0.22);
+}
+
+.weekly-shopping-modal
+.weekly-shopping-picker-add:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 26px rgba(99, 102, 241, 0.30);
+}
+
+/* =========================================================
+   WEEKLY SHOPPING — FINAL DARK OVERRIDES
+   Must stay at the bottom of meals-polish.css
+   ========================================================= */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(22, 27, 39, 0.98) 0%,
+      rgba(15, 20, 30, 0.99) 100%
+    ) !important;
+
+  color: rgba(255, 255, 255, 0.94) !important;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.08) !important;
+
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+}
+
+
+/* ---------- TOP TOOLBAR ---------- */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-tools {
+  background:
+    rgba(255, 255, 255, 0.018) !important;
+
+  border-color:
+    rgba(255, 255, 255, 0.07) !important;
+}
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-tools button {
+  color:
+    rgba(226, 232, 240, 0.88) !important;
+
+  background:
+    rgba(255, 255, 255, 0.05) !important;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.09) !important;
+}
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-tools button:hover {
+  color: #ffffff !important;
+
+  background:
+    rgba(255, 255, 255, 0.09) !important;
+}
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-tools > span {
+  color: #c4b5fd !important;
+
+  background:
+    rgba(124, 58, 237, 0.14) !important;
+
+  border:
+    1px solid rgba(139, 92, 246, 0.18) !important;
+}
+
+
+/* ---------- LIST ---------- */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-list {
+  background:
+    rgba(6, 10, 18, 0.32) !important;
+
+  border-color:
+    rgba(255, 255, 255, 0.06) !important;
+}
+
+
+/* ---------- ROWS ---------- */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-item {
+  background:
+    rgba(255, 255, 255, 0.025) !important;
+
+  border-color:
+    rgba(255, 255, 255, 0.065) !important;
+
+  color:
+    rgba(241, 245, 249, 0.92) !important;
+}
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-item:hover {
+  background:
+    rgba(255, 255, 255, 0.05) !important;
+}
+
+
+/* Selected rows */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-item:has(
+  input:checked
+) {
+  background:
+    rgba(99, 102, 241, 0.11) !important;
+
+  border-color:
+    rgba(129, 140, 248, 0.30) !important;
+}
+
+
+/* ---------- INGREDIENT NAME ---------- */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-text {
+  color:
+    rgba(241, 245, 249, 0.92) !important;
+}
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-text strong {
+  color:
+    rgba(248, 250, 252, 0.96) !important;
+}
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-text small {
+  color:
+    rgba(148, 163, 184, 0.72) !important;
+}
+
+
+/* ---------- ITEMS ALREADY IN PANTRY ---------- */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-item.already-have {
+  background:
+    rgba(255, 255, 255, 0.012) !important;
+
+  border-color:
+    rgba(255, 255, 255, 0.045) !important;
+}
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-item.already-have
+.recipe-shopping-picker-text strong {
+  color:
+    rgba(203, 213, 225, 0.50) !important;
+}
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-item.already-have
+.recipe-shopping-picker-text small {
+  color:
+    rgba(148, 163, 184, 0.44) !important;
+}
+
+
+/* ---------- CHECKBOX ---------- */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-item
+input[type="checkbox"] {
+  accent-color: #6366f1 !important;
+}
+
+
+/* ---------- PANTRY BADGE ---------- */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-stock-badge.in-pantry {
+  color: #86efac !important;
+
+  background:
+    rgba(34, 197, 94, 0.10) !important;
+
+  border:
+    1px solid rgba(34, 197, 94, 0.20) !important;
+}
+
+
+/* ---------- NEED TO BUY BADGE ---------- */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-stock-badge.need-to-buy {
+  color: #c4b5fd !important;
+
+  background:
+    rgba(139, 92, 246, 0.12) !important;
+
+  border:
+    1px solid rgba(139, 92, 246, 0.22) !important;
+}
+
+
+/* ---------- FOOTER ---------- */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-footer {
+  background:
+    rgba(14, 19, 30, 0.98) !important;
+
+  border-color:
+    rgba(255, 255, 255, 0.07) !important;
+
+  box-shadow:
+    0 -10px 28px rgba(0, 0, 0, 0.18) !important;
+}
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-cancel {
+  color:
+    rgba(226, 232, 240, 0.86) !important;
+
+  background:
+    rgba(255, 255, 255, 0.05) !important;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.09) !important;
+}
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-add {
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #6366f1
+    ) !important;
+
+  border:
+    1px solid rgba(167, 139, 250, 0.28) !important;
+
+  box-shadow:
+    0 8px 22px rgba(99, 102, 241, 0.24) !important;
+}
+
+
+/* ---------- SCROLLBAR ---------- */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-list::-webkit-scrollbar {
+  width: 9px;
+}
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-list::-webkit-scrollbar-thumb {
+  background:
+    rgba(148, 163, 184, 0.28);
+
+  border-radius: 999px;
+
+  border: 2px solid transparent;
+
+  background-clip: padding-box;
+}
+
+/* =========================================================
+   WEEKLY SHOPPING — FIXED HEADER + SCROLLING INGREDIENTS
+   ========================================================= */
+
+.recipe-details-modal.weekly-shopping-modal {
+  width: min(1040px, calc(100vw - 48px));
+  height: min(820px, calc(100vh - 64px));
+  max-height: calc(100vh - 64px);
+
+  overflow: hidden !important;
+}
+
+
+/* Main modal content */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-details-content {
+  height: 100%;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden !important;
+}
+
+
+/* Weekly Shopping heading stays visible */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-details-heading {
+  flex: 0 0 auto;
+
+  padding-bottom: 24px;
+}
+
+
+/* Ingredient picker fills remaining space */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker {
+  flex: 1 1 auto;
+
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden !important;
+}
+
+
+/* Select all / Clear all stays visible */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-tools {
+  flex: 0 0 auto;
+}
+
+
+/* ONLY this section scrolls */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-list {
+  flex: 1 1 auto;
+
+  min-height: 0;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+
+/* Cancel / Add Selected stays visible */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker-footer {
+  flex: 0 0 auto;
+
+  position: relative;
+
+  z-index: 2;
+}
+
+/* =========================================================
+   WEEKLY SHOPPING — COMPACT VERTICAL LAYOUT
+   ========================================================= */
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-details-content {
+  padding-top: 34px !important;
+  padding-bottom: 30px !important;
+}
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-details-heading {
+  padding-bottom: 22px !important;
+  margin-bottom: 0 !important;
+}
+
+.recipe-details-modal.weekly-shopping-modal
+.recipe-shopping-picker {
+  margin-top: 0 !important;
+}
+
+.recipe-details-modal.weekly-shopping-modal {
+  height: min(760px, calc(100vh - 64px));
+}
+
+/* =========================================================
+   WEEKLY SHOPPING — SUCCESS TOAST
+   ========================================================= */
+
+.meal-shopping-toast {
+  position: fixed !important;
+
+  left: 50% !important;
+  bottom: 34px !important;
+
+  z-index: 7000 !important;
+
+  width:
+    min(440px, calc(100vw - 40px));
+
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+
+  padding: 13px 14px !important;
+
+  margin: 0 !important;
+
+  transform:
+    translateX(-50%);
+
+  border-radius: 16px !important;
+
+  border:
+    1px solid
+    rgba(74, 222, 128, 0.18) !important;
+
+  color:
+    rgba(255, 255, 255, 0.94) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(20, 30, 31, 0.98),
+      rgba(15, 23, 32, 0.98)
+    ) !important;
+
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.42),
+    0 4px 16px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.04);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  animation:
+    mealShoppingToastIn
+    220ms ease-out both;
+}
+
+
+/* ---------- CHECK ---------- */
+
+.meal-shopping-toast-icon {
+  flex: 0 0 auto;
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  color: #86efac;
+
+  background:
+    rgba(34, 197, 94, 0.13);
+
+  border:
+    1px solid
+    rgba(74, 222, 128, 0.20);
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+
+/* ---------- COPY ---------- */
+
+.meal-shopping-toast-copy {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.meal-shopping-toast-copy strong {
+  color:
+    rgba(255, 255, 255, 0.96);
+
+  font-size: 13px;
+  line-height: 1.3;
+  font-weight: 750;
+}
+
+.meal-shopping-toast-copy span {
+  color:
+    rgba(203, 213, 225, 0.68);
+
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+
+/* ---------- CLOSE ---------- */
+
+.meal-shopping-toast-close {
+  flex: 0 0 auto;
+
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 50%;
+
+  color:
+    rgba(203, 213, 225, 0.65);
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  cursor: pointer;
+
+  transition:
+    background 150ms ease,
+    color 150ms ease;
+}
+
+.meal-shopping-toast-close:hover {
+  color: #ffffff;
+
+  background:
+    rgba(255, 255, 255, 0.09);
+}
+
+
+/* ---------- ENTRANCE ---------- */
+
+@keyframes mealShoppingToastIn {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(-50%)
+      translateY(14px)
+      scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(-50%)
+      translateY(0)
+      scale(1);
+  }
+}
+
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 640px) {
+  .meal-shopping-toast {
+    bottom: 20px !important;
+
+    width:
+      calc(100vw - 28px);
+  }
+}
+
+/* =========================================================
+   DINNER PLANNER — RECIPE / MANUAL STATUS
+   ========================================================= */
+
+.meal-week-meal-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  width: fit-content;
+  max-width: 100%;
+
+  margin: 8px 10px 2px;
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+
+  white-space: nowrap;
+}
+
+/* Linked recipe without a photo */
+
+.meal-week-meal-status.has-recipe {
+  color: #c4b5fd;
+
+  background:
+    rgba(124, 58, 237, 0.12);
+
+  border:
+    1px solid rgba(139, 92, 246, 0.20);
+}
+
+.meal-week-meal-status.has-recipe svg {
+  color: #a78bfa;
+}
+
+/* Manually entered dinner */
+
+.meal-week-meal-status.manual-dinner {
+  color:
+    rgba(203, 213, 225, 0.72);
+
+  background:
+    rgba(148, 163, 184, 0.07);
+
+  border:
+    1px solid rgba(148, 163, 184, 0.12);
+}
+
+.meal-week-meal-status.manual-dinner svg {
+  color:
+    rgba(148, 163, 184, 0.78);
+}
+
+/* Recipe action beside Copy */
+
+.meal-week-recipe {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 30px;
+  height: 30px;
+
+  padding: 0;
+
+  border-radius: 9px;
+
+  color: #c4b5fd;
+
+  background:
+    rgba(124, 58, 237, 0.11);
+
+  border:
+    1px solid rgba(139, 92, 246, 0.18);
+
+  cursor: pointer;
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.meal-week-recipe:hover {
+  color: #ffffff;
+
+  background:
+    rgba(124, 58, 237, 0.22);
+
+  border-color:
+    rgba(167, 139, 250, 0.34);
+
+  transform: translateY(-1px);
+}
+
+/* Keep recipe + copy actions together */
+
+.meal-week-meal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/* =========================================================
+   COPY LAST WEEK MODAL
+   ========================================================= */
+
+.copy-last-week-modal {
+  width: min(620px, calc(100vw - 40px));
+  max-height: min(720px, calc(100vh - 80px));
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(27, 31, 43, 0.99),
+      rgba(19, 22, 31, 0.99)
+    );
+
+  border:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 24px;
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.48);
+
+  color: #f8fafc;
+}
+
+/* Header */
+
+.copy-last-week-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+
+  padding: 26px 28px 20px;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.07);
+}
+
+.copy-last-week-header > div:first-child {
+  min-width: 0;
+}
+
+.copy-last-week-header .section-kicker {
+  margin: 0 0 7px;
+
+  color: #a78bfa;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.copy-last-week-header h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.copy-last-week-header p:not(.section-kicker) {
+  margin: 8px 0 0;
+
+  color: rgba(226, 232, 240, 0.66);
+
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* Selection toolbar */
+
+.copy-last-week-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 14px 28px;
+
+  background:
+    rgba(255, 255, 255, 0.018);
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.06);
+}
+
+.copy-last-week-tools button {
+  padding: 7px 11px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.09);
+
+  border-radius: 9px;
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  color: rgba(241, 245, 249, 0.82);
+
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.copy-last-week-tools button:hover {
+  background:
+    rgba(255, 255, 255, 0.08);
+
+  color: #ffffff;
+}
+
+.copy-last-week-tools > span {
+  margin-left: auto;
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(124, 58, 237, 0.15);
+
+  color: #c4b5fd;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* Dinner list */
+
+.copy-last-week-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+
+  padding: 18px 28px;
+
+  overflow-y: auto;
+}
+
+.copy-last-week-item {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns:
+    28px
+    90px
+    minmax(0, 1fr);
+
+  align-items: center;
+  gap: 12px;
+
+  min-height: 64px;
+
+  padding: 11px 14px;
+
+  text-align: left;
+
+  color: #e2e8f0;
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  border-radius: 14px;
+
+  cursor: pointer;
+
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease;
+}
+
+.copy-last-week-item:hover {
+  background:
+    rgba(255, 255, 255, 0.05);
+
+  border-color:
+    rgba(255, 255, 255, 0.12);
+}
+
+.copy-last-week-item.selected {
+  background:
+    rgba(124, 58, 237, 0.12);
+
+  border-color:
+    rgba(139, 92, 246, 0.28);
+}
+
+/* Checkbox */
+
+.copy-last-week-check {
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border:
+    1px solid rgba(148, 163, 184, 0.3);
+
+  border-radius: 7px;
+
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.copy-last-week-item.selected
+.copy-last-week-check {
+  background: #7c3aed;
+
+  border-color: #8b5cf6;
+
+  box-shadow:
+    0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+/* Day */
+
+.copy-last-week-day {
+  color: rgba(203, 213, 225, 0.68);
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Meal */
+
+.copy-last-week-meal {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.copy-last-week-meal strong {
+  overflow: hidden;
+
+  color: #f8fafc;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy-last-week-meal small {
+  color: rgba(148, 163, 184, 0.72);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.copy-last-week-item.selected
+.copy-last-week-meal small {
+  color: #a78bfa;
+}
+
+/* Empty state */
+
+.copy-last-week-empty {
+  min-height: 220px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  padding: 32px;
+
+  text-align: center;
+
+  color: rgba(148, 163, 184, 0.72);
+}
+
+.copy-last-week-empty svg {
+  color: #8b5cf6;
+}
+
+.copy-last-week-empty strong {
+  margin-top: 5px;
+
+  color: #f8fafc;
+
+  font-size: 16px;
+}
+
+.copy-last-week-empty span {
+  max-width: 320px;
+
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* Footer */
+
+.copy-last-week-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  padding: 16px 28px 20px;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  background:
+    rgba(12, 14, 20, 0.3);
+}
+
+.copy-last-week-footer
+.secondary-button {
+  min-height: 40px;
+
+  padding: 0 17px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.09);
+
+  border-radius: 11px;
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  color: rgba(241, 245, 249, 0.8);
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.copy-last-week-footer
+.add-event-button {
+  min-height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  margin: 0;
+
+  padding: 0 18px;
+
+  border-radius: 11px;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.copy-last-week-footer
+.add-event-button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Scrollbar */
+
+.copy-last-week-list::-webkit-scrollbar {
+  width: 7px;
+}
+
+.copy-last-week-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.copy-last-week-list::-webkit-scrollbar-thumb {
+  background:
+    rgba(148, 163, 184, 0.22);
+
+  border-radius: 999px;
+}
+
+/* =========================================================
+   COPY LAST WEEK TOOLBAR BUTTON
+   ========================================================= */
+
+.meal-copy-last-week {
+  min-height: 48px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  padding: 0 18px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.11);
+
+  border-radius: 13px;
+
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  color:
+    rgba(248, 250, 252, 0.92);
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.025);
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.meal-copy-last-week svg {
+  width: 17px;
+  height: 17px;
+
+  flex-shrink: 0;
+
+  color:
+    rgba(196, 181, 253, 0.95);
+
+  transition:
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.meal-copy-last-week:hover:not(:disabled) {
+  background:
+    rgba(124, 58, 237, 0.1);
+
+  border-color:
+    rgba(139, 92, 246, 0.32);
+
+  color: #ffffff;
+
+  box-shadow:
+    0 8px 22px
+      rgba(0, 0, 0, 0.14),
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.04);
+
+  transform:
+    translateY(-1px);
+}
+
+.meal-copy-last-week:hover:not(:disabled)
+svg {
+  color: #a78bfa;
+
+  transform:
+    translateX(1px);
+}
+
+.meal-copy-last-week:active:not(:disabled) {
+  transform:
+    translateY(0);
+
+  background:
+    rgba(124, 58, 237, 0.14);
+}
+
+.meal-copy-last-week:focus-visible {
+  outline: none;
+
+  border-color:
+    rgba(139, 92, 246, 0.65);
+
+  box-shadow:
+    0 0 0 3px
+      rgba(124, 58, 237, 0.16);
+}
+
+.meal-copy-last-week:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================================
+   CLEAR WEEK TOOLBAR BUTTON
+   ========================================================= */
+
+.meal-clear-week {
+  min-height: 48px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  padding: 0 18px;
+
+  border:
+    1px solid rgba(248, 113, 113, 0.16);
+
+  border-radius: 13px;
+
+  background:
+    rgba(239, 68, 68, 0.045);
+
+  color:
+    rgba(254, 226, 226, 0.9);
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.025);
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.meal-clear-week:hover:not(:disabled) {
+  background:
+    rgba(239, 68, 68, 0.1);
+
+  border-color:
+    rgba(248, 113, 113, 0.32);
+
+  color: #ffffff;
+
+  box-shadow:
+    0 8px 22px
+      rgba(0, 0, 0, 0.14),
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.04);
+
+  transform:
+    translateY(-1px);
+}
+
+.meal-clear-week:active:not(:disabled) {
+  transform:
+    translateY(0);
+
+  background:
+    rgba(239, 68, 68, 0.14);
+}
+
+.meal-clear-week:focus-visible {
+  outline: none;
+
+  border-color:
+    rgba(248, 113, 113, 0.55);
+
+  box-shadow:
+    0 0 0 3px
+      rgba(239, 68, 68, 0.12);
+}
+
+.meal-clear-week:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================================
+   CLEAR WEEK CONFIRMATION MODAL
+   ========================================================= */
+
+.clear-week-modal {
+  width: min(600px, calc(100vw - 40px));
+  max-height: min(720px, calc(100vh - 80px));
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(27, 31, 43, 0.99),
+      rgba(19, 22, 31, 0.99)
+    );
+
+  border:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 24px;
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.48);
+
+  color: #f8fafc;
+}
+
+/* Header */
+
+.clear-week-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+
+  padding: 26px 28px 20px;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.07);
+}
+
+.clear-week-header > div:first-child {
+  min-width: 0;
+}
+
+.clear-week-header .section-kicker {
+  margin: 0 0 7px;
+
+  color: #f87171;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.clear-week-header h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.clear-week-header p:not(.section-kicker) {
+  margin: 8px 0 0;
+
+  color: rgba(226, 232, 240, 0.66);
+
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.clear-week-header p strong {
+  color: rgba(248, 250, 252, 0.9);
+}
+
+/* Dinner list */
+
+.clear-week-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+
+  padding: 18px 28px;
+
+  overflow-y: auto;
+}
+
+.clear-week-item {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns:
+    100px
+    minmax(0, 1fr);
+
+  align-items: center;
+  gap: 14px;
+
+  min-height: 62px;
+
+  padding: 11px 15px;
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  border-radius: 14px;
+}
+
+.clear-week-day {
+  color: rgba(203, 213, 225, 0.68);
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.clear-week-meal {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.clear-week-meal strong {
+  overflow: hidden;
+
+  color: #f8fafc;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clear-week-meal span {
+  color: rgba(148, 163, 184, 0.72);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Empty state */
+
+.clear-week-empty {
+  min-height: 210px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  padding: 32px;
+
+  text-align: center;
+
+  color: rgba(148, 163, 184, 0.72);
+}
+
+.clear-week-empty svg {
+  color: #f87171;
+}
+
+.clear-week-empty strong {
+  margin-top: 5px;
+
+  color: #f8fafc;
+
+  font-size: 16px;
+}
+
+.clear-week-empty span {
+  font-size: 13px;
+}
+
+/* Footer */
+
+.clear-week-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 16px 28px 20px;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  background:
+    rgba(12, 14, 20, 0.3);
+}
+
+.clear-week-warning {
+  color: rgba(148, 163, 184, 0.7);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.clear-week-footer > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  flex-shrink: 0;
+}
+
+.clear-week-footer .secondary-button {
+  min-height: 40px;
+
+  padding: 0 17px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.09);
+
+  border-radius: 11px;
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  color: rgba(241, 245, 249, 0.8);
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.clear-week-confirm {
+  min-height: 40px;
+
+  padding: 0 18px;
+
+  border:
+    1px solid rgba(248, 113, 113, 0.24);
+
+  border-radius: 11px;
+
+  background:
+    rgba(239, 68, 68, 0.14);
+
+  color: #fecaca;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+.clear-week-confirm:hover:not(:disabled) {
+  background:
+    rgba(239, 68, 68, 0.22);
+
+  border-color:
+    rgba(248, 113, 113, 0.4);
+
+  color: #ffffff;
+}
+
+.clear-week-confirm:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+/* Scrollbar */
+
+.clear-week-list::-webkit-scrollbar {
+  width: 7px;
+}
+
+.clear-week-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.clear-week-list::-webkit-scrollbar-thumb {
+  background:
+    rgba(148, 163, 184, 0.22);
+
+  border-radius: 999px;
+}
+
+/* =========================================================
+   WEEK TEMPLATES TOOLBAR BUTTON
+   ========================================================= */
+
+.meal-week-templates {
+  min-height: 48px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  padding: 0 18px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.11);
+
+  border-radius: 13px;
+
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  color:
+    rgba(248, 250, 252, 0.92);
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.025);
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.meal-week-templates svg {
+  width: 17px;
+  height: 17px;
+
+  flex-shrink: 0;
+
+  color:
+    rgba(196, 181, 253, 0.95);
+
+  transition:
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.meal-week-templates:hover:not(:disabled) {
+  background:
+    rgba(124, 58, 237, 0.1);
+
+  border-color:
+    rgba(139, 92, 246, 0.32);
+
+  color: #ffffff;
+
+  box-shadow:
+    0 8px 22px
+      rgba(0, 0, 0, 0.14),
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.04);
+
+  transform:
+    translateY(-1px);
+}
+
+.meal-week-templates:hover:not(:disabled)
+svg {
+  color: #a78bfa;
+}
+
+.meal-week-templates:active:not(:disabled) {
+  transform:
+    translateY(0);
+
+  background:
+    rgba(124, 58, 237, 0.14);
+}
+
+.meal-week-templates:focus-visible {
+  outline: none;
+
+  border-color:
+    rgba(139, 92, 246, 0.65);
+
+  box-shadow:
+    0 0 0 3px
+      rgba(124, 58, 237, 0.16);
+}
+
+.meal-week-templates:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================================
+   WEEK TEMPLATES MODAL
+   ========================================================= */
+
+.week-templates-modal {
+  width: min(680px, calc(100vw - 40px));
+  max-height: min(720px, calc(100vh - 80px));
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(27, 31, 43, 0.99),
+      rgba(19, 22, 31, 0.99)
+    );
+
+  border:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 24px;
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.48);
+
+  color: #f8fafc;
+}
+
+/* Header */
+
+.week-templates-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+
+  padding: 26px 28px 20px;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.07);
+}
+
+.week-templates-header > div:first-child {
+  min-width: 0;
+}
+
+.week-templates-header .section-kicker {
+  margin: 0 0 7px;
+
+  color: #a78bfa;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.week-templates-header h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.week-templates-header p:not(.section-kicker) {
+  margin: 8px 0 0;
+
+  color: rgba(226, 232, 240, 0.66);
+
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* Toolbar */
+
+.week-templates-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 16px 28px;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.06);
+
+  background:
+    rgba(255, 255, 255, 0.018);
+}
+
+.week-templates-toolbar > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.week-templates-toolbar strong {
+  color: #f8fafc;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.week-templates-toolbar span {
+  color: rgba(148, 163, 184, 0.7);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.week-template-save-current {
+  min-height: 39px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 0 15px;
+
+  border:
+    1px solid rgba(139, 92, 246, 0.3);
+
+  border-radius: 11px;
+
+  background:
+    rgba(124, 58, 237, 0.15);
+
+  color: #ddd6fe;
+
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.week-template-save-current:hover:not(:disabled) {
+  background:
+    rgba(124, 58, 237, 0.24);
+
+  border-color:
+    rgba(139, 92, 246, 0.48);
+
+  color: #ffffff;
+}
+
+.week-template-save-current:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Empty state */
+
+.week-templates-empty {
+  min-height: 280px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  padding: 40px;
+
+  text-align: center;
+
+  color: rgba(148, 163, 184, 0.7);
+}
+
+.week-templates-empty svg {
+  margin-bottom: 5px;
+
+  color: #8b5cf6;
+}
+
+.week-templates-empty strong {
+  color: #f8fafc;
+
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.week-templates-empty span {
+  max-width: 360px;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Saved template list */
+
+.week-templates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding: 18px 28px;
+
+  overflow-y: auto;
+}
+
+.week-template-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  min-height: 68px;
+
+  padding: 12px 15px;
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  border-radius: 14px;
+}
+
+.week-template-card-copy {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.week-template-card-copy strong {
+  color: #f8fafc;
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.week-template-card-copy span {
+  color: rgba(148, 163, 184, 0.72);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.week-template-use {
+  min-height: 36px;
+
+  flex-shrink: 0;
+
+  padding: 0 13px;
+
+  border:
+    1px solid rgba(139, 92, 246, 0.26);
+
+  border-radius: 10px;
+
+  background:
+    rgba(124, 58, 237, 0.12);
+
+  color: #c4b5fd;
+
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.week-template-use:hover {
+  background:
+    rgba(124, 58, 237, 0.2);
+
+  color: #ffffff;
+}
+
+/* Footer */
+
+.week-templates-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 16px 28px 20px;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  background:
+    rgba(12, 14, 20, 0.3);
+}
+
+.week-templates-footer > span {
+  color: rgba(148, 163, 184, 0.68);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.week-templates-footer .secondary-button {
+  min-height: 40px;
+
+  padding: 0 17px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.09);
+
+  border-radius: 11px;
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  color: rgba(241, 245, 249, 0.82);
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.week-templates-list::-webkit-scrollbar {
+  width: 7px;
+}
+
+.week-templates-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.week-templates-list::-webkit-scrollbar-thumb {
+  background:
+    rgba(148, 163, 184, 0.22);
+
+  border-radius: 999px;
+}
+
+/* =========================================================
+   SAVE WEEK TEMPLATE MODAL
+   ========================================================= */
+
+.save-template-backdrop {
+  z-index: 1200;
+}
+
+.save-template-modal {
+  width: min(500px, calc(100vw - 40px));
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(27, 31, 43, 0.99),
+      rgba(19, 22, 31, 0.99)
+    );
+
+  border:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 22px;
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.55);
+
+  color: #f8fafc;
+}
+
+.save-template-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 24px 26px 19px;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.07);
+}
+
+.save-template-header .section-kicker {
+  margin: 0 0 7px;
+
+  color: #a78bfa;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.save-template-header h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.save-template-header p:not(.section-kicker) {
+  margin: 7px 0 0;
+
+  color: rgba(226, 232, 240, 0.66);
+
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.save-template-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  padding: 22px 26px;
+}
+
+.save-template-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.save-template-field > span {
+  color: rgba(226, 232, 240, 0.78);
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.save-template-field input {
+  width: 100%;
+  height: 46px;
+
+  padding: 0 14px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius: 11px;
+
+  outline: none;
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  color: #ffffff;
+
+  font: inherit;
+  font-size: 14px;
+
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease;
+}
+
+.save-template-field input::placeholder {
+  color: rgba(148, 163, 184, 0.48);
+}
+
+.save-template-field input:focus {
+  background:
+    rgba(255, 255, 255, 0.055);
+
+  border-color:
+    rgba(139, 92, 246, 0.58);
+
+  box-shadow:
+    0 0 0 3px
+      rgba(124, 58, 237, 0.12);
+}
+
+.save-template-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 13px 14px;
+
+  background:
+    rgba(124, 58, 237, 0.07);
+
+  border:
+    1px solid rgba(139, 92, 246, 0.14);
+
+  border-radius: 12px;
+}
+
+.save-template-summary > svg {
+  flex-shrink: 0;
+
+  color: #a78bfa;
+}
+
+.save-template-summary > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.save-template-summary strong {
+  color: #f8fafc;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.save-template-summary span {
+  color: rgba(148, 163, 184, 0.72);
+
+  font-size: 11px;
+}
+
+.save-template-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  padding: 16px 26px 20px;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  background:
+    rgba(12, 14, 20, 0.3);
+}
+
+.save-template-footer .secondary-button,
+.save-template-confirm {
+  min-height: 40px;
+
+  padding: 0 17px;
+
+  border-radius: 11px;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.save-template-footer .secondary-button {
+  border:
+    1px solid rgba(255, 255, 255, 0.09);
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  color:
+    rgba(241, 245, 249, 0.82);
+}
+
+.save-template-confirm {
+  border:
+    1px solid rgba(139, 92, 246, 0.34);
+
+  background:
+    rgba(124, 58, 237, 0.18);
+
+  color: #ddd6fe;
+}
+
+.save-template-confirm:hover:not(:disabled) {
+  background:
+    rgba(124, 58, 237, 0.28);
+
+  border-color:
+    rgba(139, 92, 246, 0.5);
+
+  color: #ffffff;
+}
+
+.save-template-confirm:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   DINNER PLANNER SUCCESS TOAST
+   ========================================================= */
+
+.meal-planner-toast {
+  position: fixed;
+
+  left: 50%;
+  bottom: 92px;
+
+  z-index: 1500;
+
+  width: min(
+    430px,
+    calc(100vw - 32px)
+  );
+
+  display: grid;
+  grid-template-columns:
+    36px
+    minmax(0, 1fr)
+    32px;
+
+  align-items: center;
+  gap: 11px;
+
+  padding: 12px 12px 12px 14px;
+
+  transform:
+    translateX(-50%);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(29, 33, 45, 0.98),
+      rgba(20, 23, 32, 0.98)
+    );
+
+  border:
+    1px solid rgba(139, 92, 246, 0.24);
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 18px 50px
+      rgba(0, 0, 0, 0.38);
+
+  color: #f8fafc;
+}
+
+.meal-planner-toast-icon {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background:
+    rgba(124, 58, 237, 0.16);
+
+  color: #c4b5fd;
+
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.meal-planner-toast-copy {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.meal-planner-toast-copy strong {
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.meal-planner-toast-copy span {
+  overflow: hidden;
+
+  color:
+    rgba(203, 213, 225, 0.76);
+
+  font-size: 12px;
+  font-weight: 600;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meal-planner-toast-close {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 9px;
+
+  background: transparent;
+
+  color:
+    rgba(148, 163, 184, 0.72);
+
+  cursor: pointer;
+}
+
+.meal-planner-toast-close:hover {
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  color: #ffffff;
+}
+
+/* =========================================================
+   WEEK TEMPLATE ACTIONS
+   ========================================================= */
+
+.week-template-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  flex-shrink: 0;
+}
+
+.week-template-delete {
+  min-height: 36px;
+
+  padding: 0 13px;
+
+  border:
+    1px solid rgba(248, 113, 113, 0.18);
+
+  border-radius: 10px;
+
+  background:
+    rgba(239, 68, 68, 0.07);
+
+  color:
+    rgba(252, 165, 165, 0.82);
+
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+.week-template-delete:hover:not(:disabled) {
+  background:
+    rgba(239, 68, 68, 0.14);
+
+  border-color:
+    rgba(248, 113, 113, 0.32);
+
+  color: #fecaca;
+}
+
+.week-template-delete:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.week-template-actions
+.week-template-use {
+  min-height: 36px;
+}
+
+/* =========================================================
+   DELETE WEEK TEMPLATE CONFIRMATION
+   ========================================================= */
+
+.delete-template-backdrop {
+  z-index: 1300;
+}
+
+.delete-template-modal {
+  width: min(
+    500px,
+    calc(100vw - 40px)
+  );
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(27, 31, 43, 0.99),
+      rgba(19, 22, 31, 0.99)
+    );
+
+  border:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 22px;
+
+  box-shadow:
+    0 30px 80px
+      rgba(0, 0, 0, 0.55);
+
+  color: #f8fafc;
+}
+
+.delete-template-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 24px 26px 19px;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.07);
+}
+
+.delete-template-header
+.section-kicker {
+  margin: 0 0 7px;
+
+  color: #f87171;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.delete-template-header h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 23px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.delete-template-header
+p:not(.section-kicker) {
+  margin: 7px 0 0;
+
+  color:
+    rgba(226, 232, 240, 0.66);
+
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.delete-template-body {
+  padding: 22px 26px;
+}
+
+.delete-template-warning {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  padding: 15px 16px;
+
+  background:
+    rgba(239, 68, 68, 0.07);
+
+  border:
+    1px solid rgba(248, 113, 113, 0.15);
+
+  border-radius: 13px;
+}
+
+.delete-template-warning strong {
+  color: #fecaca;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.delete-template-warning span {
+  color:
+    rgba(203, 213, 225, 0.72);
+
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.delete-template-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  padding: 16px 26px 20px;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  background:
+    rgba(12, 14, 20, 0.3);
+}
+
+.delete-template-footer
+.secondary-button,
+.delete-template-confirm {
+  min-height: 40px;
+
+  padding: 0 17px;
+
+  border-radius: 11px;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.delete-template-footer
+.secondary-button {
+  border:
+    1px solid rgba(255, 255, 255, 0.09);
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  color:
+    rgba(241, 245, 249, 0.82);
+}
+
+.delete-template-confirm {
+  border:
+    1px solid rgba(248, 113, 113, 0.28);
+
+  background:
+    rgba(239, 68, 68, 0.14);
+
+  color: #fecaca;
+}
+
+.delete-template-confirm:hover:not(:disabled) {
+  background:
+    rgba(239, 68, 68, 0.23);
+
+  border-color:
+    rgba(248, 113, 113, 0.44);
+
+  color: #ffffff;
+}
+
+.delete-template-confirm:disabled,
+.delete-template-footer
+.secondary-button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   DUPLICATE WEEK TEMPLATE
+   ========================================================= */
+
+.duplicate-template-backdrop {
+  z-index: 1320;
+}
+
+.duplicate-template-modal {
+  width: min(
+    520px,
+    calc(100vw - 40px)
+  );
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(27, 31, 43, 0.99),
+      rgba(19, 22, 31, 0.99)
+    );
+
+  border:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 22px;
+
+  box-shadow:
+    0 30px 80px
+      rgba(0, 0, 0, 0.55);
+
+  color: #f8fafc;
+}
+
+.duplicate-template-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 24px 26px 19px;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.07);
+}
+
+.duplicate-template-header
+.section-kicker {
+  margin: 0 0 7px;
+
+  color: #a78bfa;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.duplicate-template-header h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 23px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.duplicate-template-header
+p:not(.section-kicker) {
+  margin: 7px 0 0;
+
+  color:
+    rgba(226, 232, 240, 0.66);
+
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.duplicate-template-body {
+  padding: 22px 26px;
+}
+
+.duplicate-template-info {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  padding: 16px;
+
+  background:
+    rgba(139, 92, 246, 0.08);
+
+  border:
+    1px solid rgba(167, 139, 250, 0.17);
+
+  border-radius: 13px;
+}
+
+.duplicate-template-info strong {
+  color: #ddd6fe;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.duplicate-template-info span {
+  color:
+    rgba(203, 213, 225, 0.72);
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.duplicate-template-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  padding: 16px 26px 20px;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  background:
+    rgba(12, 14, 20, 0.3);
+}
+
+.duplicate-template-footer
+.secondary-button,
+.duplicate-template-replace {
+  min-height: 40px;
+
+  padding: 0 17px;
+
+  border-radius: 11px;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.duplicate-template-footer
+.secondary-button {
+  border:
+    1px solid rgba(255, 255, 255, 0.09);
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  color:
+    rgba(241, 245, 249, 0.82);
+}
+
+.duplicate-template-replace {
+  border:
+    1px solid rgba(167, 139, 250, 0.3);
+
+  background:
+    rgba(124, 58, 237, 0.2);
+
+  color: #ddd6fe;
+}
+
+.duplicate-template-replace:hover:not(:disabled) {
+  background:
+    rgba(124, 58, 237, 0.32);
+
+  border-color:
+    rgba(167, 139, 250, 0.5);
+
+  color: #ffffff;
+}
+
+.duplicate-template-replace:disabled,
+.duplicate-template-footer
+.secondary-button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}

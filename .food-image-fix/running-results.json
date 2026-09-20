@@ -1,0 +1,57 @@
+[
+  {
+    "name": "potato",
+    "success": true,
+    "canonicalName": "potato",
+    "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c8/Potato_and_cross_section.jpg/500px-Potato_and_cross_section.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "wikimedia-fresh-v2",
+    "matchedProduct": "potato",
+    "barcode": null,
+    "rotation": 0,
+    "cached": true
+  },
+  {
+    "name": "carrot",
+    "success": true,
+    "canonicalName": "carrot",
+    "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c8/Carrots.jpg/500px-Carrots.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "wikimedia-fresh-v2",
+    "matchedProduct": "carrot",
+    "barcode": null,
+    "rotation": 0,
+    "cached": true
+  },
+  {
+    "name": "apple",
+    "success": true,
+    "canonicalName": "apple",
+    "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/500px-Red_Apple.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "wikimedia-fresh-v2",
+    "matchedProduct": "apple",
+    "barcode": null,
+    "rotation": 0,
+    "cached": true
+  },
+  {
+    "name": "banana",
+    "success": true,
+    "canonicalName": "banana",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/01129441/front_en.3.400.jpg",
+    "source": "familyhub-fresh-library",
+    "matchedProduct": "fairtrade Banana",
+    "barcode": null,
+    "rotation": 0,
+    "cached": true
+  },
+  {
+    "name": "chicken breast",
+    "success": true,
+    "canonicalName": "chicken breast",
+    "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/Raw_chicken_slices.jpg/500px-Raw_chicken_slices.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "wikimedia-fresh-v2",
+    "matchedProduct": "chicken breast",
+    "barcode": null,
+    "rotation": 0,
+    "cached": false
+  }
+]

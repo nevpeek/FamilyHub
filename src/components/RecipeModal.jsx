@@ -1,6 +1,7 @@
 import { API_BASE_URL } from "../config/api";
 import {
   ImagePlus,
+  Plus,
   Trash2,
   X,
 } from "lucide-react";
@@ -150,6 +151,52 @@ setUploadingPhoto(false);
 
   if (!open) {
     return null;
+  }
+
+  const ingredientRows =
+    ingredients
+      .split("\n")
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+  function updateIngredientRow(
+    index,
+    value
+  ) {
+    const nextRows = [
+      ...ingredientRows,
+    ];
+
+    nextRows[index] = value;
+
+    setIngredients(
+      nextRows.join("\n")
+    );
+  }
+
+  function addIngredientRow() {
+    const nextRows = [
+      ...ingredientRows,
+      "",
+    ];
+
+    setIngredients(
+      nextRows.join("\n")
+    );
+  }
+
+  function removeIngredientRow(
+    index
+  ) {
+    const nextRows =
+      ingredientRows.filter(
+        (_, rowIndex) =>
+          rowIndex !== index
+      );
+
+    setIngredients(
+      nextRows.join("\n")
+    );
   }
 
   async function handleImportRecipe() {
@@ -568,241 +615,406 @@ setUploadingPhoto(false);
           className="event-form"
           onSubmit={handleSubmit}
         >
-          <div className="event-form-field event-form-full">
-            <span>Photo</span>
+          <div className="recipe-editor-overview">
+            <div className="recipe-editor-photo-column">
+              <div className="event-form-field">
+                <span>Photo</span>
 
-            <div className="recipe-photo-editor">
-              {photoUrl ? (
-                <img
-                  src={`${API_BASE_URL}${photoUrl}`}
-                  alt=""
-                />
-              ) : (
-                <div className="recipe-photo-editor-empty">
-                  <ImagePlus
-                    size={34}
-                  />
+                <div className="recipe-photo-editor">
+                  {photoUrl ? (
+                    <img
+                      src={`${API_BASE_URL}${photoUrl}`}
+                      alt=""
+                    />
+                  ) : (
+                    <div className="recipe-photo-editor-empty">
+                      <ImagePlus size={34} />
 
-                  <span>
-                    No photo yet
-                  </span>
+                      <span>
+                        No photo yet
+                      </span>
+                    </div>
+                  )}
+
+                  <label className="recipe-photo-upload-button">
+                    <ImagePlus size={17} />
+
+                    {uploadingPhoto
+                      ? "Uploading..."
+                      : photoUrl
+                        ? "Change Photo"
+                        : "Add Photo"}
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={
+                        handlePhotoUpload
+                      }
+                      disabled={
+                        uploadingPhoto ||
+                        saving
+                      }
+                    />
+                  </label>
                 </div>
-              )}
+              </div>
+            </div>
 
-              <label className="recipe-photo-upload-button">
-                <ImagePlus
-                  size={17}
-                />
-
-                {uploadingPhoto
-                  ? "Uploading..."
-                  : photoUrl
-                    ? "Change Photo"
-                    : "Add Photo"}
+            <div className="recipe-editor-details-column">
+              <label className="event-form-field">
+                <span>
+                  Recipe name
+                </span>
 
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={
-                    handlePhotoUpload
+                  type="text"
+                  value={title}
+                  onChange={(event) =>
+                    setTitle(
+                      event.target.value
+                    )
                   }
-                  disabled={
-                    uploadingPhoto ||
-                    saving
-                  }
+                  placeholder="e.g. Spaghetti Bolognese"
+                  autoFocus
                 />
               </label>
+
+              <label className="event-form-field">
+                <span>
+                  Description
+                </span>
+
+                <textarea
+                  value={description}
+                  onChange={(event) =>
+                    setDescription(
+                      event.target.value
+                    )
+                  }
+                  placeholder="Optional description"
+                  rows={3}
+                />
+              </label>
+
+              <div className="recipe-editor-meta-grid">
+<label className="event-form-field">
+  <span>
+    Prep time
+  </span>
+
+  <div className="recipe-time-input">
+    <input
+      type="number"
+      min="0"
+      step="1"
+      value={prepTime}
+      onChange={(event) =>
+        setPrepTime(
+          event.target.value
+        )
+      }
+      placeholder="0"
+    />
+
+    <span>min</span>
+  </div>
+</label>
+
+<label className="event-form-field">
+  <span>
+    Cook time
+  </span>
+
+  <div className="recipe-time-input">
+    <input
+      type="number"
+      min="0"
+      step="1"
+      value={cookTime}
+      onChange={(event) =>
+        setCookTime(
+          event.target.value
+        )
+      }
+      placeholder="0"
+    />
+
+    <span>min</span>
+  </div>
+</label>
+
+                <label className="event-form-field">
+                  <span>
+                    Servings
+                  </span>
+
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={servings}
+                    onChange={(event) =>
+                      setServings(
+                        event.target.value
+                      )
+                    }
+                    placeholder="e.g. 4"
+                  />
+                </label>
+
+                <label className="event-form-field">
+                  <span>
+                    Category
+                  </span>
+
+                  <select
+                    value={category}
+                    onChange={(event) =>
+                      setCategory(
+                        event.target.value
+                      )
+                    }
+                  >
+                    <option value="">
+                      Select
+                    </option>
+
+                    <option value="pasta">
+                      Pasta
+                    </option>
+
+                    <option value="chicken">
+                      Chicken
+                    </option>
+
+                    <option value="beef">
+                      Beef
+                    </option>
+
+                    <option value="pork">
+                      Pork
+                    </option>
+
+                    <option value="seafood">
+                      Seafood
+                    </option>
+
+                    <option value="pizza">
+                      Pizza
+                    </option>
+
+                    <option value="bbq">
+                      BBQ
+                    </option>
+
+                    <option value="slow-cooker">
+                      Slow Cooker
+                    </option>
+
+                    <option value="mexican">
+                      Mexican
+                    </option>
+
+                    <option value="asian">
+                      Asian
+                    </option>
+
+                    <option value="indian">
+                      Indian
+                    </option>
+
+                    <option value="vegetarian">
+                      Vegetarian
+                    </option>
+
+                    <option value="other">
+                      Other
+                    </option>
+                  </select>
+                </label>
+              </div>
             </div>
           </div>
 
-          <label className="event-form-field event-form-full">
-            <span>
-              Recipe name
-            </span>
+<div className="recipe-editor-cooking-grid">
+  <div className="event-form-field recipe-ingredients-field">
+    <div className="recipe-ingredients-heading">
+      <span>
+        Ingredients
+      </span>
 
-            <input
-              type="text"
-              value={title}
-              onChange={(event) =>
-                setTitle(
-                  event.target.value
-                )
-              }
-              placeholder="e.g. Spaghetti Bolognese"
-              autoFocus
-            />
-          </label>
+      <button
+        type="button"
+        className="recipe-add-ingredient-button"
+        onClick={addIngredientRow}
+        disabled={saving}
+      >
+        <Plus size={14} />
+        Add Ingredient
+      </button>
+    </div>
 
-          <label className="event-form-field event-form-full">
-            <span>
-              Description
-            </span>
-
-            <textarea
-              value={description}
-              onChange={(event) =>
-                setDescription(
-                  event.target.value
-                )
-              }
-              placeholder="Optional description"
-              rows={3}
-            />
-          </label>
-
-          <div className="event-form-grid">
-            <label className="event-form-field">
-              <span>
-                Prep time
+    <div className="recipe-ingredient-list">
+      {ingredientRows.length > 0 ? (
+        ingredientRows.map(
+          (ingredient, index) => (
+            <div
+              className="recipe-ingredient-row"
+              key={`${index}-${ingredient}`}
+            >
+              <span className="recipe-ingredient-number">
+                {index + 1}
               </span>
 
               <input
-                type="number"
-                min="0"
-                step="1"
-                value={prepTime}
+                type="text"
+                value={ingredient}
                 onChange={(event) =>
-                  setPrepTime(
+                  updateIngredientRow(
+                    index,
                     event.target.value
                   )
                 }
-                placeholder="Minutes"
+                placeholder="Add ingredient..."
               />
-            </label>
 
-            <label className="event-form-field">
-              <span>
-                Cook time
-              </span>
-
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={cookTime}
-                onChange={(event) =>
-                  setCookTime(
-                    event.target.value
+              <button
+                type="button"
+                className="recipe-remove-ingredient-button"
+                onClick={() =>
+                  removeIngredientRow(
+                    index
                   )
                 }
-                placeholder="Minutes"
-              />
-            </label>
-          </div>
-
-          <div className="event-form-grid">
-            <label className="event-form-field">
-              <span>
-                Servings
-              </span>
-
-              <input
-                type="number"
-                min="1"
-                step="1"
-                value={servings}
-                onChange={(event) =>
-                  setServings(
-                    event.target.value
-                  )
-                }
-                placeholder="e.g. 4"
-              />
-            </label>
-
-            <label className="event-form-field">
-              <span>
-                Category
-              </span>
-
-              <select
-                value={category}
-                onChange={(event) =>
-                  setCategory(
-                    event.target.value
-                  )
-                }
+                disabled={saving}
+                aria-label={`Remove ingredient ${index + 1}`}
               >
-                <option value="">
-                  Select category
-                </option>
+                <X size={15} />
+              </button>
+            </div>
+          )
+        )
+      ) : (
+        <button
+          type="button"
+          className="recipe-empty-ingredient-button"
+          onClick={addIngredientRow}
+          disabled={saving}
+        >
+          <Plus size={16} />
 
-                <option value="breakfast">
-                  Breakfast
-                </option>
+          Add your first ingredient
+        </button>
+      )}
+    </div>
+  </div>
 
-                <option value="lunch">
-                  Lunch
-                </option>
+  <div className="event-form-field recipe-method-field">
+    <div className="recipe-method-heading">
+      <span>
+        Instructions / Method
+      </span>
 
-                <option value="dinner">
-                  Dinner
-                </option>
+      <button
+        type="button"
+        className="recipe-add-method-button"
+        onClick={() => {
+          const rows =
+            instructions
+              .split("\n")
+              .filter(
+                (item) =>
+                  item.trim() !== ""
+              );
 
-                <option value="pasta">
-                  Pasta
-                </option>
+          setInstructions(
+            [...rows, ""].join("\n")
+          );
+        }}
+        disabled={saving}
+      >
+        <Plus size={14} />
+        Add Step
+      </button>
+    </div>
 
-                <option value="bbq">
-                  BBQ
-                </option>
+    <div className="recipe-method-list">
+      {instructions
+        .split("\n")
+        .filter(
+          (item) =>
+            item.trim() !== ""
+        )
+        .map(
+          (instruction, index, rows) => (
+            <div
+              className="recipe-method-row"
+              key={`${index}-${instruction}`}
+            >
+              <span className="recipe-method-number">
+                {index + 1}
+              </span>
 
-                <option value="slow-cooker">
-                  Slow Cooker
-                </option>
+<textarea
+  value={instruction}
+  rows={3}
+  onChange={(event) => {
+    const nextRows = [
+      ...rows,
+    ];
 
-                <option value="dessert">
-                  Dessert
-                </option>
+    nextRows[index] =
+      event.target.value;
 
-                <option value="snack">
-                  Snack
-                </option>
+    setInstructions(
+      nextRows.join("\n")
+    );
+  }}
+  placeholder="Describe this step..."
+/>
 
-                <option value="other">
-                  Other
-                </option>
-              </select>
-            </label>
-          </div>
+              <button
+                type="button"
+                className="recipe-remove-method-button"
+                onClick={() => {
+                  const nextRows =
+                    rows.filter(
+                      (_, rowIndex) =>
+                        rowIndex !==
+                        index
+                    );
 
-                  <label className="event-form-field event-form-full">
-            <span>
-              Ingredients
-            </span>
+                  setInstructions(
+                    nextRows.join("\n")
+                  );
+                }}
+                disabled={saving}
+                aria-label={`Remove step ${index + 1}`}
+              >
+                <X size={15} />
+              </button>
+            </div>
+          )
+        )}
 
-            <textarea
-              value={ingredients}
-              onChange={(event) =>
-                setIngredients(
-                  event.target.value
-                )
-              }
-              placeholder={
-                "One item per line\n500g mince\n1 onion\n2 carrots\nPasta sauce"
-              }
-              rows={7}
-            />
-          </label>
+      {!instructions.trim() && (
+        <button
+          type="button"
+          className="recipe-empty-method-button"
+          onClick={() =>
+            setInstructions(" ")
+          }
+          disabled={saving}
+        >
+          <Plus size={16} />
 
-          <label className="event-form-field event-form-full">
-            <span>
-              Instructions / Method
-            </span>
-
-            <textarea
-              value={instructions}
-              onChange={(event) =>
-                setInstructions(
-                  event.target.value
-                )
-              }
-              placeholder={
-                "One step per line\nBrown the mince.\nAdd the onion and garlic.\nSimmer for 30 minutes."
-              }
-              rows={9}
-            />
-          </label>
+          Add your first step
+        </button>
+      )}
+    </div>
+  </div>
+</div>
 
           <div className="event-form-field event-form-full">
             <span>

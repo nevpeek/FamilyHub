@@ -1,5 +1,6 @@
 import { API_BASE_URL } from "../config/api";
-import { useEffect, useMemo, useState } from "react";
+import { startAutoRefresh } from "../utils/startAutoRefresh";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BookOpen,
   CalendarPlus,
@@ -13,6 +14,7 @@ import {
   ShoppingCart,
   Soup,
   Utensils,
+  X,
 } from "lucide-react";
 
 function toDateKey(date) {
@@ -120,6 +122,9 @@ function MealsPage({
   onViewRecipe,
   onPlanRecipe,
 }) {
+  const replacingTemplateRef = useRef(false);
+  const [templateReplaceError, setTemplateReplaceError] = useState("");
+
   const [meals, setMeals] =
     useState([]);
 
@@ -134,10 +139,42 @@ function MealsPage({
     setAddingWeekToShopping,
   ] = useState(false);
 
-  const [
-    shoppingMessage,
-    setShoppingMessage,
-  ] = useState("");
+const [
+  shoppingMessage,
+  setShoppingMessage,
+] = useState("");
+
+useEffect(() => {
+  if (!shoppingMessage) {
+    return;
+  }
+
+  const timer = window.setTimeout(() => {
+    setShoppingMessage("");
+  }, 3200);
+
+  return () => {
+    window.clearTimeout(timer);
+  };
+}, [shoppingMessage]);
+const [
+  plannerMessage,
+  setPlannerMessage,
+] = useState("");
+
+useEffect(() => {
+  if (!plannerMessage) {
+    return;
+  }
+
+  const timer = window.setTimeout(() => {
+    setPlannerMessage("");
+  }, 3200);
+
+  return () => {
+    window.clearTimeout(timer);
+  };
+}, [plannerMessage]);
 
   const [
     weekShoppingPickerOpen,
@@ -271,10 +308,7 @@ const [
     setRecipesError,
   ] = useState("");
 
-  const [
-    mealTypeFilter,
-    setMealTypeFilter,
-  ] = useState("all");
+  const mealTypeFilter = "dinner";
 
   const [
   mealToCopy,
@@ -305,6 +339,81 @@ const [
   slotRecipePicker,
   setSlotRecipePicker,
 ] = useState(null);
+
+const [
+  copyLastWeekOpen,
+  setCopyLastWeekOpen,
+] = useState(false);
+
+const [
+  clearWeekOpen,
+  setClearWeekOpen,
+] = useState(false);
+
+const [
+  clearingWeek,
+  setClearingWeek,
+] = useState(false);
+
+const [
+  weekTemplatesOpen,
+  setWeekTemplatesOpen,
+] = useState(false);
+
+const [
+  weekTemplates,
+  setWeekTemplates,
+] = useState([]);
+
+const [
+  loadingWeekTemplates,
+  setLoadingWeekTemplates,
+] = useState(false);
+
+const [
+  templateToDelete,
+  setTemplateToDelete,
+] = useState(null);
+
+const [
+  deletingWeekTemplate,
+  setDeletingWeekTemplate,
+] = useState(false);
+
+const [
+  saveTemplateOpen,
+  setSaveTemplateOpen,
+] = useState(false);
+
+const [
+  templateName,
+  setTemplateName,
+] = useState("");
+
+const [
+  savingWeekTemplate,
+  setSavingWeekTemplate,
+] = useState(false);
+
+const [
+  duplicateWeekTemplate,
+  setDuplicateWeekTemplate,
+] = useState(null);
+
+const [
+  previousWeekMeals,
+  setPreviousWeekMeals,
+] = useState([]);
+
+const [
+  selectedPreviousMeals,
+  setSelectedPreviousMeals,
+] = useState([]);
+
+const [
+  loadingPreviousWeek,
+  setLoadingPreviousWeek,
+] = useState(false);
 
 const [
   weekStart,
@@ -352,149 +461,205 @@ useEffect(() => {
 }, [mealPlannerFocus]);
 
 useEffect(() => {
+  let cancelled = false;
+  let inFlight = false;
+  let hasLoaded = false;
+  const controller = new AbortController();
+
+  setLoading(true);
+  setError("");
+
   async function loadMeals() {
-      setLoading(true);
+    if (cancelled || inFlight) return;
+
+    inFlight = true;
+
+    try {
+      const params = new URLSearchParams({
+        start: toDateKey(weekStart),
+        end: toDateKey(weekEnd),
+      });
+
+      if (selectedMemberId !== "all") {
+        params.set("memberId", String(selectedMemberId));
+      }
+
+      if (mealTypeFilter !== "all") {
+        params.set("mealType", mealTypeFilter);
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/meals?${params.toString()}`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to load meals");
+      }
+
+      const data = await response.json();
+
+      if (cancelled) return;
+
+      setMeals(data.meals || []);
       setError("");
+      hasLoaded = true;
+    } catch (err) {
+      if (cancelled || err.name === "AbortError") return;
 
-      try {
-        const params =
-          new URLSearchParams({
-            start:
-              toDateKey(weekStart),
-            end:
-              toDateKey(weekEnd),
-          });
+      console.error("Meal Planner refresh error:", err);
 
-        if (
-          selectedMemberId !== "all"
-        ) {
-          params.set(
-            "memberId",
-            String(selectedMemberId)
-          );
-        }
+      if (!hasLoaded) {
+        setError("Unable to load meals. Retrying…");
+      }
+    } finally {
+      inFlight = false;
 
-        if (
-          mealTypeFilter !== "all"
-        ) {
-          params.set(
-            "mealType",
-            mealTypeFilter
-          );
-        }
-
-        const response =
-          await fetch(
-            `${API_BASE_URL}/api/meals?${params.toString()}`
-          );
-
-        if (!response.ok) {
-          throw new Error(
-            "Failed to load meals"
-          );
-        }
-
-        const data =
-          await response.json();
-
-        setMeals(
-          data.meals || []
-        );
-      } catch (err) {
-        console.error(err);
-
-        setError(
-          "Unable to load meals"
-        );
-      } finally {
+      if (!cancelled) {
         setLoading(false);
       }
     }
+  }
 
-    loadMeals();
-  }, [
-    selectedMemberId,
-    mealTypeFilter,
-    mealRefreshKey,
-    weekStart,
-  ]);
+  loadMeals();
+
+  const stopAutoRefresh = startAutoRefresh(loadMeals);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
+}, [
+  selectedMemberId,
+  mealTypeFilter,
+  mealRefreshKey,
+  weekStart,
+]);
 
   useEffect(() => {
+    let cancelled = false;
+    let inFlight = false;
+    let hasLoaded = false;
+    const controller = new AbortController();
+
+    setRecipesLoading(true);
+    setRecipesError("");
+
     async function loadRecipes() {
-      setRecipesLoading(true);
-      setRecipesError("");
+      if (cancelled || inFlight) return;
+
+      inFlight = true;
 
       try {
-        const response =
-          await fetch(
-            `${API_BASE_URL}/api/recipes`
-          );
+        const response = await fetch(
+          `${API_BASE_URL}/api/recipes`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
+        );
 
-        const data =
-          await response.json();
+        const data = await response.json();
 
         if (!response.ok) {
           throw new Error(
-            data.error ||
-              "Unable to load recipes"
+            data.error || "Unable to load recipes"
           );
         }
 
-        setRecipes(
-          data.recipes || []
-        );
-      } catch (err) {
-        console.error(err);
+        if (cancelled) return;
 
-        setRecipesError(
-          err.message ||
-            "Unable to load recipes"
-        );
+        setRecipes(data.recipes || []);
+        setRecipesError("");
+        hasLoaded = true;
+      } catch (err) {
+        if (cancelled || err.name === "AbortError") return;
+
+        console.error("Recipes refresh error:", err);
+
+        if (!hasLoaded) {
+          setRecipesError(
+            "Unable to load recipes. Retrying…"
+          );
+        }
       } finally {
-        setRecipesLoading(false);
+        inFlight = false;
+
+        if (!cancelled) {
+          setRecipesLoading(false);
+        }
       }
     }
 
     loadRecipes();
-  }, [
-    recipeRefreshKey,
-  ]);
 
-    useEffect(() => {
+    const stopAutoRefresh = startAutoRefresh(loadRecipes);
+
+    return () => {
+      cancelled = true;
+      stopAutoRefresh();
+      controller.abort();
+    };
+  }, [recipeRefreshKey]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let inFlight = false;
+    const controller = new AbortController();
+
+    setWheelGroupsLoading(true);
+
     async function loadWheelGroups() {
-      setWheelGroupsLoading(true);
+      if (cancelled || inFlight) return;
+
+      inFlight = true;
 
       try {
         const response = await fetch(
-          `${API_BASE_URL}/api/meal-wheel-groups`
+          `${API_BASE_URL}/api/meal-wheel-groups`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
         );
 
-        const data =
-          await response.json();
+        const data = await response.json();
 
         if (!response.ok) {
           throw new Error(
-            data.error ||
-              "Unable to load wheel groups"
+            data.error || "Unable to load wheel groups"
           );
         }
 
-        setWheelGroups(
-          data.groups || []
-        );
-      } catch (error) {
-        console.error(
-          "Unable to load wheel groups:",
-          error
-        );
+        if (cancelled) return;
 
-        setWheelGroups([]);
+        setWheelGroups(data.groups || []);
+      } catch (error) {
+        if (cancelled || error.name === "AbortError") return;
+
+        console.error("Wheel groups refresh error:", error);
       } finally {
-        setWheelGroupsLoading(false);
+        inFlight = false;
+
+        if (!cancelled) {
+          setWheelGroupsLoading(false);
+        }
       }
     }
 
     loadWheelGroups();
+
+    const stopAutoRefresh = startAutoRefresh(loadWheelGroups);
+
+    return () => {
+      cancelled = true;
+      stopAutoRefresh();
+      controller.abort();
+    };
   }, []);
 
     const recipeCategories = [
@@ -597,10 +762,7 @@ const filteredRecipes =
 
 
   const mealTypes = [
-    "breakfast",
-    "lunch",
     "dinner",
-    "snack",
   ];
 
   function getMealsForSlot(
@@ -735,6 +897,937 @@ async function handleDropMeal(
   }
 }
 
+async function handleOpenCopyLastWeek() {
+  if (loadingPreviousWeek) {
+    return;
+  }
+
+  setLoadingPreviousWeek(true);
+
+  try {
+    const previousStart =
+      addDays(weekStart, -7);
+
+    const previousEnd =
+      addDays(weekEnd, -7);
+
+    const params =
+      new URLSearchParams({
+        start: toDateKey(previousStart),
+        end: toDateKey(previousEnd),
+        mealType: "dinner",
+      });
+
+    if (selectedMemberId !== "all") {
+      params.set(
+        "memberId",
+        String(selectedMemberId)
+      );
+    }
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/meals?${params.toString()}`,
+      {
+        cache: "no-store",
+      }
+    );
+
+    const data =
+      await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          "Unable to load last week's dinners"
+      );
+    }
+
+    const previousMeals =
+      data.meals || [];
+
+    setPreviousWeekMeals(
+      previousMeals
+    );
+
+    setSelectedPreviousMeals(
+      previousMeals.map(
+        (meal) => meal.id
+      )
+    );
+
+    setCopyLastWeekOpen(true);
+  } catch (error) {
+    console.error(
+      "Copy last week error:",
+      error
+    );
+
+    setShoppingMessage(
+      error.message ||
+        "Unable to load last week's dinners"
+    );
+  } finally {
+    setLoadingPreviousWeek(false);
+  }
+}
+
+async function handleClearWeek() {
+  if (
+    clearingWeek ||
+    meals.length === 0
+  ) {
+    return;
+  }
+
+  setClearingWeek(true);
+
+  try {
+    const mealsToDelete = [
+      ...meals,
+    ];
+
+    const deletedMealIds = [];
+
+    for (const meal of mealsToDelete) {
+      const response = await fetch(
+        `${API_BASE_URL}/api/meals/${meal.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            `Unable to remove "${meal.title}"`
+        );
+      }
+
+      deletedMealIds.push(
+        meal.id
+      );
+    }
+
+    setMeals((current) =>
+      current.filter(
+        (meal) =>
+          !deletedMealIds.includes(
+            meal.id
+          )
+      )
+    );
+
+    setClearWeekOpen(false);
+  } catch (error) {
+    console.error(
+      "Clear week error:",
+      error
+    );
+
+    window.alert(
+      error.message ||
+        "Unable to clear this week's dinners"
+    );
+  } finally {
+    setClearingWeek(false);
+  }
+}
+
+async function loadWeekTemplates() {
+  if (loadingWeekTemplates) {
+    return;
+  }
+
+  setLoadingWeekTemplates(true);
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/meal-templates`,
+      {
+        cache: "no-store",
+      }
+    );
+
+    const data =
+      await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          "Unable to load week templates"
+      );
+    }
+
+    setWeekTemplates(
+      Array.isArray(data.templates)
+        ? data.templates
+        : []
+    );
+  } catch (error) {
+    console.error(
+      "Week template load error:",
+      error
+    );
+
+    setPlannerMessage(
+      error.message ||
+        "Unable to load week templates"
+    );
+  } finally {
+    setLoadingWeekTemplates(false);
+  }
+}
+
+async function handleSaveWeekTemplate() {
+  const cleanName =
+    templateName.trim();
+
+  if (
+    !cleanName ||
+    savingWeekTemplate ||
+    meals.length === 0
+  ) {
+    return;
+  }
+
+  const existingTemplate =
+    weekTemplates.find(
+      (template) =>
+        String(template.name || "")
+          .trim()
+          .toLowerCase() ===
+        cleanName.toLowerCase()
+    );
+
+  if (existingTemplate) {
+    setTemplateReplaceError("");
+    setDuplicateWeekTemplate({
+      ...existingTemplate,
+      replacementName: cleanName,
+    });
+
+    return;
+  }
+
+  setSavingWeekTemplate(true);
+
+  try {
+    const templateMeals =
+      meals.map((meal) => {
+        const mealDate =
+          new Date(
+            `${meal.meal_date}T12:00:00`
+          );
+
+        const startDate =
+          new Date(weekStart);
+
+        startDate.setHours(
+          12,
+          0,
+          0,
+          0
+        );
+
+        const dayOffset =
+          Math.round(
+            (
+              mealDate.getTime() -
+              startDate.getTime()
+            ) /
+              (
+                1000 *
+                60 *
+                60 *
+                24
+              )
+          );
+
+        return {
+          dayOffset,
+
+          title:
+            meal.title,
+
+          mealTime:
+            meal.meal_time || null,
+
+          description:
+            meal.description || null,
+
+          recipeUrl:
+            meal.recipe_url || null,
+
+          ingredients:
+            meal.ingredients || null,
+
+          recipeId:
+            meal.recipe_id || null,
+
+          reminderEnabled:
+            Boolean(
+              meal.reminder_enabled
+            ),
+
+          reminderMinutes:
+            meal.reminder_minutes ??
+            null,
+
+          memberIds: (
+            meal.members || []
+          ).map(
+            (member) => member.id
+          ),
+        };
+      });
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/meal-templates`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+
+        body: JSON.stringify({
+          name: cleanName,
+          meals: templateMeals,
+        }),
+      }
+    );
+
+    const data =
+      await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          "Unable to save week template"
+      );
+    }
+
+    if (data.template) {
+      setWeekTemplates(
+        (current) => [
+          data.template,
+          ...current,
+        ]
+      );
+    }
+
+    setTemplateName("");
+    setSaveTemplateOpen(false);
+  } catch (error) {
+    console.error(
+      "Save week template error:",
+      error
+    );
+
+    window.alert(
+      error.message ||
+        "Unable to save week template"
+    );
+  } finally {
+    setSavingWeekTemplate(false);
+  }
+}
+
+
+async function handleCopySelectedPreviousMeals() {
+  const mealsToCopy =
+    previousWeekMeals.filter(
+      (meal) =>
+        selectedPreviousMeals.includes(
+          meal.id
+        )
+    );
+
+  if (mealsToCopy.length === 0) {
+    return;
+  }
+
+  setLoadingPreviousWeek(true);
+
+  try {
+    const copiedMeals = [];
+    const skippedMeals = [];
+
+    for (const meal of mealsToCopy) {
+      const originalDate =
+        new Date(
+          `${meal.meal_date}T12:00:00`
+        );
+
+      const targetDate =
+        toDateKey(
+          addDays(originalDate, 7)
+        );
+
+      const existingDinner =
+        meals.find(
+          (currentMeal) =>
+            currentMeal.meal_date ===
+              targetDate &&
+            currentMeal.meal_type ===
+              "dinner"
+        );
+
+      if (existingDinner) {
+        skippedMeals.push({
+          meal,
+          targetDate,
+          existingDinner,
+        });
+
+        continue;
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/meals`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            title: meal.title,
+
+            mealDate: targetDate,
+
+            mealType: "dinner",
+
+            description:
+              meal.description || null,
+
+            recipeUrl:
+              meal.recipe_url || null,
+
+            ingredients:
+              meal.ingredients || null,
+
+            recipeId:
+              meal.recipe_id || null,
+
+            memberIds: (
+              meal.members || []
+            ).map(
+              (member) => member.id
+            ),
+          }),
+        }
+      );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            `Unable to copy "${meal.title}"`
+        );
+      }
+
+      if (data.meal) {
+        copiedMeals.push(
+          data.meal
+        );
+      }
+    }
+
+    if (copiedMeals.length > 0) {
+      setMeals((current) => [
+        ...current,
+        ...copiedMeals,
+      ]);
+    }
+
+    setCopyLastWeekOpen(false);
+
+    setPreviousWeekMeals([]);
+
+    setSelectedPreviousMeals([]);
+
+    if (
+      copiedMeals.length > 0 &&
+      skippedMeals.length > 0
+    ) {
+      setShoppingMessage(
+        `${copiedMeals.length} dinner${
+          copiedMeals.length === 1
+            ? ""
+            : "s"
+        } copied. ${
+          skippedMeals.length
+        } occupied day${
+          skippedMeals.length === 1
+            ? " was"
+            : "s were"
+        } skipped.`
+      );
+    } else if (
+      skippedMeals.length > 0
+    ) {
+      setShoppingMessage(
+        `Nothing copied. ${
+          skippedMeals.length
+        } selected day${
+          skippedMeals.length === 1
+            ? " already has"
+            : "s already have"
+        } dinner planned.`
+      );
+    } else {
+      setShoppingMessage(
+        `${copiedMeals.length} dinner${
+          copiedMeals.length === 1
+            ? ""
+            : "s"
+        } copied from last week.`
+      );
+    }
+  } catch (error) {
+    console.error(
+      "Copy last week error:",
+      error
+    );
+
+    setShoppingMessage(
+      error.message ||
+        "Unable to copy last week's dinners"
+    );
+  } finally {
+    setLoadingPreviousWeek(false);
+  }
+}
+
+async function handleUseWeekTemplate(
+  template
+) {
+  if (
+    !template ||
+    loadingWeekTemplates
+  ) {
+    return;
+  }
+
+  const templateMeals =
+    Array.isArray(template.meals)
+      ? template.meals
+      : [];
+
+  if (templateMeals.length === 0) {
+    window.alert(
+      "This template does not contain any dinners."
+    );
+
+    return;
+  }
+
+  setLoadingWeekTemplates(true);
+
+  try {
+    const createdMeals = [];
+    const skippedMeals = [];
+
+    for (
+      const templateMeal of templateMeals
+    ) {
+      const dayOffset =
+        Number(
+          templateMeal.day_offset
+        );
+
+      if (
+        !Number.isInteger(dayOffset) ||
+        dayOffset < 0 ||
+        dayOffset > 6
+      ) {
+        continue;
+      }
+
+      const targetDate =
+        toDateKey(
+          addDays(
+            weekStart,
+            dayOffset
+          )
+        );
+
+      const existingDinner =
+        meals.find(
+          (meal) =>
+            meal.meal_date ===
+              targetDate &&
+            meal.meal_type ===
+              "dinner"
+        );
+
+      if (existingDinner) {
+        skippedMeals.push({
+          templateMeal,
+          targetDate,
+          existingDinner,
+        });
+
+        continue;
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/meals`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            title:
+              templateMeal.title,
+
+            mealDate:
+              targetDate,
+
+            mealType:
+              "dinner",
+
+            mealTime:
+              templateMeal.meal_time ||
+              null,
+
+            description:
+              templateMeal.description ||
+              null,
+
+            recipeUrl:
+              templateMeal.recipe_url ||
+              null,
+
+            ingredients:
+              templateMeal.ingredients ||
+              null,
+
+            recipeId:
+              templateMeal.recipe_id ||
+              null,
+
+            reminderEnabled:
+              Boolean(
+                templateMeal.reminder_enabled
+              ),
+
+            reminderMinutes:
+              templateMeal.reminder_minutes ??
+              null,
+
+            memberIds: (
+              templateMeal.members || []
+            ).map(
+              (member) => member.id
+            ),
+          }),
+        }
+      );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            `Unable to add "${templateMeal.title}"`
+        );
+      }
+
+      if (data.meal) {
+        createdMeals.push(
+          data.meal
+        );
+      }
+    }
+
+    if (createdMeals.length > 0) {
+      setMeals((current) => [
+        ...current,
+        ...createdMeals,
+      ]);
+    }
+
+    setWeekTemplatesOpen(false);
+
+if (
+  createdMeals.length > 0 &&
+  skippedMeals.length > 0
+) {
+  setPlannerMessage(
+    `${createdMeals.length} dinner${
+      createdMeals.length === 1
+        ? ""
+        : "s"
+    } added from "${template.name}" · ${
+      skippedMeals.length
+    } occupied day${
+      skippedMeals.length === 1
+        ? ""
+        : "s"
+    } skipped`
+  );
+} else if (
+  skippedMeals.length > 0
+) {
+  setPlannerMessage(
+    `Nothing added · ${
+      skippedMeals.length
+    } day${
+      skippedMeals.length === 1
+        ? " already has"
+        : "s already have"
+    } dinner planned`
+  );
+} else {
+  setPlannerMessage(
+    `${createdMeals.length} dinner${
+      createdMeals.length === 1
+        ? ""
+        : "s"
+    } added from "${template.name}"`
+  );
+}
+  } catch (error) {
+    console.error(
+      "Use week template error:",
+      error
+    );
+
+    window.alert(
+      error.message ||
+        "Unable to use week template"
+    );
+  } finally {
+    setLoadingWeekTemplates(false);
+  }
+}
+
+async function handleReplaceWeekTemplate() {
+  if (
+    !duplicateWeekTemplate ||
+    savingWeekTemplate ||
+    replacingTemplateRef.current ||
+    meals.length === 0
+  ) {
+    return;
+  }
+
+  replacingTemplateRef.current = true;
+  setTemplateReplaceError("");
+  setSavingWeekTemplate(true);
+
+  try {
+    const templateMeals =
+      meals.map((meal) => {
+        const mealDate =
+          new Date(
+            `${meal.meal_date}T12:00:00`
+          );
+
+        const startDate =
+          new Date(weekStart);
+
+        startDate.setHours(
+          12,
+          0,
+          0,
+          0
+        );
+
+        const dayOffset =
+          Math.round(
+            (
+              mealDate.getTime() -
+              startDate.getTime()
+            ) /
+              (
+                1000 *
+                60 *
+                60 *
+                24
+              )
+          );
+
+        return {
+          dayOffset,
+
+          title:
+            meal.title,
+
+          mealTime:
+            meal.meal_time || null,
+
+          description:
+            meal.description || null,
+
+          recipeUrl:
+            meal.recipe_url || null,
+
+          ingredients:
+            meal.ingredients || null,
+
+          recipeId:
+            meal.recipe_id || null,
+
+          reminderEnabled:
+            Boolean(
+              meal.reminder_enabled
+            ),
+
+          reminderMinutes:
+            meal.reminder_minutes ??
+            null,
+
+          memberIds: (
+            meal.members || []
+          ).map(
+            (member) => member.id
+          ),
+        };
+      });
+
+    // One server transaction preserves the saved template if any step fails.
+    const replaceResponse = await fetch(
+      `${API_BASE_URL}/api/meal-templates/${duplicateWeekTemplate.id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: duplicateWeekTemplate.replacementName || duplicateWeekTemplate.name,
+          meals: templateMeals,
+        }),
+      }
+    );
+
+    const replaceData =
+      await replaceResponse.json();
+
+    if (!replaceResponse.ok) {
+      throw new Error(
+        replaceData.error ||
+          "Unable to save replacement template"
+      );
+    }
+
+    /*
+     * Replace the old template in
+     * frontend state.
+     */
+    setWeekTemplates(
+      (current) => [
+        replaceData.template,
+        ...current.filter(
+          (template) =>
+            Number(template.id) !==
+            Number(
+              duplicateWeekTemplate.id
+            )
+        ),
+      ]
+    );
+
+    const replacedName =
+      duplicateWeekTemplate
+        .replacementName ||
+      duplicateWeekTemplate.name;
+
+    setDuplicateWeekTemplate(null);
+    setTemplateName("");
+    setSaveTemplateOpen(false);
+
+    setPlannerMessage(
+      `"${replacedName}" template updated`
+    );
+  } catch (error) {
+    console.error(
+      "Replace week template error:",
+      error
+    );
+
+    setTemplateReplaceError(
+      error.message || "Unable to replace week template. Please try again."
+    );
+  } finally {
+    replacingTemplateRef.current = false;
+    setSavingWeekTemplate(false);
+  }
+}
+
+async function handleDeleteWeekTemplate(
+  template
+) {
+  if (
+    !template ||
+    deletingWeekTemplate
+  ) {
+    return;
+  }
+
+  setDeletingWeekTemplate(true);
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/meal-templates/${template.id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    const data =
+      await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          "Unable to delete week template"
+      );
+    }
+
+    setWeekTemplates(
+      (current) =>
+        current.filter(
+          (item) =>
+            Number(item.id) !==
+            Number(template.id)
+        )
+    );
+
+    setTemplateToDelete(null);
+
+    setPlannerMessage(
+      `"${template.name}" template deleted`
+    );
+  } catch (error) {
+    console.error(
+      "Delete week template error:",
+      error
+    );
+
+    window.alert(
+      error.message ||
+        "Unable to delete week template"
+    );
+  } finally {
+    setDeletingWeekTemplate(false);
+  }
+}
+
+
 async function handleCopyMeal() {
   if (!mealToCopy || !copyMealDate) {
     return;
@@ -799,38 +1892,82 @@ async function handleCopyMeal() {
   }
 }
 
-  function normalizePantryName(value) {
-    let normalized = String(
-      value || ""
+function normalizePantryName(value) {
+  let normalized = String(
+    value || ""
+  )
+    .trim()
+    .toLowerCase();
+
+  /*
+   * Remove a recipe quantity from the beginning
+   * before comparing the ingredient with Pantry.
+   *
+   * Examples:
+   *
+   * 2 Garlic Cloves
+   *   -> Garlic Cloves
+   *
+   * 750g Ground Lamb Mince Or Beef
+   *   -> Ground Lamb Mince Or Beef
+   *
+   * 1 1/2 tbsp Olive Oil
+   *   -> Olive Oil
+   */
+  normalized = normalized
+    .replace(
+      /^\s*\d+\s+\d+\s*\/\s*\d+\s*/i,
+      ""
     )
-      .trim()
-      .toLowerCase()
-      .replace(/[^\w\s]/g, "")
-      .replace(/\s+/g, " ");
+    .replace(
+      /^\s*\d+\s*\/\s*\d+\s*/i,
+      ""
+    )
+    .replace(
+      /^\s*\d+(?:\.\d+)?\s*/i,
+      ""
+    );
 
-    if (
-      normalized.endsWith("ies") &&
-      normalized.length > 4
-    ) {
-      normalized =
-        normalized.slice(0, -3) + "y";
-    } else if (
-      normalized.endsWith("es") &&
-      normalized.length > 4
-    ) {
-      normalized =
-        normalized.slice(0, -2);
-    } else if (
-      normalized.endsWith("s") &&
-      !normalized.endsWith("ss") &&
-      normalized.length > 3
-    ) {
-      normalized =
-        normalized.slice(0, -1);
-    }
+  /*
+   * Remove a measurement unit left at
+   * the beginning after the quantity.
+   */
+  normalized = normalized.replace(
+    /^(?:kg|g|mg|l|ml|cup|cups|tbsp|tablespoon|tablespoons|tsp|teaspoon|teaspoons|oz|ounce|ounces|lb|lbs|pound|pounds)\b\.?\s*/i,
+    ""
+  );
 
-    return normalized;
+  /*
+   * Normal Pantry-name cleanup.
+   */
+  normalized = normalized
+    .replace(/[^\w\s]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (
+    normalized.endsWith("ies") &&
+    normalized.length > 4
+  ) {
+    normalized =
+      normalized.slice(0, -3) + "y";
+  } else if (
+    normalized.endsWith("es") &&
+    normalized.length > 4
+  ) {
+    normalized =
+      normalized.slice(0, -2);
+  } else if (
+    normalized.endsWith("s") &&
+    !normalized.endsWith("ss") &&
+    normalized.length > 3
+  ) {
+    normalized =
+      normalized.slice(0, -1);
   }
+
+  return normalized;
+}
 
   function weekIngredientMatchesPantry(
     ingredient
@@ -868,54 +2005,91 @@ async function handleCopyMeal() {
     );
   }
 
-    async function handleWheelGroupChange(
-    value
-  ) {
+  function handleWheelGroupChange(value) {
     setWheelGroup(value);
     setWheelResult(null);
     setWheelRotation(0);
+  }
 
-    if (
-      !value.startsWith("custom:")
-    ) {
-      setWheelCustomRecipes([]);
+  useEffect(() => {
+    let cancelled = false;
+    let inFlight = false;
+    const controller = new AbortController();
+
+    setWheelCustomRecipes([]);
+
+    if (!wheelGroup.startsWith("custom:")) {
+      setWheelCustomGroupLoading(false);
       return;
     }
 
-    const groupId =
-      value.replace("custom:", "");
+    const groupId = wheelGroup.replace("custom:", "");
 
     setWheelCustomGroupLoading(true);
 
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/meal-wheel-groups/${groupId}`
-      );
+    async function loadSelectedWheelGroup() {
+      if (cancelled || inFlight) return;
 
-      const data =
-        await response.json();
+      inFlight = true;
 
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-            "Unable to load wheel group"
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/meal-wheel-groups/${groupId}`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
         );
+
+        if (cancelled) return;
+
+        if (response.status === 404) {
+          setWheelGroup("all");
+          setWheelCustomRecipes([]);
+          setWheelResult(null);
+          setWheelRotation(0);
+          return;
+        }
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error || "Unable to load wheel group"
+          );
+        }
+
+        if (cancelled) return;
+
+        setWheelCustomRecipes(data.group.recipes || []);
+      } catch (error) {
+        if (cancelled || error.name === "AbortError") return;
+
+        console.error(
+          "Selected wheel group refresh error:",
+          error
+        );
+      } finally {
+        inFlight = false;
+
+        if (!cancelled) {
+          setWheelCustomGroupLoading(false);
+        }
       }
-
-      setWheelCustomRecipes(
-        data.group.recipes || []
-      );
-    } catch (error) {
-      console.error(
-        "Unable to load custom wheel group:",
-        error
-      );
-
-      setWheelCustomRecipes([]);
-    } finally {
-      setWheelCustomGroupLoading(false);
     }
-  }
+
+    loadSelectedWheelGroup();
+
+    const stopAutoRefresh = startAutoRefresh(
+      loadSelectedWheelGroup
+    );
+
+    return () => {
+      cancelled = true;
+      stopAutoRefresh();
+      controller.abort();
+    };
+  }, [wheelGroup]);
 
     async function renameWheelGroup(
     group
@@ -1389,44 +2563,54 @@ setWheelSpinning(false);
         ingredients
       );
 
+      const pantryHasIngredient = (
+        ingredient
+      ) => {
+        const ingredientName =
+          normalizePantryName(
+            ingredient?.name
+          );
+
+        if (!ingredientName) {
+          return false;
+        }
+
+        return availablePantryItems.some(
+          (pantryItem) => {
+            const pantryName =
+              normalizePantryName(
+                pantryItem.name
+              );
+
+            if (!pantryName) {
+              return false;
+            }
+
+            return (
+              ingredientName === pantryName ||
+              ingredientName.includes(
+                pantryName
+              ) ||
+              pantryName.includes(
+                ingredientName
+              )
+            );
+          }
+        );
+      };
+
       const ingredientsToBuy =
         ingredients
           .map((ingredient, index) => ({
             ingredient,
             index,
           }))
-          .filter(({ ingredient }) => {
-            const ingredientName =
-              ingredient?.name
-                ?.trim()
-                .toLowerCase();
-
-            if (!ingredientName) {
-              return true;
-            }
-
-            return !availablePantryItems.some(
-              (pantryItem) => {
-                const pantryName =
-                  pantryItem.name
-                    ?.trim()
-                    .toLowerCase();
-
-                if (!pantryName) {
-                  return false;
-                }
-
-                return (
-                  ingredientName.includes(
-                    pantryName
-                  ) ||
-                  pantryName.includes(
-                    ingredientName
-                  )
-                );
-              }
-            );
-          })
+          .filter(
+            ({ ingredient }) =>
+              !pantryHasIngredient(
+                ingredient
+              )
+          )
           .map(({ index }) => index);
 
       setSelectedWeekIngredients(
@@ -1506,14 +2690,7 @@ setWheelSpinning(false);
 body: JSON.stringify({
   name: ingredient.name,
   quantity:
-    ingredient.quantity ||
-    (
-      ingredient.occurrences > 1
-        ? String(
-            ingredient.occurrences
-          )
-        : null
-    ),
+    ingredient.quantity || "1",
   category: "other",
   notes:
     `Meal plan: ${ingredient.recipeTitles.join(
@@ -1582,14 +2759,14 @@ body: JSON.stringify({
 
     <h2>
       {view === "planner"
-        ? "Meal Planner"
+        ? "Dinner Planner"
         : "Recipe Library"}
     </h2>
 
     <p>
       {view === "planner"
-        ? "Plan meals for the family and keep dinner organised."
-        : "Save your favourite family meals, recipes and photos."}
+        ? "Plan the family's dinners for the week and keep everything organised."
+        : "Save your favourite family dinners, recipes and photos."}
     </p>
 
 
@@ -1614,7 +2791,7 @@ body: JSON.stringify({
           <span>
             {view === "recipes"
               ? "Add Recipe"
-              : "Add Meal"}
+              : "Add Dinner"}
           </span>
         </button>
       </section>
@@ -1690,7 +2867,7 @@ body: JSON.stringify({
           setView("planner")
         }
       >
-        Meal Planner
+Dinner Planner
       </button>
 
       <button
@@ -1708,24 +2885,72 @@ body: JSON.stringify({
       </button>
     </div>
 
-    {view === "planner" && (
-      <button
-        type="button"
-        className="meal-add-week-shopping"
-        onClick={
-          handleAddWeekToShopping
-        }
-        disabled={
-          addingWeekToShopping
-        }
-      >
-        <ShoppingCart size={16} />
+{view === "planner" && (
+  <>
+<button
+  type="button"
+  className="meal-copy-last-week"
+  onClick={
+    handleOpenCopyLastWeek
+  }
+  disabled={
+    loadingPreviousWeek
+  }
+>
+  <Copy size={16} />
 
-        {addingWeekToShopping
-          ? "Adding..."
-          : "Add Week to Shopping"}
-      </button>
-    )}
+  {loadingPreviousWeek
+    ? "Loading..."
+    : "Copy Last Week"}
+</button>
+
+<button
+  type="button"
+  className="meal-clear-week"
+  onClick={() =>
+    setClearWeekOpen(true)
+  }
+>
+  Clear Week
+</button>
+
+<button
+  type="button"
+  className="meal-week-templates"
+  onClick={async () => {
+    await loadWeekTemplates();
+
+    setWeekTemplatesOpen(true);
+  }}
+  disabled={
+    loadingWeekTemplates
+  }
+>
+  <BookOpen size={16} />
+
+  {loadingWeekTemplates
+    ? "Loading..."
+    : "Week Templates"}
+</button>
+
+<button
+  type="button"
+  className="meal-add-week-shopping"
+      onClick={
+        handleAddWeekToShopping
+      }
+      disabled={
+        addingWeekToShopping
+      }
+    >
+      <ShoppingCart size={16} />
+
+      {addingWeekToShopping
+        ? "Adding..."
+        : "Add Week to Shopping"}
+    </button>
+  </>
+)}
     <button
       type="button"
       className="meal-random-picker-button"
@@ -1740,60 +2965,12 @@ body: JSON.stringify({
 
   </div>
 
-  {view === "planner" && (
-    <div className="meal-type-filters">
-      {[
-        "all",
-        "breakfast",
-        "lunch",
-        "dinner",
-        "snack",
-      ].map((type) => (
-        <button
-          type="button"
-          key={type}
-          className={
-            mealTypeFilter === type
-              ? "selected"
-              : ""
-          }
-          onClick={() =>
-            setMealTypeFilter(type)
-          }
-        >
-          {type === "all"
-            ? "All"
-            : type
-                .charAt(0)
-                .toUpperCase() +
-              type.slice(1)}
-        </button>
-      ))}
-    </div>
-  )}
+
 </section>
 
 {view === "recipes" && (
-        <section className="recipe-library">
-          <div className="recipe-library-toolbar">
-            <div>
-              <strong>
-                {recipes.length} saved{" "}
-                {recipes.length === 1
-                  ? "recipe"
-                  : "recipes"}
-              </strong>
-
-              <span>
-                Your family's saved meals
-                and favourites.
-              </span>
-            </div>
-
-        
-                   </div>
-
-          <div className="recipe-library-filters">
+  <section className="recipe-library">
+    <div className="recipe-library-filters">
             <input
               type="search"
               value={recipeSearch}
@@ -1853,7 +3030,7 @@ body: JSON.stringify({
               )
             )}
 
-            <div className="recipe-quick-filter-divider" />
+<span className="recipe-filter-divider" />
 
             <button
               type="button"
@@ -2086,6 +3263,875 @@ body: JSON.stringify({
           )}
         </section>
       )}
+
+
+      
+{duplicateWeekTemplate && (
+  <div
+    className="event-modal-backdrop duplicate-template-backdrop"
+    onMouseDown={(event) => {
+      if (
+        event.target ===
+          event.currentTarget &&
+        !savingWeekTemplate
+      ) {
+        setDuplicateWeekTemplate(null);
+      }
+    }}
+  >
+    <div
+      className="duplicate-template-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="duplicate-template-title"
+    >
+      <div className="duplicate-template-header">
+        <div>
+          <p className="section-kicker">
+            Week Templates
+          </p>
+
+          <h2 id="duplicate-template-title">
+            Template Already Exists
+          </h2>
+
+          <p>
+            A template called “
+            {duplicateWeekTemplate.name}”
+            already exists.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="meal-wheel-close"
+          onClick={() =>
+            setDuplicateWeekTemplate(null)
+          }
+          disabled={
+            savingWeekTemplate
+          }
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="duplicate-template-body">
+        {templateReplaceError && (
+          <p role="alert">{templateReplaceError}</p>
+        )}
+        <div className="duplicate-template-info">
+          <strong>
+            Replace the existing template?
+          </strong>
+
+          <span>
+            The saved “
+            {duplicateWeekTemplate.name}”
+            template will be replaced with
+            the dinners currently shown in
+            this week.
+          </span>
+
+          <span>
+            Your recipes and dinners already
+            on the planner will not be
+            affected.
+          </span>
+        </div>
+      </div>
+
+      <div className="duplicate-template-footer">
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={() =>
+            setDuplicateWeekTemplate(null)
+          }
+          disabled={
+            savingWeekTemplate
+          }
+        >
+          Cancel
+        </button>
+
+<button
+  type="button"
+  className="duplicate-template-replace"
+  onClick={
+    handleReplaceWeekTemplate
+  }
+  disabled={
+    savingWeekTemplate
+  }
+>
+  {savingWeekTemplate
+    ? "Replacing..."
+    : "Replace Existing"}
+</button>
+      </div>
+    </div>
+  </div>
+)}
+
+{templateToDelete && (
+  <div
+    className="event-modal-backdrop delete-template-backdrop"
+    onMouseDown={(event) => {
+      if (
+        event.target ===
+          event.currentTarget &&
+        !deletingWeekTemplate
+      ) {
+        setTemplateToDelete(null);
+      }
+    }}
+  >
+    <div
+      className="delete-template-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="delete-template-title"
+    >
+      <div className="delete-template-header">
+        <div>
+          <p className="section-kicker">
+            Week Templates
+          </p>
+
+          <h2 id="delete-template-title">
+            Delete “{templateToDelete.name}”?
+          </h2>
+
+          <p>
+            This will permanently remove
+            this saved week template.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="meal-wheel-close"
+          onClick={() =>
+            setTemplateToDelete(null)
+          }
+          disabled={
+            deletingWeekTemplate
+          }
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="delete-template-body">
+        <div className="delete-template-warning">
+          <strong>
+            Your recipes and planned dinners
+            will not be affected.
+          </strong>
+
+          <span>
+            Only the saved “
+            {templateToDelete.name}” week
+            template will be deleted.
+          </span>
+        </div>
+      </div>
+
+      <div className="delete-template-footer">
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={() =>
+            setTemplateToDelete(null)
+          }
+          disabled={
+            deletingWeekTemplate
+          }
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          className="delete-template-confirm"
+          onClick={() =>
+            handleDeleteWeekTemplate(
+              templateToDelete
+            )
+          }
+          disabled={
+            deletingWeekTemplate
+          }
+        >
+          {deletingWeekTemplate
+            ? "Deleting..."
+            : "Delete Template"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{saveTemplateOpen && (
+  <div
+    className="event-modal-backdrop save-template-backdrop"
+    onMouseDown={(event) => {
+      if (
+        event.target ===
+        event.currentTarget
+      ) {
+        setSaveTemplateOpen(false);
+      }
+    }}
+  >
+    <div
+      className="save-template-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="save-template-title"
+    >
+      <div className="save-template-header">
+        <div>
+          <p className="section-kicker">
+            Week Templates
+          </p>
+
+          <h2 id="save-template-title">
+            Save Current Week
+          </h2>
+
+          <p>
+            Give this dinner plan a name so
+            you can use it again later.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="meal-wheel-close"
+          onClick={() =>
+            setSaveTemplateOpen(false)
+          }
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="save-template-body">
+        <label
+          className="save-template-field"
+        >
+          <span>
+            Template Name
+          </span>
+
+          <input
+            type="text"
+            value={templateName}
+            onChange={(event) =>
+              setTemplateName(
+                event.target.value
+              )
+            }
+            placeholder="e.g. Normal Week"
+            autoFocus
+            maxLength={50}
+          />
+        </label>
+
+        <div className="save-template-summary">
+          <BookOpen size={18} />
+
+          <div>
+            <strong>
+              {meals.length}{" "}
+              {meals.length === 1
+                ? "dinner"
+                : "dinners"}{" "}
+              will be saved
+            </strong>
+
+            <span>
+              Your recipes remain in the
+              Recipe Library.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="save-template-footer">
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={() =>
+            setSaveTemplateOpen(false)
+          }
+        >
+          Cancel
+        </button>
+
+<button
+  type="button"
+  className="save-template-confirm"
+  onClick={
+    handleSaveWeekTemplate
+  }
+  disabled={
+    !templateName.trim() ||
+    savingWeekTemplate
+  }
+>
+  {savingWeekTemplate
+    ? "Saving..."
+    : "Save Template"}
+</button>
+      </div>
+    </div>
+  </div>
+)}
+
+{weekTemplatesOpen && (
+  <div
+    className="event-modal-backdrop"
+    onMouseDown={(event) => {
+      if (
+        event.target ===
+        event.currentTarget
+      ) {
+        setWeekTemplatesOpen(false);
+      }
+    }}
+  >
+    <div
+      className="week-templates-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="week-templates-title"
+    >
+      <div className="week-templates-header">
+        <div>
+          <p className="section-kicker">
+            Dinner Planner
+          </p>
+
+          <h2 id="week-templates-title">
+            Week Templates
+          </h2>
+
+          <p>
+            Save favourite dinner plans and
+            reuse them on any week.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="meal-wheel-close"
+          onClick={() =>
+            setWeekTemplatesOpen(false)
+          }
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="week-templates-toolbar">
+        <div>
+          <strong>
+            Saved Templates
+          </strong>
+
+          <span>
+            {weekTemplates.length}{" "}
+            {weekTemplates.length === 1
+              ? "template"
+              : "templates"}
+          </span>
+        </div>
+
+<button
+  type="button"
+  className="week-template-save-current"
+  onClick={() => {
+    setTemplateName("");
+    setSaveTemplateOpen(true);
+  }}
+  disabled={
+    meals.length === 0
+  }
+>
+  <Plus size={16} />
+  Save Current Week
+</button>
+      </div>
+
+      {weekTemplates.length === 0 ? (
+        <div className="week-templates-empty">
+          <BookOpen size={38} />
+
+          <strong>
+            No week templates yet
+          </strong>
+
+          <span>
+            Plan some dinners, then save the
+            week so you can use it again later.
+          </span>
+        </div>
+      ) : (
+        <div className="week-templates-list">
+          {weekTemplates.map(
+            (template) => (
+              <div
+                key={template.id}
+                className="week-template-card"
+              >
+                <div className="week-template-card-copy">
+                  <strong>
+                    {template.name}
+                  </strong>
+
+                  <span>
+                    {template.meals?.length || 0}{" "}
+                    dinners
+                  </span>
+                </div>
+
+<div className="week-template-actions">
+
+<button
+  type="button"
+  className="week-template-delete"
+  onClick={() =>
+    setTemplateToDelete(
+      template
+    )
+  }
+  disabled={
+    loadingWeekTemplates ||
+    deletingWeekTemplate
+  }
+>
+  Delete
+</button>
+
+  <button
+    type="button"
+    className="week-template-use"
+    onClick={() =>
+      handleUseWeekTemplate(
+        template
+      )
+    }
+    disabled={
+      loadingWeekTemplates
+    }
+  >
+    {loadingWeekTemplates
+      ? "Applying..."
+      : "Use Template"}
+  </button>
+</div>
+              </div>
+            )
+          )}
+        </div>
+      )}
+
+      <div className="week-templates-footer">
+        <span>
+          Templates save the dinner plan,
+          not copies of your recipes.
+        </span>
+
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={() =>
+            setWeekTemplatesOpen(false)
+          }
+        >
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{clearWeekOpen && (
+  <div
+    className="event-modal-backdrop"
+    onMouseDown={(event) => {
+      if (
+        event.target ===
+        event.currentTarget
+      ) {
+        setClearWeekOpen(false);
+      }
+    }}
+  >
+    <div
+      className="clear-week-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="clear-week-title"
+    >
+      <div className="clear-week-header">
+        <div>
+          <p className="section-kicker">
+            Dinner Planner
+          </p>
+
+          <h2 id="clear-week-title">
+            Clear This Week?
+          </h2>
+
+          <p>
+            This will remove the planned
+            dinners from{" "}
+            <strong>
+              {formatWeekStart(weekStart)}
+              {" – "}
+              {formatWeekEnd(weekEnd)}
+            </strong>
+            .
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="meal-wheel-close"
+          onClick={() =>
+            setClearWeekOpen(false)
+          }
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      {meals.length === 0 ? (
+        <div className="clear-week-empty">
+          <Utensils size={32} />
+
+          <strong>
+            Nothing to clear
+          </strong>
+
+          <span>
+            There are no dinners planned
+            for this week.
+          </span>
+        </div>
+      ) : (
+        <div className="clear-week-list">
+          {meals.map((meal) => {
+            const mealDate =
+              new Date(
+                `${meal.meal_date}T12:00:00`
+              );
+
+            const dayName =
+              new Intl.DateTimeFormat(
+                "en-AU",
+                {
+                  weekday: "long",
+                }
+              ).format(mealDate);
+
+            return (
+              <div
+                key={meal.id}
+                className="clear-week-item"
+              >
+                <span className="clear-week-day">
+                  {dayName}
+                </span>
+
+                <div className="clear-week-meal">
+                  <strong>
+                    {meal.title}
+                  </strong>
+
+                  <span>
+                    {meal.recipe_id
+                      ? "Linked recipe"
+                      : "Manual dinner"}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="clear-week-footer">
+        <span className="clear-week-warning">
+          Saved recipes will not be deleted.
+        </span>
+
+        <div>
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={() =>
+              setClearWeekOpen(false)
+            }
+          >
+            Cancel
+          </button>
+
+<button
+  type="button"
+  className="clear-week-confirm"
+  onClick={
+    handleClearWeek
+  }
+  disabled={
+    meals.length === 0 ||
+    clearingWeek
+  }
+>
+  {clearingWeek
+    ? "Clearing..."
+    : `Clear ${
+        meals.length
+      } ${
+        meals.length === 1
+          ? "Dinner"
+          : "Dinners"
+      }`}
+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+{copyLastWeekOpen && (
+  <div
+    className="event-modal-backdrop"
+    onMouseDown={(event) => {
+      if (
+        event.target ===
+        event.currentTarget
+      ) {
+        setCopyLastWeekOpen(false);
+      }
+    }}
+  >
+    <div
+      className="copy-last-week-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="copy-last-week-title"
+    >
+      <div className="copy-last-week-header">
+        <div>
+          <p className="section-kicker">
+            Dinner Planner
+          </p>
+
+          <h2 id="copy-last-week-title">
+            Copy Last Week
+          </h2>
+
+          <p>
+            Choose which dinners to copy
+            into this week.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="meal-wheel-close"
+          onClick={() =>
+            setCopyLastWeekOpen(false)
+          }
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      {previousWeekMeals.length === 0 ? (
+        <div className="copy-last-week-empty">
+          <Utensils size={32} />
+
+          <strong>
+            No dinners last week
+          </strong>
+
+          <span>
+            There are no dinners to copy
+            from the previous week.
+          </span>
+        </div>
+      ) : (
+        <>
+          <div className="copy-last-week-tools">
+            <button
+              type="button"
+              onClick={() =>
+                setSelectedPreviousMeals(
+                  previousWeekMeals.map(
+                    (meal) => meal.id
+                  )
+                )
+              }
+            >
+              Select all
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                setSelectedPreviousMeals([])
+              }
+            >
+              Clear all
+            </button>
+
+            <span>
+              {
+                selectedPreviousMeals.length
+              }{" "}
+              selected
+            </span>
+          </div>
+
+          <div className="copy-last-week-list">
+            {previousWeekMeals.map(
+              (meal) => {
+                const selected =
+                  selectedPreviousMeals.includes(
+                    meal.id
+                  );
+
+                const mealDate =
+                  new Date(
+                    `${meal.meal_date}T12:00:00`
+                  );
+
+                const dayName =
+                  new Intl.DateTimeFormat(
+                    "en-AU",
+                    {
+                      weekday: "long",
+                    }
+                  ).format(mealDate);
+
+                const linkedRecipe =
+                  meal.recipe_id
+                    ? recipes.find(
+                        (recipe) =>
+                          Number(
+                            recipe.id
+                          ) ===
+                          Number(
+                            meal.recipe_id
+                          )
+                      )
+                    : null;
+
+                return (
+                  <button
+                    type="button"
+                    key={meal.id}
+                    className={`copy-last-week-item ${
+                      selected
+                        ? "selected"
+                        : ""
+                    }`}
+                    onClick={() => {
+                      setSelectedPreviousMeals(
+                        (current) =>
+                          current.includes(
+                            meal.id
+                          )
+                            ? current.filter(
+                                (id) =>
+                                  id !==
+                                  meal.id
+                              )
+                            : [
+                                ...current,
+                                meal.id,
+                              ]
+                      );
+                    }}
+                  >
+                    <span className="copy-last-week-check">
+                      {selected ? "✓" : ""}
+                    </span>
+
+                    <span className="copy-last-week-day">
+                      {dayName}
+                    </span>
+
+                    <span className="copy-last-week-meal">
+                      <strong>
+                        {meal.title}
+                      </strong>
+
+                      <small>
+                        {linkedRecipe
+                          ? "Recipe"
+                          : "Manual dinner"}
+                      </small>
+                    </span>
+                  </button>
+                );
+              }
+            )}
+          </div>
+        </>
+      )}
+
+      <div className="copy-last-week-footer">
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={() =>
+            setCopyLastWeekOpen(false)
+          }
+        >
+          Cancel
+        </button>
+
+<button
+  type="button"
+  className="add-event-button"
+  onClick={
+    handleCopySelectedPreviousMeals
+  }
+  disabled={
+    selectedPreviousMeals.length === 0 ||
+    loadingPreviousWeek
+  }
+>
+  <Copy size={16} />
+
+  {loadingPreviousWeek
+    ? "Copying..."
+    : `Copy ${
+        selectedPreviousMeals.length
+      } ${
+        selectedPreviousMeals.length === 1
+          ? "Dinner"
+          : "Dinners"
+      }`}
+</button>
+      </div>
+    </div>
+  </div>
+)}
+
 
       {slotRecipePicker && (
   <div
@@ -2897,13 +4943,13 @@ return (
   </div>
 )}
 
-                  {weekShoppingPickerOpen && (
-            <div className="event-modal-backdrop">
-              <div
-                className="recipe-details-modal"
-                role="dialog"
-                aria-modal="true"
-              >
+{weekShoppingPickerOpen && (
+  <div className="event-modal-backdrop">
+    <div
+      className="recipe-details-modal weekly-shopping-modal"
+      role="dialog"
+      aria-modal="true"
+    >
                 <div className="recipe-details-content">
                   <div className="recipe-details-heading">
                     <div>
@@ -2923,18 +4969,36 @@ return (
 
                   <div className="recipe-shopping-picker">
                     <div className="recipe-shopping-picker-tools">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setSelectedWeekIngredients(
-                            weekShoppingIngredients.map(
-                              (_, index) => index
-                            )
-                          )
-                        }
-                      >
-                        Select all
-                      </button>
+
+<button
+  type="button"
+  onClick={() =>
+    setSelectedWeekIngredients(
+      weekShoppingIngredients
+        .map(
+          (
+            ingredient,
+            index
+          ) => ({
+            ingredient,
+            index,
+          })
+        )
+        .filter(
+          ({ ingredient }) =>
+            !weekIngredientMatchesPantry(
+              ingredient
+            )
+        )
+        .map(
+          ({ index }) =>
+            index
+        )
+    )
+  }
+>
+  Select all
+</button>
 
                       <button
                         type="button"
@@ -3013,11 +5077,17 @@ return (
                                 )}
                               </span>
 
-                              {alreadyHave && (
-                                <span className="recipe-shopping-pantry-badge">
-                                  Already Have
-                                </span>
-                              )}
+                              <span
+                                className={`recipe-shopping-stock-badge ${
+                                  alreadyHave
+                                    ? "in-pantry"
+                                    : "need-to-buy"
+                                }`}
+                              >
+                                {alreadyHave
+                                  ? "✓ In Pantry"
+                                  : "Need to Buy"}
+                              </span>
                             </label>
                           );
                         }
@@ -3066,29 +5136,92 @@ return (
 
 
 
-            {shoppingMessage && (
-        <div className="meal-shopping-message">
-          {shoppingMessage}
-        </div>
-      )}
+{shoppingMessage && (
+  <div
+    className="meal-shopping-message meal-shopping-toast"
+    role="status"
+    aria-live="polite"
+  >
+    <div className="meal-shopping-toast-icon">
+      ✓
+    </div>
 
-      <section className="meal-week-navigation">
-        <button
-          type="button"
-          onClick={() =>
-            setWeekStart(
-              (current) =>
-                addDays(
-                  current,
-                  -7
-                )
-            )
-          }
-        >
-          ← Previous
-        </button>
+    <div className="meal-shopping-toast-copy">
+      <strong>
+        Shopping List Updated
+      </strong>
 
-        <div className="meal-week-title">
+      <span>
+        {shoppingMessage}
+      </span>
+    </div>
+
+    <button
+      type="button"
+      className="meal-shopping-toast-close"
+      onClick={() =>
+        setShoppingMessage("")
+      }
+      aria-label="Dismiss notification"
+    >
+      <X size={16} />
+    </button>
+  </div>
+)}
+
+{plannerMessage && (
+  <div
+    className="meal-planner-toast"
+    role="status"
+    aria-live="polite"
+  >
+    <div className="meal-planner-toast-icon">
+      ✓
+    </div>
+
+    <div className="meal-planner-toast-copy">
+      <strong>
+        Dinner Plan Updated
+      </strong>
+
+      <span>
+        {plannerMessage}
+      </span>
+    </div>
+
+    <button
+      type="button"
+      className="meal-planner-toast-close"
+      onClick={() =>
+        setPlannerMessage("")
+      }
+      aria-label="Dismiss notification"
+    >
+      <X size={16} />
+    </button>
+  </div>
+)}
+
+      <section className="meal-week-toolbar">
+        <div className="meal-week-range">
+          <button
+            type="button"
+            className="meal-week-previous"
+            aria-label="Previous week"
+            title="Previous week"
+            onClick={() =>
+              setWeekStart(
+                (current) =>
+                  addDays(
+                    current,
+                    -7
+                  )
+              )
+            }
+          >
+            Previous
+          </button>
+
           <strong>
             {formatWeekStart(
               weekStart
@@ -3101,6 +5234,7 @@ return (
 
           <button
             type="button"
+            className="meal-week-current"
             onClick={() =>
               setWeekStart(
                 startOfWeek(
@@ -3111,22 +5245,25 @@ return (
           >
             This week
           </button>
-        </div>
 
-        <button
-          type="button"
-          onClick={() =>
-            setWeekStart(
-              (current) =>
-                addDays(
-                  current,
-                  7
-                )
-            )
-          }
-        >
-          Next →
-        </button>
+          <button
+            type="button"
+            className="meal-week-next"
+            aria-label="Next week"
+            title="Next week"
+            onClick={() =>
+              setWeekStart(
+                (current) =>
+                  addDays(
+                    current,
+                    7
+                  )
+              )
+            }
+          >
+            Next
+          </button>
+        </div>
       </section>
 
       {loading ? (
@@ -3240,24 +5377,37 @@ return (
     );
   }}
 >
-                                <div className="meal-week-slot-heading">
-                                  <Icon
-                                    size={
-                                      15
-                                    }
-                                  />
+<div
+  className={`meal-week-slot-heading ${
+    slotMeals.length > 0
+      ? "has-meal"
+      : ""
+  }`}
+>
+  <Icon
+    size={
+      15
+    }
+  />
 
-                                  <span>
-                                    {mealType
-                                      .charAt(
-                                        0
-                                      )
-                                      .toUpperCase() +
-                                      mealType.slice(
-                                        1
-                                      )}
-                                  </span>
-                                </div>
+  <span>
+    {slotMeals.length > 0
+      ? slotMeals
+          .map(
+            (meal) =>
+              meal.title
+          )
+          .join(", ")
+      : mealType
+          .charAt(
+            0
+          )
+          .toUpperCase() +
+        mealType.slice(
+          1
+        )}
+  </span>
+</div>
 
                                 {slotMeals.length >
                                 0 ? (
@@ -3309,52 +5459,57 @@ onClick={() => {
     }
   }}
 >
-<div className="meal-week-meal-heading">
-  <strong>
-    {meal.title}
-  </strong>
+{meal.recipe_id && (() => {
+  const recipe = recipes.find(
+    (item) =>
+      Number(item.id) ===
+      Number(meal.recipe_id)
+  );
 
-  <div className="meal-week-meal-actions">
-    {meal.recipe_id && (
-      <button
-        type="button"
-        className="meal-week-recipe"
-        title="View recipe"
-        onClick={(event) => {
-          event.stopPropagation();
+  if (!recipe?.photo_url) {
+    return null;
+  }
 
-          const recipe =
-            recipes.find(
-              (item) =>
-                Number(item.id) ===
-                Number(meal.recipe_id)
-            );
-
-          if (recipe) {
-            onViewRecipe?.(recipe);
-          }
-        }}
-      >
-        <BookOpen size={14} />
-      </button>
-    )}
-
+  return (
     <button
       type="button"
-      className="meal-week-copy"
-      title="Copy meal"
+      className="meal-week-meal-photo"
+      title={`View ${meal.title} recipe`}
       onClick={(event) => {
         event.stopPropagation();
-
-        setMealToCopy(meal);
-        setCopyMealDate(
-          meal.meal_date || ""
-        );
+        onViewRecipe?.(recipe);
       }}
     >
-      <Copy size={14} />
+      <img
+        src={`${API_BASE_URL}${recipe.photo_url}`}
+        alt={meal.title}
+      />
+
+      <span className="meal-week-photo-recipe-hint">
+        <BookOpen size={14} />
+        Recipe
+      </span>
     </button>
-  </div>
+  );
+})()}
+
+<div className="meal-week-meal-actions">
+  <button
+    type="button"
+    className="meal-week-copy"
+    title="Copy dinner to another day"
+    aria-label="Copy dinner to another day"
+    onClick={(event) => {
+      event.stopPropagation();
+
+      setMealToCopy(meal);
+      setCopyMealDate(
+        meal.meal_date || ""
+      );
+    }}
+  >
+    <Copy size={16} />
+  </button>
 </div>
 
     {meal.description && (
@@ -3395,6 +5550,7 @@ onClick={() => {
                                   </div>
                                 ) : (
 <div className="meal-week-empty-actions">
+  
   <button
     type="button"
     className="meal-week-add-slot"
@@ -3405,8 +5561,8 @@ onClick={() => {
       })
     }
   >
-    <Plus size={16} />
-    Add
+    <Plus size={20} />
+    Add Dinner
   </button>
 
   <button
@@ -3443,3 +5599,4 @@ onClick={() => {
 }
 
 export default MealsPage;
+

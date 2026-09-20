@@ -7,15 +7,118 @@ import {
 import PantryItemModal from "../components/PantryItemModal";
 import FoodPicture from "../components/FoodPicture";
 import { API_BASE_URL } from "../config/api";
+import { startAutoRefresh } from "../utils/startAutoRefresh";
+
+function getPantryQuantityNumber(
+  quantity
+) {
+  if (
+    quantity === null ||
+    quantity === undefined ||
+    quantity === ""
+  ) {
+    return null;
+  }
+
+  const match = String(quantity)
+    .trim()
+    .replace(",", ".")
+    .match(/-?\d+(?:\.\d+)?/);
+
+  if (!match) {
+    return null;
+  }
+
+  const value = Number(match[0]);
+
+  return Number.isFinite(value)
+    ? value
+    : null;
+}
+
+function isPantryItemRunningLow(
+  item
+) {
+  if (
+    !Number(item?.low_stock_enabled)
+  ) {
+    return false;
+  }
+
+  const quantity =
+    getPantryQuantityNumber(
+      item?.quantity
+    );
+
+  const threshold =
+    Number(
+      item?.low_stock_threshold
+    );
+
+  if (
+    quantity === null ||
+    !Number.isFinite(threshold)
+  ) {
+    return false;
+  }
+
+  return quantity <= threshold;
+}
+
+function normalizePantryItemName(
+  value
+) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+function isPantryItemOnShoppingList(
+  pantryItem,
+  shoppingItems
+) {
+  const pantryName =
+    normalizePantryItemName(
+      pantryItem?.name
+    );
+
+  return shoppingItems.some(
+    (shoppingItem) =>
+      !shoppingItem.is_completed &&
+      normalizePantryItemName(
+        shoppingItem.name
+      ) === pantryName
+  );
+}
 
 export default function PantryPage() {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] =
-    useState(true);
-  const [error, setError] =
-    useState("");
-  const [searchTerm, setSearchTerm] =
-    useState("");
+
+const [items, setItems] = useState([]);
+
+const [
+  shoppingItems,
+  setShoppingItems,
+] = useState([]);
+
+const [
+  addingToShoppingId,
+  setAddingToShoppingId,
+] = useState(null);
+
+const [
+  adjustingQuantityId,
+  setAdjustingQuantityId,
+] = useState(null);
+
+const [loading, setLoading] =
+  useState(true);
+
+const [error, setError] =
+  useState("");
+
+const [searchTerm, setSearchTerm] =
+  useState("");
 
   const [
     categoryFilter,
@@ -29,75 +132,339 @@ export default function PantryPage() {
     useState(null);
 
   useEffect(() => {
+    let cancelled = false;
+    let inFlight = false;
+    let hasLoaded = false;
+    const controller = new AbortController();
+
+    setLoading(true);
+    setError("");
+
     async function loadPantry() {
-      setLoading(true);
-      setError("");
+      if (cancelled || inFlight) return;
+
+      inFlight = true;
 
       try {
         const response = await fetch(
-          `${API_BASE_URL}/api/pantry`
+          `${API_BASE_URL}/api/pantry`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
         );
 
-        const data =
-          await response.json();
+        const data = await response.json();
 
         if (!response.ok) {
           throw new Error(
-            data.error ||
-              "Unable to load pantry"
+            data.error || "Unable to load pantry"
           );
         }
 
-        setItems(data.items || []);
-      } catch (err) {
-        console.error(err);
+        if (cancelled) return;
 
-        setError(
-          err.message ||
-            "Unable to load pantry"
-        );
+        setItems(data.items || []);
+        setError("");
+        hasLoaded = true;
+      } catch (err) {
+        if (cancelled || err.name === "AbortError") return;
+
+        console.error("Pantry refresh error:", err);
+
+        if (!hasLoaded) {
+          setError(
+            "Unable to load pantry. Retrying…"
+          );
+        }
       } finally {
-        setLoading(false);
+        inFlight = false;
+
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     loadPantry();
-  }, []);
 
-  const filteredItems = useMemo(() => {
-    const search =
-      searchTerm.trim().toLowerCase();
+    const stopAutoRefresh = startAutoRefresh(loadPantry);
 
-    return items.filter((item) => {
-      const matchesSearch =
-        !search ||
-        [
-          item.name,
-          item.category,
-          item.notes,
-        ]
-          .filter(Boolean)
-          .some((value) =>
-            value
-              .toLowerCase()
-              .includes(search)
-          );
+    return () => {
+      cancelled = true;
+      stopAutoRefresh();
+      controller.abort();
+    };
+}, []);
 
-      const matchesCategory =
-        categoryFilter === "all" ||
-        item.category ===
-          categoryFilter;
+useEffect(() => {
+  let cancelled = false;
 
-      return (
-        matchesSearch &&
-        matchesCategory
+  async function loadShoppingItems() {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/shopping?completed=false`,
+        {
+          cache: "no-store",
+        }
       );
-    });
-  }, [
-    items,
-    searchTerm,
-    categoryFilter,
-  ]);
+
+      const data =
+        await response.json();
+
+      if (
+        !response.ok ||
+        cancelled
+      ) {
+        return;
+      }
+
+      setShoppingItems(
+        data.items || []
+      );
+    } catch (err) {
+      if (!cancelled) {
+        console.error(
+          "Unable to load Shopping items:",
+          err
+        );
+      }
+    }
+  }
+
+  loadShoppingItems();
+
+  const stopAutoRefresh =
+    startAutoRefresh(
+      loadShoppingItems
+    );
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+  };
+}, []);
+
+async function addPantryItemToShopping(
+  item
+) {
+  if (
+    addingToShoppingId !== null
+  ) {
+    return;
+  }
+
+  setAddingToShoppingId(item.id);
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/shopping/from-pantry`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          name: item.name,
+          category:
+            item.category ||
+            "other",
+        }),
+      }
+    );
+
+    const data =
+      await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          "Unable to add item to Shopping"
+      );
+    }
+
+    if (data.item) {
+      setShoppingItems(
+        (current) => {
+          const exists =
+            current.some(
+              (shoppingItem) =>
+                shoppingItem.id ===
+                data.item.id
+            );
+
+          if (exists) {
+            return current.map(
+              (shoppingItem) =>
+                shoppingItem.id ===
+                data.item.id
+                  ? data.item
+                  : shoppingItem
+            );
+          }
+
+          return [
+            ...current,
+            data.item,
+          ];
+        }
+      );
+    }
+  } catch (err) {
+    console.error(err);
+
+    window.alert(
+      err.message ||
+        "Unable to add item to Shopping"
+    );
+  } finally {
+    setAddingToShoppingId(
+      null
+    );
+  }
+}
+
+async function adjustPantryQuantity(
+  item,
+  adjustment
+) {
+  if (
+    adjustingQuantityId !== null
+  ) {
+    return;
+  }
+
+  setAdjustingQuantityId(item.id);
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/pantry/${item.id}/quantity`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          adjustment,
+        }),
+      }
+    );
+
+    const data =
+      await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          "Unable to update Pantry quantity"
+      );
+    }
+
+    if (data.item) {
+      setItems((current) =>
+        current.map(
+          (pantryItem) =>
+            pantryItem.id ===
+            data.item.id
+              ? data.item
+              : pantryItem
+        )
+      );
+    }
+
+    /*
+     * If dropping the quantity caused
+     * automatic Shopping to add this
+     * item, refresh the active Shopping
+     * list immediately so the Pantry
+     * badge changes to:
+     *
+     * ✓ On Shopping List
+     */
+    if (
+      data.automaticShopping?.added
+    ) {
+      const shoppingResponse =
+        await fetch(
+          `${API_BASE_URL}/api/shopping?completed=false`,
+          {
+            cache: "no-store",
+          }
+        );
+
+      if (shoppingResponse.ok) {
+        const shoppingData =
+          await shoppingResponse.json();
+
+        setShoppingItems(
+          shoppingData.items || []
+        );
+      }
+    }
+  } catch (err) {
+    console.error(err);
+
+    window.alert(
+      err.message ||
+        "Unable to update Pantry quantity"
+    );
+  } finally {
+    setAdjustingQuantityId(null);
+  }
+}
+
+const filteredItems = useMemo(() => {
+
+  const search =
+    searchTerm.trim().toLowerCase();
+
+  return items.filter((item) => {
+    const matchesSearch =
+      !search ||
+      [
+        item.name,
+        item.category,
+        item.notes,
+      ]
+        .filter(Boolean)
+        .some((value) =>
+          value
+            .toLowerCase()
+            .includes(search)
+        );
+
+    const matchesCategory =
+      categoryFilter === "all"
+        ? true
+        : categoryFilter ===
+            "running-low"
+          ? isPantryItemRunningLow(
+              item
+            )
+          : item.category ===
+            categoryFilter;
+
+    return (
+      matchesSearch &&
+      matchesCategory
+    );
+  });
+}, [
+  items,
+  searchTerm,
+  categoryFilter,
+]);
+
+const runningLowCount =
+  useMemo(
+    () =>
+      items.filter(
+        isPantryItemRunningLow
+      ).length,
+    [items]
+  );
 
   return (
     <div className="pantry-page">
@@ -128,73 +495,97 @@ export default function PantryPage() {
         </button>
       </section>
 
-      <section className="pantry-toolbar">
-        <div className="pantry-search">
-          <Search size={18} />
+<section className="pantry-toolbar pantry-toolbar-combined">
+  <div className="pantry-search">
+    <Search size={18} />
 
-          <input
-            type="search"
-            aria-label="Search pantry"
-            placeholder="Search pantry..."
-            value={searchTerm}
-            onChange={(event) =>
-              setSearchTerm(
-                event.target.value
-              )
-            }
-          />
-        </div>
+    <input
+      type="search"
+      placeholder="Search pantry..."
+      value={searchTerm}
+      onChange={(event) =>
+        setSearchTerm(
+          event.target.value
+        )
+      }
+    />
+  </div>
 
-        <div className="pantry-toolbar-actions">
-          <select
-            aria-label="Filter pantry by category"
-            value={categoryFilter}
-            onChange={(event) =>
-              setCategoryFilter(
-                event.target.value
-              )
-            }
-          >
-            <option value="all">
-              All categories
-            </option>
-            <option value="produce">
-              Produce
-            </option>
-            <option value="meat">
-              Meat
-            </option>
-            <option value="dairy">
-              Dairy
-            </option>
-            <option value="bakery">
-              Bakery
-            </option>
-            <option value="pantry">
-              Pantry
-            </option>
-            <option value="frozen">
-              Frozen
-            </option>
-            <option value="drinks">
-              Drinks
-            </option>
-            <option value="household">
-              Household
-            </option>
-            <option value="other">
-              Other
-            </option>
-          </select>
+  <div
+    className="pantry-category-filter"
+    role="group"
+    aria-label="Filter pantry by category"
+  >
+{[
+  ["all", "All"],
+  [
+    "running-low",
+    "Running Low",
+  ],
+  ["produce", "Produce"],
+  ["meat", "Meat"],
+  ["dairy", "Dairy"],
+  ["bakery", "Bakery"],
+  ["pantry", "Pantry"],
+  ["frozen", "Frozen"],
+  ["drinks", "Drinks"],
+  ["household", "Household"],
+  ["other", "Other"],
+].map(
+  ([value, label]) => {
+    const count =
+      value === "all"
+        ? items.length
+        : value ===
+            "running-low"
+          ? runningLowCount
+          : items.filter(
+              (item) =>
+                item.category ===
+                value
+            ).length;
 
-          <span className="pantry-count">
-            {filteredItems.length}{" "}
-            {filteredItems.length === 1
-              ? "item"
-              : "items"}
-          </span>
-        </div>
-      </section>
+    return (
+      <button
+        key={value}
+        type="button"
+        className={`pantry-category-filter-button ${
+          categoryFilter === value
+            ? "is-active"
+            : ""
+        } ${
+          value ===
+          "running-low"
+            ? "pantry-running-low-filter"
+            : ""
+        }`}
+        onClick={() =>
+          setCategoryFilter(
+            value
+          )
+        }
+        aria-pressed={
+          categoryFilter === value
+        }
+      >
+        <span>{label}</span>
+
+        <small>
+          {count}
+        </small>
+      </button>
+    );
+  }
+)}
+  </div>
+
+  <span className="pantry-count">
+    {filteredItems.length}{" "}
+    {filteredItems.length === 1
+      ? "item"
+      : "items"}
+  </span>
+</section>
 
       {loading ? (
         <div className="empty-state">
@@ -266,19 +657,121 @@ export default function PantryPage() {
 />
 
 <div className="pantry-card-content">
-  <strong>
-    {item.name}
-  </strong>
+  <div className="pantry-card-heading">
+    <strong className="pantry-card-name">
+      {item.name}
+    </strong>
 
-                <span>
-                  {item.quantity ||
-                    "In pantry"}
-                </span>
+    {item.pack_size && (
+      <span className="pantry-card-pack-size">
+        {item.pack_size}
+      </span>
+    )}
+  </div>
 
-                <small>
-                  {item.category}
-                </small>
-              </div>
+<div className="pantry-card-details">
+<div
+  className="pantry-quantity-stepper"
+  onClick={(event) =>
+    event.stopPropagation()
+  }
+>
+  <button
+    type="button"
+    className="pantry-quantity-stepper-button"
+    disabled={
+      adjustingQuantityId ===
+        item.id ||
+      Number(item.quantity) <= 0
+    }
+    onClick={(event) => {
+      event.stopPropagation();
+
+      adjustPantryQuantity(
+        item,
+        -1
+      );
+    }}
+    aria-label={`Decrease ${item.name} quantity`}
+  >
+    −
+  </button>
+
+  <span className="pantry-quantity-stepper-value">
+    {item.quantity ?? 1}
+  </span>
+
+  <button
+    type="button"
+    className="pantry-quantity-stepper-button"
+    disabled={
+      adjustingQuantityId ===
+      item.id
+    }
+    onClick={(event) => {
+      event.stopPropagation();
+
+      adjustPantryQuantity(
+        item,
+        1
+      );
+    }}
+    aria-label={`Increase ${item.name} quantity`}
+  >
+    +
+  </button>
+</div>
+
+<div className="pantry-card-badges">
+  {isPantryItemRunningLow(
+    item
+  ) && (
+    <>
+      <span className="pantry-low-stock-badge">
+        LOW
+      </span>
+
+      {isPantryItemOnShoppingList(
+        item,
+        shoppingItems
+      ) ? (
+        <span className="pantry-on-shopping-badge">
+          ✓ On Shopping List
+        </span>
+      ) : (
+        <button
+          type="button"
+          className="pantry-add-shopping-button"
+          disabled={
+            addingToShoppingId ===
+            item.id
+          }
+          onClick={(event) => {
+            event.stopPropagation();
+
+            addPantryItemToShopping(
+              item
+            );
+          }}
+        >
+          {addingToShoppingId ===
+          item.id
+            ? "Adding..."
+            : "+ Shopping"}
+        </button>
+      )}
+    </>
+  )}
+
+  <span
+    className={`pantry-category-badge pantry-category-${item.category}`}
+  >
+    {item.category}
+  </span>
+</div>
+</div>
+</div>
+
             </article>
           ))}
         </div>

@@ -1,0 +1,171 @@
+[
+  {
+    "food": "potato",
+    "options": [
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c8/Potato_and_cross_section.jpg/500px-Potato_and_cross_section.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "potato",
+        "barcode": null,
+        "score": 10100,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      },
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/Kongo_potato_raw.jpg/500px-Kongo_potato_raw.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "Kongo potato raw",
+        "barcode": null,
+        "score": 2650,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      }
+    ]
+  },
+  {
+    "food": "carrot",
+    "options": [
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c8/Carrots.jpg/500px-Carrots.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "carrot",
+        "barcode": null,
+        "score": 10250,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      },
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Raw_Carrots_in_Bowl.jpg/500px-Raw_Carrots_in_Bowl.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "Raw Carrots in Bowl",
+        "barcode": null,
+        "score": 2500,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      },
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7a/Crunchy_Fresh_Carrots.jpg/500px-Crunchy_Fresh_Carrots.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "Crunchy Fresh Carrots",
+        "barcode": null,
+        "score": 2250,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      }
+    ]
+  },
+  {
+    "food": "apple",
+    "options": [
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/500px-Red_Apple.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "apple",
+        "barcode": null,
+        "score": 10250,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      },
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/Raw_apple.JPG/500px-Raw_apple.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "Raw apple",
+        "barcode": null,
+        "score": 2650,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      },
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/Raw_apple_on_sale.jpg/500px-Raw_apple_on_sale.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "Raw apple on sale",
+        "barcode": null,
+        "score": 2500,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      },
+      {
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Raw-Apples-Green_21446-480x360_%284900266062%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+        "matchedProduct": "Raw Apples Green 21446 480x360 (4900266062)",
+        "barcode": null,
+        "score": 2400,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      },
+      {
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Raw-Apples-Green_31444-480x360_%284899674139%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+        "matchedProduct": "Raw Apples Green 31444 480x360 (4899674139)",
+        "barcode": null,
+        "score": 2400,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      }
+    ]
+  },
+  {
+    "food": "banana",
+    "options": [
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/500px-Banana-Single.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "banana",
+        "barcode": null,
+        "score": 10250,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      },
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Raw_bananas.jpg/500px-Raw_bananas.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "Raw bananas",
+        "barcode": null,
+        "score": 2650,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      },
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Raw_Banana_of_Sindh.jpg/500px-Raw_Banana_of_Sindh.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "Raw Banana of Sindh",
+        "barcode": null,
+        "score": 2500,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      },
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Green_raw_bananas_-_Underexposed.jpg/500px-Green_raw_bananas_-_Underexposed.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "Green raw bananas   Underexposed",
+        "barcode": null,
+        "score": 2500,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      },
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Green_raw_bananas_-_Very_bright.jpg/500px-Green_raw_bananas_-_Very_bright.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "Green raw bananas   Very bright",
+        "barcode": null,
+        "score": 2500,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      },
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/Green_raw_bananas_-_Overprocessed.jpg/500px-Green_raw_bananas_-_Overprocessed.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "Green raw bananas   Overprocessed",
+        "barcode": null,
+        "score": 2500,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      }
+    ]
+  },
+  {
+    "food": "chicken breast",
+    "options": [
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/Raw_chicken_slices.jpg/500px-Raw_chicken_slices.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "chicken breast",
+        "barcode": null,
+        "score": 10650,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      },
+      {
+        "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/CHICKEN_BREAST.jpg/500px-CHICKEN_BREAST.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "matchedProduct": "CHICKEN BREAST",
+        "barcode": null,
+        "score": 2750,
+        "source": "wikimedia-fresh-v2",
+        "freshImage": true
+      }
+    ]
+  }
+]

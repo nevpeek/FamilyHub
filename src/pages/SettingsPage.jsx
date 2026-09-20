@@ -8,8 +8,11 @@ import {
 } from "lucide-react";
 
 import { API_BASE_URL } from "../config/api";
+import { startAutoRefresh } from "../utils/startAutoRefresh";
 
 function SettingsPage({
+  wallMode,
+  onWallModeChange,
   members,
   onEditMember,
   onAddMember,
@@ -127,6 +130,9 @@ const [weatherSettings, setWeatherSettings] =
   const [weatherSettingsSaved, setWeatherSettingsSaved] =
     useState(false);
 
+  const [weatherSettingsDirty, setWeatherSettingsDirty] =
+    useState(false);
+
     const [
   notificationPermission,
   setNotificationPermission,
@@ -139,42 +145,57 @@ const [weatherSettings, setWeatherSettings] =
 });
 
 
-    useEffect(() => {
+useEffect(() => {
   let cancelled = false;
+  let inFlight = false;
+  let hasLoaded = false;
+  const controller = new AbortController();
+
+  setCalendarSourcesLoading(true);
+  setCalendarSourcesError("");
 
   async function loadCalendarSources() {
-    try {
-      setCalendarSourcesLoading(true);
-      setCalendarSourcesError("");
+    if (cancelled || inFlight) return;
 
+    inFlight = true;
+
+    try {
       const response = await fetch(
-        `${API_BASE_URL}/api/calendar-sources`
+        `${API_BASE_URL}/api/calendar-sources`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
+        }
       );
 
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.error ||
-            "Unable to load calendar sources"
+          data.error || "Unable to load calendar sources"
         );
       }
 
-      if (!cancelled) {
-        setCalendarSources(
-          Array.isArray(data) ? data : []
-        );
-      }
+      if (cancelled) return;
+
+      setCalendarSources(
+        Array.isArray(data) ? data : []
+      );
+      setCalendarSourcesError("");
+      hasLoaded = true;
     } catch (error) {
-      console.error(error);
+      if (cancelled || error.name === "AbortError") return;
 
-      if (!cancelled) {
+      console.error("Calendar sources refresh error:", error);
+
+      if (!hasLoaded) {
         setCalendarSourcesError(
-          error.message ||
-            "Unable to load calendar sources"
+          "Unable to load calendar sources. Retrying…"
         );
       }
     } finally {
+      inFlight = false;
+
       if (!cancelled) {
         setCalendarSourcesLoading(false);
       }
@@ -183,48 +204,64 @@ const [weatherSettings, setWeatherSettings] =
 
   loadCalendarSources();
 
+  const stopAutoRefresh = startAutoRefresh(loadCalendarSources);
+
   return () => {
     cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
   };
 }, []);
 
   useEffect(() => {
+    if (weatherSettingsDirty || weatherSettingsSaving) return;
+
     let cancelled = false;
+    let inFlight = false;
+    let hasLoaded = false;
+    const controller = new AbortController();
 
     async function loadWeatherSettings() {
-      try {
-        setWeatherSettingsLoading(true);
-        setWeatherSettingsError("");
+      if (cancelled || inFlight) return;
 
+      inFlight = true;
+
+      try {
         const response = await fetch(
-          `${API_BASE_URL}/api/weather/settings`
+          `${API_BASE_URL}/api/weather/settings`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
         );
 
         const data = await response.json();
 
         if (!response.ok) {
           throw new Error(
-            data.error ||
-              "Unable to load weather settings"
+            data.error || "Unable to load weather settings"
           );
         }
 
-        if (!cancelled) {
-          setWeatherSettings(data);
-          setWeatherLocation(
-            data.locationName || ""
-          );
-        }
+        if (cancelled) return;
+
+        setWeatherSettings(data);
+        setWeatherLocation(data.locationName || "");
+        setWeatherSettingsError("");
+        hasLoaded = true;
       } catch (error) {
-        console.error(error);
+        if (cancelled || error.name === "AbortError") return;
 
-        if (!cancelled) {
+        console.error("Weather settings refresh error:", error);
+
+        if (!hasLoaded) {
           setWeatherSettingsError(
-            error.message ||
-              "Unable to load weather settings"
+            "Unable to load weather settings. Retrying…"
           );
         }
       } finally {
+        inFlight = false;
+
         if (!cancelled) {
           setWeatherSettingsLoading(false);
         }
@@ -233,10 +270,16 @@ const [weatherSettings, setWeatherSettings] =
 
     loadWeatherSettings();
 
+    const stopAutoRefresh = startAutoRefresh(
+      loadWeatherSettings
+    );
+
     return () => {
       cancelled = true;
+      stopAutoRefresh();
+      controller.abort();
     };
-  }, []);
+  }, [weatherSettingsDirty, weatherSettingsSaving]);
 
     async function findWeatherLocation() {
     const query = weatherLocation.trim();
@@ -277,6 +320,8 @@ const [weatherSettings, setWeatherSettings] =
       }
 
       const location = data.results[0];
+
+      setWeatherSettingsDirty(true);
 
       setWeatherSettings((current) => ({
         ...current,
@@ -365,6 +410,7 @@ const [weatherSettings, setWeatherSettings] =
       setWeatherLocation(
         data.locationName || ""
       );
+      setWeatherSettingsDirty(false);
       setWeatherSettingsSaved(true);
     } catch (error) {
       console.error(error);
@@ -1338,10 +1384,8 @@ syncIntervalMinutes:
       type="text"
       value={weatherLocation}
       onChange={(event) => {
-        setWeatherLocation(
-          event.target.value
-        );
-
+        setWeatherSettingsDirty(true);
+        setWeatherLocation(event.target.value);
         setWeatherSettingsSaved(false);
       }}
       placeholder="Enter suburb or city"
@@ -1377,6 +1421,8 @@ syncIntervalMinutes:
       weatherSettings?.warningsEnabled ?? true
     }
     onChange={(event) => {
+      setWeatherSettingsDirty(true);
+
       setWeatherSettings((current) => ({
         ...current,
         warningsEnabled: event.target.checked,
@@ -1432,6 +1478,45 @@ syncIntervalMinutes:
     </div>
 
     <div>
+
+<section className="settings-section">
+  <div className="settings-section-heading">
+    <div className="settings-section-icon">
+      <Settings size={22} />
+    </div>
+
+    <div>
+      <h3>Wall Display</h3>
+      <p>Make FamilyHub ready for your household touchscreen.</p>
+    </div>
+  </div>
+
+  <div className="settings-appearance-block">
+    <label className="settings-weather-warning-toggle">
+      <div>
+        <strong>Wall Mode</strong>
+        <span>
+          Use the wall display layout and enter fullscreen.
+          This preference is remembered on this device.
+        </span>
+      </div>
+
+      <input
+        type="checkbox"
+        className="settings-toggle-input"
+        checked={wallMode}
+        onChange={(event) =>
+          onWallModeChange(event.target.checked)
+        }
+      />
+
+      <span className="settings-toggle-switch">
+        <span className="settings-toggle-knob" />
+      </span>
+    </label>
+  </div>
+</section> 
+
       <h3>Notifications</h3>
       <p>
         Allow FamilyHub to show browser notifications

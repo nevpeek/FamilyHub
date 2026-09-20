@@ -12,6 +12,7 @@ import {
 import ListItemModal from "../components/ListItemModal";
 import ListModal from "../components/ListModal";
 import { API_BASE_URL } from "../config/api";
+import { startAutoRefresh } from "../utils/startAutoRefresh";
 
 function ListsPage({
   members = [],
@@ -55,101 +56,192 @@ function ListsPage({
   const [creatingList, setCreatingList] =
     useState(false);
 
-  async function loadLists() {
-    setLoading(true);
-    setError("");
+  async function loadLists({
+    background = false,
+    signal,
+  } = {}) {
+    if (signal?.aborted) return;
+
+    if (!background) {
+      setLoading(true);
+      setError("");
+    }
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/lists`
+        `${API_BASE_URL}/api/lists`,
+        {
+          signal,
+          cache: "no-store",
+        }
       );
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.error ||
-            "Unable to load lists"
+          data.error || "Unable to load lists"
         );
       }
 
-      const nextLists =
-        data.lists || [];
+      if (signal?.aborted) return;
+
+      const nextLists = Array.isArray(data)
+        ? data
+        : data.lists || [];
 
       setLists(nextLists);
 
-      setSelectedListId(
-        (current) => {
-          if (
-            current &&
-            nextLists.some(
-              (list) =>
-                list.id === current
-            )
-          ) {
-            return current;
-          }
-
-          return (
-            nextLists[0]?.id ||
-            null
-          );
+      setSelectedListId((current) => {
+        // Keep the current selection during background updates.
+        // The selected-list loader will handle a deleted list.
+        if (background && current !== null) {
+          return current;
         }
-      );
+
+        if (
+          current !== null &&
+          nextLists.some((list) => list.id === current)
+        ) {
+          return current;
+        }
+
+        return nextLists[0]?.id ?? null;
+      });
     } catch (err) {
+      if (signal?.aborted || err.name === "AbortError") return;
+
       console.error(err);
 
-      setError(
-        err.message ||
-          "Unable to load lists"
-      );
+      if (!background) {
+        setError(
+          err.message || "Unable to load lists"
+        );
+      }
     } finally {
-      setLoading(false);
+      if (!background && !signal?.aborted) {
+        setLoading(false);
+      }
     }
   }
 
   async function loadSelectedList(
-    listId
+    listId,
+    { signal } = {}
   ) {
-    if (!listId) {
+    if (signal?.aborted) return;
+
+    if (listId == null) {
       setSelectedList(null);
       return;
     }
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/lists/${listId}`
+        `${API_BASE_URL}/api/lists/${listId}`,
+        {
+          signal,
+          cache: "no-store",
+        }
       );
 
-      const data =
-        await response.json();
+      if (signal?.aborted) return;
+
+      if (response.status === 404) {
+        setSelectedList((current) =>
+          current?.id === listId ? null : current
+        );
+
+        setSelectedListId((current) =>
+          current === listId ? null : current
+        );
+
+        return;
+      }
+
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.error ||
-            "Unable to load list"
+          data.error || "Unable to load list"
         );
       }
 
-      setSelectedList(
-        data.list
-      );
-    } catch (err) {
-      console.error(err);
+      if (signal?.aborted) return;
 
-      setSelectedList(null);
+      setSelectedList(data.list);
+    } catch (err) {
+      if (signal?.aborted || err.name === "AbortError") return;
+
+      console.error("List refresh error:", err);
     }
   }
 
   useEffect(() => {
-    loadLists();
+    let inFlight = false;
+    let firstLoad = true;
+    const controller = new AbortController();
+
+    async function refreshLists() {
+      if (controller.signal.aborted || inFlight) return;
+
+      inFlight = true;
+
+      try {
+        await loadLists({
+          background: !firstLoad,
+          signal: controller.signal,
+        });
+      } finally {
+        firstLoad = false;
+        inFlight = false;
+      }
+    }
+
+    refreshLists();
+
+    const stopAutoRefresh = startAutoRefresh(refreshLists);
+
+    return () => {
+      stopAutoRefresh();
+      controller.abort();
+    };
   }, []);
 
   useEffect(() => {
-    loadSelectedList(
-      selectedListId
+    let inFlight = false;
+    const controller = new AbortController();
+
+    setSelectedList(null);
+
+    if (selectedListId == null) {
+      return () => controller.abort();
+    }
+
+    async function refreshSelectedList() {
+      if (controller.signal.aborted || inFlight) return;
+
+      inFlight = true;
+
+      try {
+        await loadSelectedList(selectedListId, {
+          signal: controller.signal,
+        });
+      } finally {
+        inFlight = false;
+      }
+    }
+
+    refreshSelectedList();
+
+    const stopAutoRefresh = startAutoRefresh(
+      refreshSelectedList
     );
+
+    return () => {
+      stopAutoRefresh();
+      controller.abort();
+    };
   }, [selectedListId]);
 
   async function createList(
@@ -486,7 +578,7 @@ function ListsPage({
                   type="button"
                   className="lists-edit-button"
                   onClick={() =>
-                    setEditingList(true)
+                    setEditingList(selectedList)
                   }
                 >
                   <Settings2 size={17} />
@@ -740,9 +832,9 @@ function ListsPage({
         />
       )}
 
-      {editingList && selectedList && (
+      {editingList && (
         <ListModal
-          list={selectedList}
+          list={editingList}
           onClose={() =>
             setEditingList(false)
           }
