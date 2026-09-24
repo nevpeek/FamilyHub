@@ -713,7 +713,7 @@ if (
   }
 
 async function handleDelete() {
-  if (!eventToEdit || occurrenceEditMode) {
+  if (!eventToEdit || occurrenceEditMode || futureEditMode) {
     return;
   }
 
@@ -721,7 +721,7 @@ async function handleDelete() {
 }
 
 async function confirmDelete() {
-  if (!eventToEdit || occurrenceEditMode) {
+  if (!eventToEdit || occurrenceEditMode || futureEditMode) {
     return;
   }
 
@@ -1269,7 +1269,7 @@ async function confirmDelete() {
 
 <div className="event-modal-actions event-form-full">
   <div>
-    {eventToEdit && !occurrenceEditMode && (
+    {eventToEdit && !occurrenceEditMode && !futureEditMode && (
       <button
         type="button"
         className="event-delete-button"
