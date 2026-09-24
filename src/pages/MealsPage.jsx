@@ -1338,6 +1338,138 @@ async function handleSaveWeekTemplate() {
   }
 }
 
+async function handleReplaceWeekTemplate() {
+  if (
+    !duplicateWeekTemplate ||
+    savingWeekTemplate ||
+    replacingTemplateRef.current
+  ) {
+    return;
+  }
+
+  replacingTemplateRef.current = true;
+  setSavingWeekTemplate(true);
+  setTemplateReplaceError("");
+
+  try {
+    const templateMeals =
+      meals.map((meal) => {
+        const mealDate =
+          new Date(
+            `${meal.meal_date}T12:00:00`
+          );
+
+        const startDate =
+          new Date(weekStart);
+
+        startDate.setHours(
+          12,
+          0,
+          0,
+          0
+        );
+
+        const dayOffset =
+          Math.round(
+            (
+              mealDate.getTime() -
+              startDate.getTime()
+            ) /
+              (
+                1000 *
+                60 *
+                60 *
+                24
+              )
+          );
+
+        return {
+          dayOffset,
+          title: meal.title,
+          mealTime:
+            meal.meal_time || null,
+          description:
+            meal.description || null,
+          recipeUrl:
+            meal.recipe_url || null,
+          ingredients:
+            meal.ingredients || null,
+          recipeId:
+            meal.recipe_id || null,
+          reminderEnabled:
+            Boolean(
+              meal.reminder_enabled
+            ),
+          reminderMinutes:
+            meal.reminder_minutes ??
+            null,
+          memberIds: (
+            meal.members || []
+          ).map(
+            (member) => member.id
+          ),
+        };
+      });
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/meal-templates/${duplicateWeekTemplate.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          name:
+            duplicateWeekTemplate.replacementName ||
+            duplicateWeekTemplate.name,
+          meals: templateMeals,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          "Unable to replace week template"
+      );
+    }
+
+    setWeekTemplates(
+      (current) =>
+        current.map(
+          (template) =>
+            Number(template.id) ===
+            Number(data.template.id)
+              ? data.template
+              : template
+        )
+    );
+
+    setDuplicateWeekTemplate(null);
+    setTemplateName("");
+    setSaveTemplateOpen(false);
+    setPlannerMessage(
+      `"${data.template.name}" template replaced`
+    );
+  } catch (error) {
+    console.error(
+      "Replace week template error:",
+      error
+    );
+
+    setTemplateReplaceError(
+      error.message ||
+        "Unable to replace week template"
+    );
+  } finally {
+    replacingTemplateRef.current = false;
+    setSavingWeekTemplate(false);
+  }
+}
+
 
 async function handleCopySelectedPreviousMeals() {
   const selected = previousWeekMeals.filter(meal => selectedPreviousMeals.includes(meal.id));
