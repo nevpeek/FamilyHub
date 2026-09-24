@@ -375,7 +375,7 @@ function RecipeDetailsModal({
       }}
     >
       <div
-        className="recipe-details-modal"
+        className="recipe-details-modal fh-dialog"
         role="dialog"
         aria-modal="true"
       >
@@ -575,7 +575,7 @@ function RecipeDetailsModal({
               }}
             >
               <div
-                className="recipe-shopping-picker recipe-shopping-picker-modal"
+                className="recipe-shopping-picker recipe-shopping-picker-modal fh-dialog"
                 role="dialog"
                 aria-modal="true"
                 aria-label={`Add ${recipe.title} ingredients to Shopping`}

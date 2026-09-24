@@ -905,7 +905,7 @@ function toggleMember(memberId) {
   }}
 >
   <motion.div
-    className="event-modal"
+    className="event-modal fh-dialog"
     role="dialog"
     aria-modal="true"
     aria-labelledby="shopping-modal-title"
@@ -1461,7 +1461,7 @@ onClick={() =>
             }
           }}
         >
-          <div className="reward-delete-confirm-modal">
+          <div className="reward-delete-confirm-modal fh-dialog">
             <div className="reward-delete-confirm-icon">
               <Trash2 size={24} />
             </div>

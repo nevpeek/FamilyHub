@@ -1,5 +1,6 @@
 import { API_BASE_URL } from "../config/api";
 import {
+  ClipboardPaste,
   ImagePlus,
   Plus,
   Trash2,
@@ -9,6 +10,104 @@ import {
   useEffect,
   useState,
 } from "react";
+
+function parseRecipeMinutes(value) {
+  const hours = Number(value.match(/(\d+(?:\.\d+)?)\s*(?:hours?|hrs?)/i)?.[1] || 0);
+  const minutes = Number(value.match(/(\d+)\s*(?:minutes?|mins?)/i)?.[1] || 0);
+
+  if (hours || minutes) {
+    return Math.round(hours * 60 + minutes);
+  }
+
+  return Number(value.match(/\d+/)?.[0] || 0) || null;
+}
+
+function cleanCapturedLine(value) {
+  return value
+    .replace(/^\s*(?:[-*•]|\d+[.)])\s*/, "")
+    .trim();
+}
+
+function parseCapturedRecipe(value) {
+  const lines = String(value || "")
+    .replace(/\r/g, "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const captured = {
+    title: "",
+    description: [],
+    ingredients: [],
+    instructions: [],
+    prepTime: null,
+    cookTime: null,
+    servings: null,
+    recipeUrl: "",
+  };
+
+  let section = "description";
+
+  lines.forEach((line) => {
+    const heading = line.replace(/:$/, "").trim().toLowerCase();
+
+    if (/^ingredients?$/.test(heading)) {
+      section = "ingredients";
+      return;
+    }
+
+    if (/^(instructions?|method|directions?|steps?)$/.test(heading)) {
+      section = "instructions";
+      return;
+    }
+
+    if (/^(description|notes?|about)$/.test(heading)) {
+      section = "description";
+      return;
+    }
+
+    const prepMatch = line.match(/^prep(?:aration)?\s*time\s*[:–-]\s*(.+)$/i);
+    if (prepMatch) {
+      captured.prepTime = parseRecipeMinutes(prepMatch[1]);
+      return;
+    }
+
+    const cookMatch = line.match(/^(?:cook|cooking)\s*time\s*[:–-]\s*(.+)$/i);
+    if (cookMatch) {
+      captured.cookTime = parseRecipeMinutes(cookMatch[1]);
+      return;
+    }
+
+    const servingsMatch = line.match(/^(?:serves|servings?|yield)\s*[:–-]?\s*(\d+)/i);
+    if (servingsMatch) {
+      captured.servings = Number(servingsMatch[1]);
+      return;
+    }
+
+    const urlMatch = line.match(/https?:\/\/\S+/i);
+    if (urlMatch && !captured.recipeUrl) {
+      captured.recipeUrl = urlMatch[0].replace(/[),.;]+$/, "");
+      return;
+    }
+
+    if (!captured.title) {
+      captured.title = cleanCapturedLine(line);
+      return;
+    }
+
+    const cleanedLine = cleanCapturedLine(line);
+    if (cleanedLine) {
+      captured[section].push(cleanedLine);
+    }
+  });
+
+  return {
+    ...captured,
+    description: captured.description.join("\n"),
+    ingredients: captured.ingredients.join("\n"),
+    instructions: captured.instructions.join("\n"),
+  };
+}
 
 function RecipeModal({
   open,
@@ -81,6 +180,10 @@ function RecipeModal({
   const [error, setError] =
     useState("");
 
+  const [captureOpen, setCaptureOpen] = useState(false);
+  const [captureText, setCaptureText] = useState("");
+  const [captureMessage, setCaptureMessage] = useState("");
+
     const [deleteConfirmOpen, setDeleteConfirmOpen] =
   useState(false);
 
@@ -142,6 +245,9 @@ function RecipeModal({
 );
 
 setUploadingPhoto(false);
+    setCaptureOpen(false);
+    setCaptureText("");
+    setCaptureMessage("");
     setSaving(false);
     setError("");
   }, [
@@ -196,6 +302,50 @@ setUploadingPhoto(false);
 
     setIngredients(
       nextRows.join("\n")
+    );
+  }
+
+  function handleCaptureRecipe() {
+    const captured = parseCapturedRecipe(captureText);
+
+    if (!captured.title) {
+      setCaptureMessage("Add some recipe text first.");
+      return;
+    }
+
+    setTitle(captured.title);
+    setDescription(captured.description);
+    setIngredients(captured.ingredients);
+    setInstructions(captured.instructions);
+
+    if (captured.prepTime != null) {
+      setPrepTime(String(captured.prepTime));
+    }
+
+    if (captured.cookTime != null) {
+      setCookTime(String(captured.cookTime));
+    }
+
+    if (captured.servings != null) {
+      setServings(String(captured.servings));
+    }
+
+    if (captured.recipeUrl) {
+      setRecipeUrl(captured.recipeUrl);
+    }
+
+    const foundParts = [
+      captured.ingredients && "ingredients",
+      captured.instructions && "method",
+      captured.prepTime != null && "prep time",
+      captured.cookTime != null && "cook time",
+      captured.servings != null && "servings",
+    ].filter(Boolean);
+
+    setCaptureMessage(
+      foundParts.length
+        ? `Details filled: ${foundParts.join(", ")}. Check them below before saving.`
+        : "Recipe name filled. Add any missing details below before saving."
     );
   }
 
@@ -583,7 +733,7 @@ setUploadingPhoto(false);
       }}
     >
       <div
-        className="event-modal"
+        className="event-modal fh-dialog"
         role="dialog"
         aria-modal="true"
       >
@@ -615,6 +765,60 @@ setUploadingPhoto(false);
           className="event-form"
           onSubmit={handleSubmit}
         >
+          {!recipe && (
+            <section className="recipe-capture-panel event-form-full">
+              <div className="recipe-capture-heading">
+                <span className="recipe-capture-icon">
+                  <ClipboardPaste size={20} />
+                </span>
+
+                <div>
+                  <strong>Capture a copied recipe</strong>
+                  <small>Paste the recipe text and review what FamilyHub finds.</small>
+                </div>
+
+                <button
+                  type="button"
+                  className="recipe-capture-toggle"
+                  onClick={() => {
+                    setCaptureOpen((current) => !current);
+                    setCaptureMessage("");
+                  }}
+                  disabled={saving}
+                >
+                  {captureOpen ? "Hide" : "Paste recipe"}
+                </button>
+              </div>
+
+              {captureOpen && (
+                <div className="recipe-capture-body">
+                  <textarea
+                    value={captureText}
+                    onChange={(event) => {
+                      setCaptureText(event.target.value);
+                      setCaptureMessage("");
+                    }}
+                    rows={9}
+                    placeholder={"Recipe name\nPrep time: 15 min\nCook time: 30 min\nServes: 4\n\nIngredients\n2 cups flour\n\nMethod\n1. Mix the ingredients"}
+                    aria-label="Copied recipe text"
+                  />
+
+                  <div className="recipe-capture-actions">
+                    <small aria-live="polite">{captureMessage}</small>
+                    <button
+                      type="button"
+                      className="recipe-capture-fill-button"
+                      onClick={handleCaptureRecipe}
+                      disabled={!captureText.trim() || saving}
+                    >
+                      Fill recipe details
+                    </button>
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+
           <div className="recipe-editor-overview">
             <div className="recipe-editor-photo-column">
               <div className="event-form-field">
@@ -1126,7 +1330,7 @@ onClick={() =>
             }
           }}
         >
-          <div className="reward-delete-confirm-modal">
+          <div className="reward-delete-confirm-modal fh-dialog">
             <div className="reward-delete-confirm-icon">
               <Trash2 size={24} />
             </div>

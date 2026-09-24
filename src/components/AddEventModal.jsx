@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "../config/api";
 import { useEffect, useMemo, useState } from "react";
-import { Trash2, X } from "lucide-react";
+import { AlertTriangle, Trash2, X } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 
 function formatDateKey(value) {
@@ -99,6 +99,76 @@ const [deleting, setDeleting] = useState(false);
 const [deleteConfirmOpen, setDeleteConfirmOpen] =
   useState(false);
 const [error, setError] = useState("");
+const [nearbyEvents, setNearbyEvents] = useState([]);
+
+  useEffect(() => {
+    if (!isOpen || !startDate || !endDate) return;
+
+    const controller = new AbortController();
+    const params = new URLSearchParams({
+      start: startDate,
+      end: endDate || startDate,
+    });
+
+    fetch(`${API_BASE_URL}/api/events?${params.toString()}`, {
+      signal: controller.signal,
+      cache: "no-store",
+    })
+      .then((response) => response.ok ? response.json() : { events: [] })
+      .then((data) => setNearbyEvents(data.events || []))
+      .catch((err) => {
+        if (err.name !== "AbortError") setNearbyEvents([]);
+      });
+
+    return () => controller.abort();
+  }, [isOpen, startDate, endDate]);
+
+  const conflictingEvents = useMemo(() => {
+    if (
+      allDay ||
+      !startDate ||
+      !endDate ||
+      !startTime ||
+      !endTime ||
+      selectedMemberIds.length === 0
+    ) {
+      return [];
+    }
+
+    const proposedStart = new Date(`${startDate}T${startTime}:00`);
+    const proposedEnd = new Date(`${endDate}T${endTime}:00`);
+    if (proposedEnd <= proposedStart) return [];
+
+    return nearbyEvents.filter((existing) => {
+      if (existing.all_day) return false;
+
+      const existingId = existing.series_event_id || existing.id;
+      const editedId = eventToEdit?.series_event_id || eventToEdit?.id;
+      if (editedId && String(existingId) === String(editedId)) return false;
+
+      const existingMemberIds = (existing.members || []).map((member) => String(member.id));
+      const sharesMember = existingMemberIds.length === 0 || selectedMemberIds.some(
+        (memberId) => existingMemberIds.includes(String(memberId))
+      );
+      if (!sharesMember || !existing.start_time) return false;
+
+      const existingStart = new Date(`${existing.start_date}T${existing.start_time}:00`);
+      const existingEnd = new Date(
+        `${existing.end_date || existing.start_date}T${existing.end_time || existing.start_time}:00`
+      );
+
+      return proposedStart < existingEnd && proposedEnd > existingStart;
+    });
+  }, [
+    allDay,
+    startDate,
+    endDate,
+    startTime,
+    endTime,
+    selectedMemberIds,
+    nearbyEvents,
+    eventToEdit,
+  ]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -540,15 +610,6 @@ recurrenceCount:
       ? Number(recurrenceCount) || null
       : null,
 
-
-          recurrenceCount:
-            occurrenceEditMode
-              ? null
-              : recurrenceRule &&
-                  recurrenceEndType === "count"
-                ? Number(recurrenceCount) || null
-                : null,
-
           memberIds: selectedMemberIds,
         }),
       });
@@ -730,7 +791,7 @@ async function confirmDelete() {
       transition={{ duration: reduceMotion ? 0 : 0.18 }}
     >
       <motion.div
-        className="event-modal"
+        className="event-modal fh-dialog"
         role="dialog"
         aria-modal="true"
         initial={
@@ -965,6 +1026,29 @@ async function confirmDelete() {
               </label>
             )}
           </div>
+
+          {conflictingEvents.length > 0 && (
+            <div className="event-conflict-warning" role="status">
+              <AlertTriangle size={20} />
+              <div>
+                <strong>
+                  {conflictingEvents.length === 1
+                    ? "This overlaps another event"
+                    : `This overlaps ${conflictingEvents.length} other events`}
+                </strong>
+                <span>
+                  {conflictingEvents.slice(0, 2).map((conflict) => {
+                    const names = (conflict.members || [])
+                      .map((member) => member.name)
+                      .filter(Boolean)
+                      .join(", ");
+                    return `${conflict.title}${names ? ` · ${names}` : ""}`;
+                  }).join(" • ")}
+                </span>
+                <small>You can still save if this timing is intentional.</small>
+              </div>
+            </div>
+          )}
 
           {!occurrenceEditMode && !futureEditMode && (
             <>

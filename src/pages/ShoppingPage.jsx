@@ -63,6 +63,8 @@ function ShoppingPage({
     useState(false);
   const [categoryFilter, setCategoryFilter] =
     useState("all");
+  const [shoppingMode, setShoppingMode] =
+    useState(false);
 
     const [deleteAllConfirmOpen, setDeleteAllConfirmOpen] =
   useState(false);
@@ -75,6 +77,28 @@ const [deletingAll, setDeletingAll] =
 
 const [clearingCompleted, setClearingCompleted] =
   useState(false);
+
+  useEffect(() => {
+    if (!shoppingMode || !("wakeLock" in navigator)) return;
+
+    let wakeLock = null;
+    let cancelled = false;
+
+    navigator.wakeLock.request("screen")
+      .then((lock) => {
+        if (cancelled) {
+          lock.release();
+          return;
+        }
+        wakeLock = lock;
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+      wakeLock?.release().catch(() => {});
+    };
+  }, [shoppingMode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -387,7 +411,7 @@ setDeletingAll(true);
           item.is_completed
             ? "completed"
             : ""
-        }`}
+        } ${shoppingMode ? "shopping-mode-card" : ""}`}
       >
         <button
           type="button"
@@ -411,8 +435,9 @@ setDeletingAll(true);
         <button
           type="button"
           className="shopping-card-content"
-          onClick={() =>
-            onEditItem?.(item)
+          onClick={() => shoppingMode
+            ? toggleItemCompletion(item)
+            : onEditItem?.(item)
           }
         >
 <div className="shopping-card-main">
@@ -464,45 +489,71 @@ setDeletingAll(true);
   }
 
   return (
-    <div className="shopping-page">
+    <div className={`shopping-page ${shoppingMode ? "shopping-mode" : ""}`}>
       <section className="calendar-page-heading">
         <div>
           <p className="section-kicker">
-            Shopping
+            {shoppingMode ? "In Store" : "Shopping"}
           </p>
 
-          <h2>Shared Shopping List</h2>
+          <h2>{shoppingMode ? "Shopping Mode" : "Shared Shopping List"}</h2>
 
           <p>
-            Keep one family shopping list
-            everyone can update.
+            {shoppingMode
+              ? `${activeItems.length} ${activeItems.length === 1 ? "item" : "items"} left to pick up.`
+              : "Keep one family shopping list everyone can update."}
           </p>
         </div>
 
         <div className="shopping-heading-actions">
-          <button
-            type="button"
-            className="shopping-delete-all-button"
-onClick={() =>
-  setDeleteAllConfirmOpen(true)
-}
-            disabled={items.length === 0}
-          >
-            <Trash2 size={18} />
-            <span>Delete All</span>
-          </button>
+          {shoppingMode ? (
+            <button
+              type="button"
+              className="shopping-mode-button active"
+              onClick={() => setShoppingMode(false)}
+            >
+              <span>Exit Shopping Mode</span>
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="shopping-mode-button"
+                onClick={() => {
+                  setShowCompleted(false);
+                  setCategoryFilter("all");
+                  setShoppingMode(true);
+                }}
+                disabled={activeItems.length === 0}
+              >
+                <ShoppingCart size={18} />
+                <span>Shopping Mode</span>
+              </button>
 
-          <button
-            type="button"
-            className="add-event-button"
-            onClick={onAddItem}
-          >
-            <Plus size={22} />
-            <span>Add Item</span>
-          </button>
+              <button
+                type="button"
+                className="shopping-delete-all-button"
+                onClick={() => setDeleteAllConfirmOpen(true)}
+                disabled={items.length === 0}
+              >
+                <Trash2 size={18} />
+                <span>Delete All</span>
+              </button>
+
+              <button
+                type="button"
+                className="add-event-button"
+                onClick={onAddItem}
+              >
+                <Plus size={22} />
+                <span>Add Item</span>
+              </button>
+            </>
+          )}
         </div>
       </section>
-<section className="family-selector family-selector-section">
+
+{!shoppingMode && <section className="family-selector family-selector-section">
   <button
     type="button"
     className={`family-selector-button family-selector-everyone ${
@@ -550,7 +601,7 @@ onClick={() =>
       {member.name}
     </button>
   ))}
-</section>
+</section>}
 
       <section className="shopping-toolbar">
         <div>
@@ -612,7 +663,7 @@ onClick={() =>
             </option>
           </select>
 
-          <label className="shopping-show-completed">
+          {!shoppingMode && <label className="shopping-show-completed">
             <input
               type="checkbox"
               checked={showCompleted}
@@ -626,9 +677,9 @@ onClick={() =>
             <span>
               Show completed
             </span>
-          </label>
+          </label>}
 
-          {completedItems.length > 0 && (
+          {!shoppingMode && completedItems.length > 0 && (
             <button
               type="button"
               className="shopping-clear-completed"
@@ -657,10 +708,12 @@ onClick={() =>
           <ShoppingCart size={34} />
 
           <div>
-            <h3>Shopping list is empty</h3>
+            <h3>{shoppingMode ? "Shopping complete" : "Shopping list is empty"}</h3>
 
             <p>
-              Add an item or change the filters.
+              {shoppingMode
+                ? "Everything on the list has been picked up."
+                : "Add an item or change the filters."}
             </p>
           </div>
         </div>
@@ -742,7 +795,7 @@ onClick={() =>
             }
           }}
         >
-          <div className="reward-delete-confirm-modal">
+          <div className="reward-delete-confirm-modal fh-dialog">
             <div className="reward-delete-confirm-icon">
               <Trash2 size={24} />
             </div>
@@ -804,7 +857,7 @@ onClick={() =>
             }
           }}
         >
-          <div className="reward-delete-confirm-modal">
+          <div className="reward-delete-confirm-modal fh-dialog">
             <div className="reward-delete-confirm-icon">
               <Trash2 size={24} />
             </div>

@@ -102,7 +102,7 @@ function EventDetailsModal({
   return (
     <div className="event-modal-backdrop">
       <div
-        className="event-modal event-details-modal"
+        className="event-modal event-details-modal fh-dialog"
         role="dialog"
         aria-modal="true"
       >

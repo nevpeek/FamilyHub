@@ -39,6 +39,7 @@ import "./wall-mode.css";
 import "./tablet-polish.css";
 import CamerasPage from "./pages/CamerasPage";
 import "./cameras.css";
+import "./home-responsive.css";
 import HomePage from "./pages/HomePage";
 import CalendarPage from "./pages/CalendarPage";
 import TasksPage from "./pages/TasksPage";
@@ -143,6 +144,36 @@ function formatDateKey(date) {
   const day = String(date.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
+}
+
+function getDisplayScheduleState(currentDate, startTime, endTime) {
+  const toMinutes = (value) => {
+    const [hours, minutes] = String(value || "00:00").split(":").map(Number);
+    return hours * 60 + minutes;
+  };
+
+  const startMinutes = toMinutes(startTime);
+  const endMinutes = toMinutes(endTime);
+  const currentMinutes = currentDate.getHours() * 60 + currentDate.getMinutes();
+
+  if (startMinutes === endMinutes) {
+    return { active: false, key: "" };
+  }
+
+  const overnight = startMinutes > endMinutes;
+  const active = overnight
+    ? currentMinutes >= startMinutes || currentMinutes < endMinutes
+    : currentMinutes >= startMinutes && currentMinutes < endMinutes;
+
+  const occurrenceDate = new Date(currentDate);
+  if (overnight && currentMinutes < endMinutes) {
+    occurrenceDate.setDate(occurrenceDate.getDate() - 1);
+  }
+
+  return {
+    active,
+    key: `${formatDateKey(occurrenceDate)}:${startTime}-${endTime}`,
+  };
 }
 
 function formatEventTime(time) {
@@ -373,16 +404,37 @@ const [theme, setTheme] = useState(() => {
 });
 const [selectedMemberId, setSelectedMemberId] = useState("all");
 const [currentTime, setCurrentTime] = useState(() => new Date());
+const [dailyBriefEnabled, setDailyBriefEnabled] = useState(() =>
+  localStorage.getItem("familyhub-daily-brief-enabled") === "true"
+);
+const [dailyBriefTime, setDailyBriefTime] = useState(() =>
+  localStorage.getItem("familyhub-daily-brief-time") || "07:00"
+);
 
 const [wallMode, setWallMode] = useState(() => {
   return localStorage.getItem("familyhub-wall-mode") === "true";
 });
+
+const [displayScheduleEnabled, setDisplayScheduleEnabled] = useState(() =>
+  localStorage.getItem("familyhub-display-schedule-enabled") === "true"
+);
+const [displayScheduleStart, setDisplayScheduleStart] = useState(() =>
+  localStorage.getItem("familyhub-display-schedule-start") || "20:00"
+);
+const [displayScheduleEnd, setDisplayScheduleEnd] = useState(() =>
+  localStorage.getItem("familyhub-display-schedule-end") || "06:30"
+);
+const [displaySchedulePhotos, setDisplaySchedulePhotos] = useState(() =>
+  localStorage.getItem("familyhub-display-schedule-photos") !== "false"
+);
+const [displayScheduleDismissedFor, setDisplayScheduleDismissedFor] = useState("");
 
 const [isFullscreen, setIsFullscreen] = useState(() => {
   return Boolean(document.fullscreenElement);
 });
 
 const [ambientMode, setAmbientMode] = useState(false);
+const [ambientPreviewMode, setAmbientPreviewMode] = useState(false);
 const [ambientWeather, setAmbientWeather] =
   useState(null);
 const [addEventOpen, setAddEventOpen] = useState(false);
@@ -400,6 +452,7 @@ const [countdownRefreshKey, setCountdownRefreshKey] = useState(0);
 const [taskRefreshKey, setTaskRefreshKey] = useState(0);
 const [taskModalOpen, setTaskModalOpen] = useState(false);
 const [selectedTask, setSelectedTask] = useState(null);
+const [newTaskDefaults, setNewTaskDefaults] = useState(null);
 
 const [recurringChoiceTask, setRecurringChoiceTask] = useState(null);
 const [taskEditMode, setTaskEditMode] = useState(null);
@@ -775,6 +828,47 @@ useEffect(() => {
 }, [wallMode]);
 
 useEffect(() => {
+  localStorage.setItem(
+    "familyhub-display-schedule-enabled",
+    String(displayScheduleEnabled)
+  );
+  localStorage.setItem("familyhub-display-schedule-start", displayScheduleStart);
+  localStorage.setItem("familyhub-display-schedule-end", displayScheduleEnd);
+  localStorage.setItem(
+    "familyhub-display-schedule-photos",
+    String(displaySchedulePhotos)
+  );
+}, [
+  displayScheduleEnabled,
+  displayScheduleStart,
+  displayScheduleEnd,
+  displaySchedulePhotos,
+]);
+
+const displaySchedule = getDisplayScheduleState(
+  currentTime,
+  displayScheduleStart,
+  displayScheduleEnd
+);
+
+const displayScheduleActive = displayScheduleEnabled && displaySchedule.active;
+
+useEffect(() => {
+  if (
+    displayScheduleActive &&
+    displayScheduleDismissedFor !== displaySchedule.key &&
+    !activeReminder
+  ) {
+    setAmbientMode(true);
+  }
+}, [
+  activeReminder,
+  displaySchedule.key,
+  displayScheduleActive,
+  displayScheduleDismissedFor,
+]);
+
+useEffect(() => {
   let cancelled = false;
   let inFlight = false;
   const controller = new AbortController();
@@ -826,7 +920,9 @@ useEffect(() => {
 
 useEffect(() => {
   if (!wallMode) {
-    setAmbientMode(false);
+    if (!displayScheduleActive && !ambientPreviewMode) {
+      setAmbientMode(false);
+    }
     return;
   }
 
@@ -835,7 +931,7 @@ useEffect(() => {
     return;
   }
 
-    if (ambientMode) {
+    if (ambientMode || ambientPreviewMode) {
     const previousFocus = document.activeElement;
 
     document.querySelector(".ambient-display")?.focus({
@@ -914,7 +1010,13 @@ const activityEvents = [
       );
     });
   };
-}, [wallMode, activeReminder, ambientMode]);
+}, [
+  wallMode,
+  activeReminder,
+  ambientMode,
+  ambientPreviewMode,
+  displayScheduleActive,
+]);
 
 const todayKey = formatDateKey(currentTime);
 
@@ -926,6 +1028,18 @@ const ambientGreeting =
     : ambientHour < 18
       ? "Good afternoon"
       : "Good evening";
+
+const ambientPhotoMembers = members.filter((member) => member.photo_url);
+const ambientPhotoMember = ambientPhotoMembers.length
+  ? ambientPhotoMembers[
+      Math.floor(currentTime.getMinutes() / 5) % ambientPhotoMembers.length
+    ]
+  : null;
+const ambientPhotoUrl = ambientPhotoMember
+  ? ambientPhotoMember.photo_url.startsWith("http")
+    ? ambientPhotoMember.photo_url
+    : `${API_BASE_URL}${ambientPhotoMember.photo_url}`
+  : "";
 
 const ambientTomorrow = new Date(currentTime);
 ambientTomorrow.setDate(ambientTomorrow.getDate() + 1);
@@ -1666,6 +1780,83 @@ useEffect(() => {
   taskRefreshKey,
 ]);
 
+const dailyBriefSummary = useMemo(() => {
+  const eventCount = homeEvents.filter(
+    (event) => event.start_date === todayKey
+  ).length;
+  const taskCount = homeTasks.filter(
+    (task) => !task.is_completed
+  ).length;
+  const dinner = homeMeals.find(
+    (meal) => meal.meal_type === "dinner"
+  ) || homeMeals[0];
+
+  const parts = [
+    `${eventCount} ${eventCount === 1 ? "event" : "events"}`,
+    `${taskCount} ${taskCount === 1 ? "task" : "tasks"}`,
+    dinner ? `Dinner: ${dinner.title}` : "Dinner is not planned",
+  ];
+
+  if (homeShoppingItems.length > 0) {
+    parts.push(`${homeShoppingItems.length} shopping items`);
+  }
+
+  return parts.join(" • ");
+}, [homeEvents, homeTasks, homeMeals, homeShoppingItems, todayKey]);
+
+useEffect(() => {
+  localStorage.setItem(
+    "familyhub-daily-brief-enabled",
+    String(dailyBriefEnabled)
+  );
+  localStorage.setItem(
+    "familyhub-daily-brief-time",
+    dailyBriefTime
+  );
+}, [dailyBriefEnabled, dailyBriefTime]);
+
+useEffect(() => {
+  if (
+    !dailyBriefEnabled ||
+    !("Notification" in window) ||
+    Notification.permission !== "granted"
+  ) {
+    return;
+  }
+
+  const [hour, minute] = dailyBriefTime.split(":").map(Number);
+  const scheduled = new Date(currentTime);
+  scheduled.setHours(hour, minute, 0, 0);
+  const latest = new Date(scheduled.getTime() + 5 * 60 * 1000);
+  const sentKey = `familyhub-daily-brief-sent:${todayKey}`;
+
+  if (
+    currentTime < scheduled ||
+    currentTime > latest ||
+    localStorage.getItem(sentKey) === "true"
+  ) {
+    return;
+  }
+
+  const notification = new Notification("FamilyHub Daily Brief", {
+    body: dailyBriefSummary,
+    tag: `familyhub-daily-brief-${todayKey}`,
+  });
+
+  localStorage.setItem(sentKey, "true");
+  notification.onclick = () => {
+    window.focus();
+    setActivePage("home");
+    notification.close();
+  };
+}, [
+  currentTime,
+  dailyBriefEnabled,
+  dailyBriefTime,
+  dailyBriefSummary,
+  todayKey,
+]);
+
 useEffect(() => {
   const now = currentTime;
 
@@ -1880,25 +2071,42 @@ return (
     className={`familyhub-shell ${
       wallMode ? "wall-mode" : ""
     } ${
-      ambientMode ? "ambient-mode" : ""
+      ambientMode || ambientPreviewMode ? "ambient-mode" : ""
     }`}
   >
 
-{ambientMode && (
+{(ambientMode || ambientPreviewMode) && (
   <div
     className="ambient-display"
+    style={
+      displaySchedulePhotos && ambientPhotoUrl
+        ? {
+            backgroundImage: `linear-gradient(rgba(2, 6, 23, 0.72), rgba(2, 6, 23, 0.9)), url("${ambientPhotoUrl}")`,
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+          }
+        : undefined
+    }
     role="button"
     tabIndex={0}
     aria-label="Return to FamilyHub"
     onClick={(event) => {
       event.preventDefault();
       event.stopPropagation();
+      if (displayScheduleActive) {
+        setDisplayScheduleDismissedFor(displaySchedule.key);
+      }
+      setAmbientPreviewMode(false);
       setAmbientMode(false);
     }}
     onKeyDown={(event) => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         event.stopPropagation();
+        if (displayScheduleActive) {
+          setDisplayScheduleDismissedFor(displaySchedule.key);
+        }
+        setAmbientPreviewMode(false);
         setAmbientMode(false);
       }
     }}
@@ -2177,6 +2385,13 @@ homeCountdownsError={homeCountdownsError}
 
 onNavigate={setActivePage}
 
+    onPlanBusyMeal={(recipe, defaults) => {
+      setSelectedMeal(null);
+      setNewMealDefaults(defaults);
+      setMealRecipeDefault(recipe);
+      setMealModalOpen(true);
+    }}
+
     onAddEvent={() => {
       setSelectedEvent(null);
       setSelectedEventDate(null);
@@ -2185,6 +2400,7 @@ onNavigate={setActivePage}
 
     onAddTask={() => {
       setSelectedTask(null);
+      setNewTaskDefaults(null);
       setTaskModalOpen(true);
     }}
 
@@ -2286,8 +2502,9 @@ onAddEvent={(value = null) => {
   selectedMemberId={selectedMemberId}
   setSelectedMemberId={setSelectedMemberId}
   taskRefreshKey={taskRefreshKey}
-  onAddTask={() => {
+  onAddTask={(defaults = null) => {
     setSelectedTask(null);
+    setNewTaskDefaults(defaults);
     setTaskModalOpen(true);
   }}
   onEditTask={(task) => {
@@ -2430,6 +2647,23 @@ onPlanRecipe={async (
   setAccentColour={setAccentColour}
   theme={theme}
   setTheme={setTheme}
+  dailyBriefEnabled={dailyBriefEnabled}
+  setDailyBriefEnabled={setDailyBriefEnabled}
+  dailyBriefTime={dailyBriefTime}
+  setDailyBriefTime={setDailyBriefTime}
+  dailyBriefSummary={dailyBriefSummary}
+  displayScheduleEnabled={displayScheduleEnabled}
+  setDisplayScheduleEnabled={setDisplayScheduleEnabled}
+  displayScheduleStart={displayScheduleStart}
+  setDisplayScheduleStart={setDisplayScheduleStart}
+  displayScheduleEnd={displayScheduleEnd}
+  setDisplayScheduleEnd={setDisplayScheduleEnd}
+  displaySchedulePhotos={displaySchedulePhotos}
+  setDisplaySchedulePhotos={setDisplaySchedulePhotos}
+  onPreviewDisplay={() => {
+    setAmbientPreviewMode(true);
+    setAmbientMode(true);
+  }}
     onEditMember={(member) =>
       setSelectedFamilyMember(member)
     }
@@ -2447,7 +2681,7 @@ onPlanRecipe={async (
 
 {activeReminder && (
   <div className="reminder-popup">
-    <div className="reminder-popup-card">
+    <div className="reminder-popup-card fh-dialog">
       <span className="reminder-popup-label">
 {activeReminder.type === "event"
   ? "Event reminder"
@@ -2745,16 +2979,19 @@ onThisAndFuture={() => {
   task={selectedTask}
   editMode={taskEditMode}
   members={members}
+  defaultCategory={newTaskDefaults?.category || "chore"}
   onClose={() => {
   setTaskModalOpen(false);
   setSelectedTask(null);
   setTaskEditMode(null);
+  setNewTaskDefaults(null);
 }}
   onSaved={() => {
   setTaskRefreshKey((current) => current + 1);
   setTaskModalOpen(false);
   setSelectedTask(null);
   setTaskEditMode(null);
+  setNewTaskDefaults(null);
 }}
 />
 

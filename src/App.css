@@ -1006,6 +1006,44 @@
   font-weight: 700;
 }
 
+.event-conflict-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 13px 14px;
+  border: 1px solid color-mix(in srgb, var(--fh-warning, #d97706) 42%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--fh-warning, #d97706) 12%, var(--fh-surface, #fff));
+  color: var(--fh-text, #1f2937);
+}
+
+.event-conflict-warning > svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: var(--fh-warning, #d97706);
+}
+
+.event-conflict-warning > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.event-conflict-warning strong,
+.event-conflict-warning span,
+.event-conflict-warning small {
+  display: block;
+}
+
+.event-conflict-warning span {
+  overflow-wrap: anywhere;
+  color: var(--fh-text, #1f2937);
+}
+
+.event-conflict-warning small {
+  color: var(--fh-text-muted, #6b7280);
+}
+
 .event-form-actions {
   display: flex;
   justify-content: flex-end;
@@ -3555,6 +3593,89 @@
   font-weight: 500;
 }
 
+.routine-starters {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--fh-border, #dfe5ed);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--fh-accent, #2563eb) 6%, var(--fh-surface, #fff));
+}
+
+.routine-starters-heading,
+.routine-starters-heading > span {
+  display: flex;
+  align-items: center;
+}
+
+.routine-starters-heading {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.routine-starters-heading > span {
+  gap: 7px;
+  color: var(--fh-text, #172033);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.routine-starters-heading > span svg {
+  color: var(--fh-accent, #2563eb);
+}
+
+.routine-starters-heading small {
+  color: var(--fh-text-muted, #64748b);
+}
+
+.routine-starter-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.routine-starter-options button {
+  display: flex;
+  min-height: 70px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--fh-border, #dfe5ed);
+  border-radius: 13px;
+  background: var(--fh-surface, #fff);
+  color: var(--fh-text, #172033);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+}
+
+.routine-starter-options button:hover,
+.routine-starter-options button.selected {
+  border-color: var(--fh-accent, #2563eb);
+  background: color-mix(in srgb, var(--fh-accent, #2563eb) 11%, var(--fh-surface, #fff));
+  color: var(--fh-accent, #2563eb);
+}
+
+@media (max-width: 620px) {
+  .routine-starters-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .routine-starter-options {
+    grid-template-columns: 1fr;
+  }
+
+  .routine-starter-options button {
+    min-height: 48px;
+    justify-content: flex-start;
+  }
+}
+
 /* ========================================
    Recurring Task Badge
 ======================================== */
@@ -4822,6 +4943,117 @@
 }
 
 /* Recipe URL Import */
+
+.recipe-capture-panel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--fh-border, #dbe3ee);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--fh-accent, #2563eb) 6%, var(--fh-surface, #fff));
+}
+
+.recipe-capture-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+}
+
+.recipe-capture-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--fh-accent, #2563eb) 14%, var(--fh-surface, #fff));
+  color: var(--fh-accent, #2563eb);
+}
+
+.recipe-capture-heading > div {
+  display: grid;
+  gap: 2px;
+}
+
+.recipe-capture-heading strong {
+  color: var(--fh-text, #172033);
+  font-size: 0.85rem;
+}
+
+.recipe-capture-heading small,
+.recipe-capture-actions small {
+  color: var(--fh-muted, #64748b);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.recipe-capture-toggle,
+.recipe-capture-fill-button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--fh-accent, #2563eb);
+  border-radius: 10px;
+  background: var(--fh-surface, #fff);
+  color: var(--fh-accent, #2563eb);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.recipe-capture-fill-button {
+  background: var(--fh-accent, #2563eb);
+  color: #fff;
+}
+
+.recipe-capture-toggle:disabled,
+.recipe-capture-fill-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.recipe-capture-body {
+  display: grid;
+  gap: 10px;
+}
+
+.recipe-capture-body textarea {
+  width: 100%;
+  min-height: 180px;
+  resize: vertical;
+}
+
+.recipe-capture-actions {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.recipe-capture-actions small:empty {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .recipe-capture-heading {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .recipe-capture-toggle {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .recipe-capture-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .recipe-capture-fill-button {
+    width: 100%;
+  }
+}
 
 .recipe-import-row {
   display: flex;
@@ -6308,6 +6540,147 @@
 .settings-appearance-copy span {
   color: #64748b;
   font-size: 12px;
+}
+
+.settings-daily-brief {
+  display: grid;
+  gap: 14px;
+}
+
+.settings-daily-brief .settings-weather-warning-toggle {
+  max-width: none;
+  padding: 0;
+  border: 0;
+}
+
+.settings-daily-brief-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.settings-daily-brief-controls label {
+  display: grid;
+  gap: 6px;
+  color: var(--fh-text-muted, #64748b);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.settings-daily-brief-controls input {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--fh-border, #dbe3ee);
+  border-radius: 11px;
+  background: var(--fh-surface, #fff);
+  color: var(--fh-text, #172033);
+  font: inherit;
+}
+
+.settings-daily-brief-preview {
+  display: grid;
+  gap: 5px;
+  padding: 13px 14px;
+  border: 1px solid color-mix(in srgb, var(--fh-accent, #2563eb) 30%, transparent);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--fh-accent, #2563eb) 8%, var(--fh-surface, #fff));
+}
+
+.settings-daily-brief-preview span {
+  color: var(--fh-accent, #2563eb);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.settings-daily-brief-preview strong {
+  color: var(--fh-text, #172033);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.settings-daily-brief-note {
+  color: var(--fh-text-muted, #64748b);
+  line-height: 1.45;
+}
+
+.settings-display-schedule {
+  display: grid;
+  gap: 14px;
+}
+
+.settings-display-schedule .settings-weather-warning-toggle {
+  max-width: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.settings-display-schedule-times {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.settings-display-schedule-times label {
+  display: grid;
+  gap: 6px;
+  color: var(--fh-text-muted, #64748b);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.settings-display-schedule-times input {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--fh-border, #dbe3ee);
+  border-radius: 11px;
+  background: var(--fh-surface, #fff);
+  color: var(--fh-text, #172033);
+  font: inherit;
+}
+
+.settings-display-photo-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 13px;
+  border: 1px solid var(--fh-border, #dbe3ee);
+  border-radius: 12px;
+  background: var(--fh-surface, #fff);
+  color: var(--fh-text, #172033);
+  cursor: pointer;
+}
+
+.settings-display-photo-option input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--fh-accent, #2563eb);
+}
+
+.settings-display-photo-option > span {
+  display: grid;
+  gap: 3px;
+}
+
+.settings-display-photo-option small {
+  color: var(--fh-text-muted, #64748b);
+  line-height: 1.4;
+}
+
+@media (max-width: 600px) {
+  .settings-display-schedule-times {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .settings-display-schedule-times :is(label, input, button) {
+    width: 100%;
+  }
 }
 
 .settings-colour-options {
@@ -19418,10 +19791,10 @@ transform-origin: center;
 /* FamilyHub — Apple-inspired Home */
 
 .apple-home {
-  --apple-surface: #ffffff;
-  --apple-border: rgba(60, 60, 67, 0.12);
-  --apple-text: #1d1d1f;
-  --apple-muted: #6e6e73;
+  --apple-surface: var(--fh-surface);
+  --apple-border: var(--fh-border);
+  --apple-text: var(--fh-text);
+  --apple-muted: var(--fh-muted);
   --apple-shadow: 0 4px 20px rgba(0, 0, 0, 0.045);
 
   font-family:
@@ -19431,10 +19804,10 @@ transform-origin: center;
 }
 
 html[data-theme="dark"] .apple-home {
-  --apple-surface: #1c1c1e;
-  --apple-border: rgba(255, 255, 255, 0.12);
-  --apple-text: #f5f5f7;
-  --apple-muted: #a1a1a6;
+  --apple-surface: var(--fh-surface);
+  --apple-border: var(--fh-border);
+  --apple-text: var(--fh-text);
+  --apple-muted: var(--fh-muted);
   --apple-shadow: 0 4px 20px rgba(0, 0, 0, 0.16);
 }
 
@@ -19771,11 +20144,11 @@ html[data-theme="dark"] .familyhub-shell .wall-mode-button {
 /* FamilyHub — Apple-inspired forms */
 
 .familyhub-shell .event-modal {
-  --form-surface: #ffffff;
-  --form-field: #f5f5f7;
-  --form-text: #1d1d1f;
-  --form-muted: #636366;
-  --form-border: rgba(60, 60, 67, 0.14);
+  --form-surface: var(--fh-surface);
+  --form-field: var(--fh-inset);
+  --form-text: var(--fh-text);
+  --form-muted: var(--fh-muted);
+  --form-border: var(--fh-border);
 
   background: var(--form-surface);
   color: var(--form-text);
@@ -19787,11 +20160,11 @@ html[data-theme="dark"] .familyhub-shell .wall-mode-button {
 }
 
 html[data-theme="dark"] .familyhub-shell .event-modal {
-  --form-surface: #1c1c1e;
-  --form-field: #2c2c2e;
-  --form-text: #f5f5f7;
-  --form-muted: #aeaeb2;
-  --form-border: rgba(255, 255, 255, 0.16);
+  --form-surface: var(--fh-surface);
+  --form-field: var(--fh-inset);
+  --form-text: var(--fh-text);
+  --form-muted: var(--fh-muted);
+  --form-border: var(--fh-border);
 
   color-scheme: dark;
 }
@@ -19924,9 +20297,9 @@ html[data-theme="dark"] .familyhub-shell .event-modal {
 /* FamilyHub — Calendar segmented control */
 
 .familyhub-shell .calendar-view-switch {
-  --segment-track: #eaeaed;
+  --segment-track: var(--fh-track);
   --segment-active: #ffffff;
-  --segment-text: #1d1d1f;
+  --segment-text: var(--fh-text);
 
   gap: 3px;
   padding: 4px;
@@ -19936,9 +20309,9 @@ html[data-theme="dark"] .familyhub-shell .event-modal {
 }
 
 html[data-theme="dark"] .familyhub-shell .calendar-view-switch {
-  --segment-track: #2c2c2e;
+  --segment-track: var(--fh-track);
   --segment-active: #636366;
-  --segment-text: #f5f5f7;
+  --segment-text: var(--fh-text);
 }
 
 .familyhub-shell .calendar-view-switch .calendar-view-button {
@@ -19994,15 +20367,15 @@ html[data-theme="dark"] .familyhub-shell .calendar-view-switch {
 /* FamilyHub — Calendar toolbar controls */
 
 .familyhub-shell .calendar-page {
-  --calendar-control-bg: #f5f5f7;
-  --calendar-control-text: #1d1d1f;
-  --calendar-control-border: rgba(60, 60, 67, 0.14);
+  --calendar-control-bg: var(--fh-inset);
+  --calendar-control-text: var(--fh-text);
+  --calendar-control-border: var(--fh-border);
 }
 
 html[data-theme="dark"] .familyhub-shell .calendar-page {
-  --calendar-control-bg: #2c2c2e;
-  --calendar-control-text: #f5f5f7;
-  --calendar-control-border: rgba(255, 255, 255, 0.14);
+  --calendar-control-bg: var(--fh-inset);
+  --calendar-control-text: var(--fh-text);
+  --calendar-control-border: var(--fh-border);
 }
 
 .familyhub-shell .calendar-page .calendar-toolbar {
@@ -20204,17 +20577,17 @@ html[data-theme="light"] .familyhub-shell
 /* FamilyHub — Tasks headings and segmented control */
 
 .familyhub-shell .tasks-page {
-  --tasks-text: #1d1d1f;
-  --tasks-muted: #636366;
-  --tasks-track: #eaeaed;
-  --tasks-selected: #ffffff;
+  --tasks-text: var(--fh-text);
+  --tasks-muted: var(--fh-muted);
+  --tasks-track: var(--fh-track);
+  --tasks-selected: var(--fh-selected);
 }
 
 html[data-theme="dark"] .familyhub-shell .tasks-page {
-  --tasks-text: #f5f5f7;
-  --tasks-muted: #aeaeb2;
-  --tasks-track: #2c2c2e;
-  --tasks-selected: #636366;
+  --tasks-text: var(--fh-text);
+  --tasks-muted: var(--fh-muted);
+  --tasks-track: var(--fh-track);
+  --tasks-selected: var(--fh-selected);
 }
 
 .familyhub-shell .tasks-page .chores-group-heading h3 {

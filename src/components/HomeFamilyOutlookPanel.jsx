@@ -9,18 +9,42 @@ function HomeFamilyOutlookPanel({
   upcomingDays,
   onNavigate,
 }) {
+  const totals = upcomingDays.reduce(
+    (summary, day) => ({
+      events: summary.events + day.events.length,
+      tasks: summary.tasks + day.tasks.length,
+      meals: summary.meals + day.meals.length,
+      clearDays:
+        summary.clearDays +
+        (day.events.length + day.tasks.length + day.meals.length === 0 ? 1 : 0),
+    }),
+    { events: 0, tasks: 0, meals: 0, clearDays: 0 }
+  );
+
   return (
     <article className="panel upcoming-panel">
       <div className="panel-heading">
         <div>
-          <p className="section-kicker">
-            Family Outlook
-          </p>
+          <p className="section-kicker">Weekly overview</p>
 
-          <h3>
-            Next 7 days
-          </h3>
+          <h3>Next 7 days</h3>
         </div>
+
+        <button
+          type="button"
+          className="text-button"
+          onClick={() => onNavigate("calendar")}
+        >
+          View calendar
+          <ChevronRight size={18} />
+        </button>
+      </div>
+
+      <div className="home-week-summary" aria-label="Weekly totals">
+        <span><CalendarDays size={15} /><strong>{totals.events}</strong> events</span>
+        <span><CheckSquare size={15} /><strong>{totals.tasks}</strong> tasks</span>
+        <span><Soup size={15} /><strong>{totals.meals}</strong> meals</span>
+        <span><strong>{totals.clearDays}</strong> clear days</span>
       </div>
 
       <div className="upcoming-placeholder">

@@ -516,7 +516,7 @@ memberIds,
       }}
     >
       <motion.div
-        className="event-modal"
+        className="event-modal fh-dialog"
         role="dialog"
         aria-modal="true"
         initial={
@@ -946,7 +946,7 @@ memberIds,
             }
           }}
         >
-          <div className="reward-delete-confirm-modal">
+          <div className="reward-delete-confirm-modal fh-dialog">
             <div className="reward-delete-confirm-icon">
               <Trash2 size={24} />
             </div>

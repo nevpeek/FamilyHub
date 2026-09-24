@@ -23,16 +23,6 @@ function HomeHeader({
           {getGreeting(currentTime)}
         </h2>
 
-        <p className="page-description home-today-date">
-          {new Intl.DateTimeFormat(
-            "en-AU",
-            {
-              weekday: "long",
-              day: "numeric",
-              month: "long",
-            }
-          ).format(currentTime)}
-        </p>
       </div>
 
       <div className="home-header-actions">

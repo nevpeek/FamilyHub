@@ -50,7 +50,7 @@ function OccurrenceActionModal({
   return (
     <div className="event-modal-backdrop">
       <div
-        className="occurrence-action-modal"
+        className="occurrence-action-modal fh-dialog"
         role="dialog"
         aria-modal="true"
       >

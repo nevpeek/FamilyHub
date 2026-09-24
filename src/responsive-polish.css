@@ -42,6 +42,22 @@
   .familyhub-shell .meals-page .meal-week-grid { min-width: 0; grid-template-columns: minmax(0, 1fr); }
   .familyhub-shell .meals-page .meal-week-slot { min-height: 0; padding: 14px; }
   .familyhub-shell .meals-page .meal-week-day { min-width: 0; }
+  .familyhub-shell .tasks-page { min-width: 0; overflow-x: clip; }
+  .familyhub-shell .tasks-page .tasks-toolbar {
+    width: 100%; min-width: 0; align-items: stretch; flex-direction: column; gap: 10px;
+  }
+  .familyhub-shell .tasks-page .tasks-view-switch {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: 100%; min-width: 0; box-sizing: border-box;
+  }
+  .familyhub-shell .tasks-page .tasks-view-button {
+    min-width: 0; padding: 0 5px; font-size: 12px;
+  }
+  .familyhub-shell .tasks-page .tasks-toolbar-right {
+    width: 100%; min-width: 0; box-sizing: border-box;
+  }
+  .familyhub-shell .tasks-page .routine-rewards-summary { min-width: 0; }
+  .familyhub-shell .tasks-page .routine-rewards-members { max-width: 100%; }
   .familyhub-shell .lists-page .lists-workspace { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .familyhub-shell .lists-page .lists-sidebar { padding: 14px; }
   .familyhub-shell .lists-page .lists-sidebar-items { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 8px; }

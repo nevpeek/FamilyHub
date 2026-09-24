@@ -185,7 +185,7 @@ function RewardModal({
           }
         }}
       >
-        <div className="event-modal reward-modal">
+        <div className="event-modal reward-modal fh-dialog">
           <div className="event-modal-heading">
             <div>
               <span className="section-kicker">
@@ -368,7 +368,7 @@ function RewardModal({
             }
           }}
         >
-          <div className="reward-delete-confirm-modal">
+          <div className="reward-delete-confirm-modal fh-dialog">
             <div className="reward-delete-confirm-icon">
               🗑️
             </div>

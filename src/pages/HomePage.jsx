@@ -21,7 +21,8 @@ import HomeFamilyOutlookPanel from "../components/HomeFamilyOutlookPanel";
 import HomeListsPanel from "../components/HomeListsPanel";
 import HomeQuickActions from "../components/HomeQuickActions";
 import HomeFamilySelector from "../components/HomeFamilySelector";
-import HomeSummaryLine from "../components/HomeSummaryLine";
+import HomeSmartPlanningPanel from "../components/HomeSmartPlanningPanel";
+import HomeCheckInPanel from "../components/HomeCheckInPanel";
 
 export default function HomePage({
   members,
@@ -55,6 +56,7 @@ homeCountdownsLoading,
 homeCountdownsError,
 
 onNavigate,
+  onPlanBusyMeal,
   onAddEvent,
   onAddTask,
   onAddMeal,
@@ -69,37 +71,48 @@ const reduceMotion = useReducedMotion();
 const [layoutMode, setLayoutMode] = useState(false);
 const defaultHomePanelOrder = [
   "today",
-  "chores",
   "countdown",
-  "camera",
-  "context",
+  "chores",
+  "checkins",
   "dinner",
   "outlook",
+  "context",
+  "camera",
   "lists",
 ];
 
 const defaultHomePanelSizes = {
   today: { width: 8, height: 1 },
   chores: { width: 8, height: 1 },
+  checkins: { width: 4, height: 1 },
   countdown: { width: 4, height: 1 },
   camera: { width: 4, height: 1 },
   context: { width: 4, height: 1 },
   dinner: { width: 4, height: 1 },
   outlook: { width: 12, height: 1 },
-  lists: { width: 12, height: 1 },
+  lists: { width: 4, height: 1 },
 };
 
 const [homePanelOrder, setHomePanelOrder] = useState(() => {
   try {
     const savedLayout = localStorage.getItem(
-      "familyhub-home-panel-order"
+      "familyhub-home-panel-order-v2"
     );
 
     if (savedLayout) {
       const parsedLayout = JSON.parse(savedLayout);
 
       if (Array.isArray(parsedLayout)) {
-        return parsedLayout;
+        const validSavedPanels = parsedLayout.filter(
+          (panelId) => defaultHomePanelOrder.includes(panelId)
+        );
+
+        return [
+          ...validSavedPanels,
+          ...defaultHomePanelOrder.filter(
+            (panelId) => !validSavedPanels.includes(panelId)
+          ),
+        ];
       }
     }
   } catch (error) {
@@ -115,7 +128,7 @@ const [homePanelOrder, setHomePanelOrder] = useState(() => {
 const [homePanelSizes, setHomePanelSizes] = useState(() => {
   try {
     const savedSizes = localStorage.getItem(
-      "familyhub-home-panel-sizes"
+      "familyhub-home-panel-sizes-v2"
     );
 
     if (savedSizes) {
@@ -218,11 +231,11 @@ function startLayoutHold() {
 function saveHomeLayout() {
   try {
     localStorage.setItem(
-      "familyhub-home-panel-order",
+      "familyhub-home-panel-order-v2",
       JSON.stringify(homePanelOrder)
     );
     localStorage.setItem(
-  "familyhub-home-panel-sizes",
+  "familyhub-home-panel-sizes-v2",
   JSON.stringify(homePanelSizes)
 );
   } catch (error) {
@@ -1035,6 +1048,9 @@ const [familyStarsLoading, setFamilyStarsLoading] =
 const [homeListsLoading, setHomeListsLoading] =
   useState(true);
 
+const [homePantryItems, setHomePantryItems] = useState([]);
+const [homeRecipes, setHomeRecipes] = useState([]);
+
 
 useEffect(() => {
   let cancelled = false;
@@ -1085,6 +1101,60 @@ useEffect(() => {
   loadWeather();
 
   const stopAutoRefresh = startAutoRefresh(loadWeather);
+
+  return () => {
+    cancelled = true;
+    stopAutoRefresh();
+    controller.abort();
+  };
+}, []);
+
+useEffect(() => {
+  let cancelled = false;
+  let inFlight = false;
+  const controller = new AbortController();
+
+  async function loadPlanningData() {
+    if (cancelled || inFlight) return;
+    inFlight = true;
+
+    try {
+      const [pantryResponse, recipesResponse] = await Promise.all([
+        fetch(`${API_BASE_URL}/api/pantry`, {
+          signal: controller.signal,
+          cache: "no-store",
+        }),
+        fetch(`${API_BASE_URL}/api/recipes`, {
+          signal: controller.signal,
+          cache: "no-store",
+        }),
+      ]);
+
+      const [pantryData, recipesData] = await Promise.all([
+        pantryResponse.json(),
+        recipesResponse.json(),
+      ]);
+
+      if (cancelled) return;
+
+      if (pantryResponse.ok) {
+        setHomePantryItems(pantryData.items || []);
+      }
+
+      if (recipesResponse.ok) {
+        setHomeRecipes(recipesData.recipes || []);
+      }
+    } catch (err) {
+      if (!cancelled && err.name !== "AbortError") {
+        console.error("Home planning suggestions error:", err);
+      }
+    } finally {
+      inFlight = false;
+    }
+  }
+
+  loadPlanningData();
+  const stopAutoRefresh = startAutoRefresh(loadPlanningData);
 
   return () => {
     cancelled = true;
@@ -1230,14 +1300,14 @@ const homeDayMode =
     ? "morning"
     : currentHour >= 17
       ? "evening"
-      : "day";
+      : "afternoon";
 
 const homeDayHeading =
   homeDayMode === "morning"
     ? "Morning overview"
     : homeDayMode === "evening"
       ? "Evening overview"
-      : "Today at a glance";      
+      : "Afternoon overview";
 
   const todayKey = [
     currentTime.getFullYear(),
@@ -1254,38 +1324,6 @@ const homeDayHeading =
       (event) =>
         event.start_date === todayKey
     );
-
-    const upcomingTodayEvents =
-  todayEvents.filter((event) => {
-    if (event.all_day) {
-      return true;
-    }
-
-    if (!event.start_time) {
-      return false;
-    }
-
-    const [hours, minutes] =
-      event.start_time
-        .split(":")
-        .map(Number);
-
-    const eventTime = new Date(
-      currentTime
-    );
-
-    eventTime.setHours(
-      hours,
-      minutes,
-      0,
-      0
-    );
-
-    return eventTime >= currentTime;
-  });
-
-const nextTodayEvent =
-  upcomingTodayEvents[0] || null;
 
   const openShoppingItems =
   homeShoppingItems.filter(
@@ -1410,7 +1448,6 @@ const upcomingDays = Array.from(
           todayEvents={todayEvents}
           homeEventsLoading={homeEventsLoading}
           homeEventsError={homeEventsError}
-          nextTodayEvent={nextTodayEvent}
           onNavigate={onNavigate}
         />
       );
@@ -1460,6 +1497,14 @@ const upcomingDays = Array.from(
           homeCountdownsError={
             homeCountdownsError
           }
+        />
+      );
+
+    case "checkins":
+      return (
+        <HomeCheckInPanel
+          members={members}
+          currentTime={currentTime}
         />
       );
 
@@ -1553,16 +1598,6 @@ const upcomingDays = Array.from(
   error={error}
   selectedMemberId={selectedMemberId}
   setSelectedMemberId={setSelectedMemberId}
-/>
-
-<HomeSummaryLine
-  todayEvents={todayEvents}
-  todayTaskAssignments={todayTaskAssignments}
-  todayTaskCompletions={todayTaskCompletions}
-  homeMeals={homeMeals}
-  openShoppingItems={openShoppingItems}
-  homeLists={homeLists}
-  onNavigate={onNavigate}
 />
 
 {layoutMode && (
@@ -1868,6 +1903,15 @@ animate={{
       </div>
     )}
 </section>
+
+<HomeSmartPlanningPanel
+  pantryItems={homePantryItems}
+  recipes={homeRecipes}
+  openShoppingItems={openShoppingItems}
+  upcomingDays={upcomingDays}
+  onNavigate={onNavigate}
+  onPlanBusyMeal={onPlanBusyMeal}
+/>
 
 </motion.div>
   );

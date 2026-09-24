@@ -1206,7 +1206,7 @@ body: JSON.stringify({
       onClick={onClose}
     >
       <form
-        className="pantry-item-modal"
+        className="pantry-item-modal fh-dialog"
         onSubmit={handleSubmit}
         onClick={(event) =>
           event.stopPropagation()
@@ -1877,7 +1877,7 @@ onClick={() =>
           }}
         >
           <div
-            className="reward-delete-confirm-modal"
+            className="reward-delete-confirm-modal fh-dialog"
             onMouseDown={(event) =>
               event.stopPropagation()
             }

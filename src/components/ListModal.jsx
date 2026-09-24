@@ -331,7 +331,7 @@ const response = await fetch(
         }
       }}
     >
-      <div className="event-modal list-modal">
+      <div className="event-modal list-modal fh-dialog">
         <div className="event-modal-heading">
           <div>
             <p className="page-kicker">
@@ -562,7 +562,7 @@ onClick={() =>
             }
           }}
         >
-          <div className="reward-delete-confirm-modal">
+          <div className="reward-delete-confirm-modal fh-dialog">
             <div className="reward-delete-confirm-icon">
               <Trash2 size={24} />
             </div>

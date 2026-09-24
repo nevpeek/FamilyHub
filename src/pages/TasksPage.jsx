@@ -991,21 +991,26 @@ const routinesByTimeOfDay = useMemo(() => {
             Tasks
           </p>
 
-          <h2>Family Tasks</h2>
+          <h2>{taskView === "routines" ? "Family Routines" : "Family Tasks"}</h2>
 
           <p>
-            Keep track of chores and jobs
-            across the family.
+            {taskView === "routines"
+              ? "Build repeatable morning, afternoon, and evening habits."
+              : "Keep track of chores and jobs across the family."}
           </p>
         </div>
 
         <button
           type="button"
           className="add-event-button"
-          onClick={onAddTask}
+          onClick={() => onAddTask?.(
+            taskView === "routines"
+              ? { category: "routine" }
+              : null
+          )}
         >
           <Plus size={22} />
-          <span>Add Task</span>
+          <span>{taskView === "routines" ? "Add Routine" : "Add Task"}</span>
         </button>
       </section>
 
@@ -1850,7 +1855,7 @@ routinesByTimeOfDay.morning.map(
       }
     }}
   >
-    <div className="redeem-reward-modal">
+    <div className="redeem-reward-modal fh-dialog">
       <div className="redeem-reward-icon">
         🎁
       </div>

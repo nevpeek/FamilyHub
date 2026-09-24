@@ -2,15 +2,49 @@ import { API_BASE_URL } from "../config/api";
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import {
+  Moon,
+  School,
+  Sparkles,
+  Sun,
   Trash2,
   X,
 } from "lucide-react";
+
+const ROUTINE_STARTERS = [
+  {
+    title: "Get ready for school",
+    description: "Get dressed, have breakfast, brush teeth, and pack the school bag.",
+    dueTime: "07:30",
+    recurrenceRule: "daily",
+    icon: School,
+  },
+  {
+    title: "After-school reset",
+    description: "Empty the school bag, put lunch boxes away, and prepare for tomorrow.",
+    dueTime: "15:30",
+    recurrenceRule: "daily",
+    icon: Sun,
+  },
+  {
+    title: "Bedtime routine",
+    description: "Pack up, shower, brush teeth, and get ready for bed.",
+    dueTime: "19:00",
+    recurrenceRule: "daily",
+    icon: Moon,
+  },
+];
+
+function todayDateKey() {
+  const today = new Date();
+  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+}
 
 function TaskModal({
   open,
   task,
   editMode,
   members,
+  defaultCategory = "chore",
   onClose,
   onSaved,
 }) {
@@ -67,10 +101,13 @@ const isEditing = Boolean(task?.id);
 
     setTitle(task?.title || "");
     setDescription(task?.description || "");
-    setDueDate(task?.due_date || "");
-    setDueTime(task?.due_time || "");
+    const nextCategory = task?.category || defaultCategory;
+    const isNewRoutine = !task && nextCategory === "routine";
+
+    setDueDate(task?.due_date || (isNewRoutine ? todayDateKey() : ""));
+    setDueTime(task?.due_time || (isNewRoutine ? "07:30" : ""));
     setPriority(task?.priority || "normal");
-setCategory(task?.category || "chore");
+setCategory(nextCategory);
 
 setStarValue(
   task?.star_value !== undefined &&
@@ -93,11 +130,9 @@ setReminderMinutes(
     : "15"
 );
 
-setIsRecurring(
-  Boolean(task?.is_recurring)
-);
+setIsRecurring(isNewRoutine || Boolean(task?.is_recurring));
 setRecurrenceRule(
-  task?.recurrence_rule || "weekly"
+  task?.recurrence_rule || (isNewRoutine ? "daily" : "weekly")
 );
 
 setRecurrenceEndDate(
@@ -112,7 +147,7 @@ setMemberIds(
 
     setError("");
     setSaving(false);
-  }, [open, task]);
+  }, [open, task, editMode, defaultCategory]);
 
   if (!open) {
     return null;
@@ -312,7 +347,7 @@ const response = await fetch(
       }}
     >
       <motion.div
-        className="event-modal"
+        className="event-modal fh-dialog"
         role="dialog"
         aria-modal="true"
         aria-label={isEditing ? "Edit Task" : "Add Task"}
@@ -330,13 +365,17 @@ const response = await fetch(
         <div className="event-modal-header">
           <div>
             <p className="section-kicker">
-              Tasks
+              {category === "routine" ? "Routines" : "Tasks"}
             </p>
 
             <h2>
               {isEditing
-                ? "Edit Task"
-                : "Add Task"}
+                ? category === "routine"
+                  ? "Edit Routine"
+                  : "Edit Task"
+                : category === "routine"
+                  ? "Add Routine"
+                  : "Add Task"}
             </h2>
           </div>
 
@@ -354,6 +393,41 @@ const response = await fetch(
   className="event-form"
   onSubmit={handleSubmit}
 >
+  {category === "routine" && !isEditing && (
+    <div className="routine-starters event-form-full">
+      <div className="routine-starters-heading">
+        <span><Sparkles size={16} /> Quick starters</span>
+        <small>Choose one, then make it yours.</small>
+      </div>
+
+      <div className="routine-starter-options">
+        {ROUTINE_STARTERS.map((starter) => {
+          const Icon = starter.icon;
+
+          return (
+            <button
+              type="button"
+              key={starter.title}
+              className={title === starter.title ? "selected" : ""}
+              onClick={() => {
+                setTitle(starter.title);
+                setDescription(starter.description);
+                setDueDate(dueDate || todayDateKey());
+                setDueTime(starter.dueTime);
+                setIsRecurring(true);
+                setRecurrenceRule(starter.recurrenceRule);
+                setRecurrenceEndDate("");
+              }}
+            >
+              <Icon size={19} />
+              <span>{starter.title}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  )}
+
   <label className="event-form-field event-form-full">
     <span>Task title</span>
 
@@ -756,7 +830,9 @@ const response = await fetch(
           ? "Saving..."
           : isEditing
             ? "Save Changes"
-            : "Add Task"}
+            : category === "routine"
+              ? "Add Routine"
+              : "Add Task"}
       </button>
     </div>
   </div>
@@ -775,7 +851,7 @@ const response = await fetch(
             }
           }}
         >
-          <div className="reward-delete-confirm-modal">
+          <div className="reward-delete-confirm-modal fh-dialog">
             <div className="reward-delete-confirm-icon">
               <Trash2 size={24} />
             </div>

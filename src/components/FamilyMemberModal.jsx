@@ -206,7 +206,7 @@ onClose?.();
       }}
     >
       <div
-        className="event-modal"
+        className="event-modal fh-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="family-member-modal-title"

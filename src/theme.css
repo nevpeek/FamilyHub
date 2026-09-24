@@ -1,0 +1,264 @@
+/* Shared appearance contract. Imported last so every page and dialog follows
+   the same resolved theme, including dialogs mounted outside a page container. */
+:root {
+  color-scheme: light;
+  --fh-page: #f5f5f7;
+  --fh-surface: #ffffff;
+  --fh-inset: #f2f2f5;
+  --fh-track: #e9e9ed;
+  --fh-selected: #ffffff;
+  --fh-text: #1d1d1f;
+  --fh-muted: #636366;
+  --fh-border: rgba(60, 60, 67, .18);
+  --fh-danger: #b42332;
+  --fh-success: #217345;
+  --fh-shadow: 0 24px 80px rgba(0, 0, 0, .20);
+  --fh-backdrop: rgba(18, 20, 28, .46);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --fh-page: #141416;
+  --fh-surface: #1c1c1e;
+  --fh-inset: #2c2c2e;
+  --fh-track: #2c2c2e;
+  --fh-selected: #505054;
+  --fh-text: #f5f5f7;
+  --fh-muted: #b5b5bd;
+  --fh-border: rgba(255, 255, 255, .18);
+  --fh-danger: #ff9a9f;
+  --fh-success: #80dba0;
+  --fh-shadow: 0 24px 80px rgba(0, 0, 0, .50);
+  --fh-backdrop: rgba(0, 0, 0, .65);
+}
+html[data-theme] body { background: var(--fh-page); color: var(--fh-text); }
+html[data-theme] .familyhub-shell { background: var(--fh-page); color: var(--fh-text); }
+
+/* These explicit overrides replace legacy fixed dark colours. Layout, identity
+   colours, photo overlays and video surfaces remain owned by their components. */
+html[data-theme] .fh-dialog {
+  color-scheme: inherit;
+  background: var(--fh-surface) !important;
+  color: var(--fh-text) !important;
+  border: 1px solid var(--fh-border) !important;
+  border-radius: 24px;
+  box-shadow: var(--fh-shadow) !important;
+  font-family: inherit;
+}
+html[data-theme] .fh-dialog { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+html[data-theme] .fh-dialog :is(h2, h3) { font-weight: 650; }
+html[data-theme] .fh-dialog :is(label > span, .week-templates-toolbar strong,
+  .meal-wheel-group > span, .meal-wheel-group-card strong, .meal-wheel-recipe-item strong,
+  .meal-wheel-current-group strong, .meal-wheel-result > strong, .reminder-popup-card > strong) {
+  color: var(--fh-text) !important;
+}
+html[data-theme] .fh-dialog :is(.week-templates-toolbar span, .week-templates-footer > span,
+  .meal-wheel-group-card span, .meal-wheel-recipe-item span, .meal-wheel-recipe-tools span,
+  .meal-wheel-current-group span, .meal-wheel-current-group small, .meal-wheel-result > span,
+  .reminder-popup-label, .reminder-popup-card > span, .copy-last-week-tools span) {
+  color: var(--fh-muted) !important;
+}
+html[data-theme] .fh-dialog :is(.meal-wheel-group-card, .meal-wheel-recipe-item,
+  .meal-wheel-current-group, .meal-wheel-result) {
+  background: var(--fh-inset);
+  border-color: var(--fh-border);
+}
+html[data-theme] :is(.event-modal-backdrop, .modal-backdrop,
+  .reward-delete-backdrop, .camera-editor-backdrop, .home-camera-viewer-backdrop,
+  .recipe-shopping-picker-backdrop, .settings-confirm-overlay) {
+  background: var(--fh-backdrop);
+  backdrop-filter: blur(6px);
+}
+html[data-theme] .fh-dialog :is(h1, h2, h3, h4, legend) {
+  color: var(--fh-text) !important;
+  letter-spacing: -.025em;
+}
+html[data-theme] .fh-dialog :is(p, label, .event-form-field > span,
+  .week-template-card-copy span, .save-template-summary span,
+  .clear-week-day, .copy-last-week-day, .clear-week-warning,
+  .pantry-item-image-preview-copy, .recipe-details-description) {
+  color: var(--fh-muted);
+}
+html[data-theme] .fh-dialog :is(.event-modal-header, .event-modal-content,
+  .event-modal-actions, .camera-editor-header, .clear-week-header,
+  .copy-last-week-header, .delete-template-header, .duplicate-template-header,
+  .save-template-header, .week-templates-header, .week-templates-toolbar,
+  .meal-slot-recipe-picker-header, .meal-wheel-group-manager-header,
+  .home-camera-viewer-header, .pantry-item-actions, .recipe-details-actions,
+  .clear-week-footer, .copy-last-week-footer, .delete-template-footer,
+  .duplicate-template-footer, .meal-wheel-recipe-footer,
+  .recipe-shopping-picker-footer, .save-template-footer, .week-templates-footer) {
+  background: var(--fh-surface) !important;
+  border-color: var(--fh-border) !important;
+  color: var(--fh-text);
+}
+html[data-theme] .fh-dialog :is(input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="range"]):not([type="file"]), select, textarea) {
+  background: var(--fh-inset) !important;
+  color: var(--fh-text) !important;
+  border: 1px solid var(--fh-border) !important;
+  border-radius: 12px;
+  font: inherit;
+}
+html[data-theme] .fh-dialog :is(input, textarea)::placeholder { color: var(--fh-muted); opacity: 1; }
+html[data-theme] .fh-dialog :is(input[type="checkbox"], input[type="radio"]) { accent-color: var(--familyhub-accent, #007aff); }
+html[data-theme] .fh-dialog :is(.week-template-card, .save-template-summary,
+  .clear-week-item, .copy-last-week-item, .duplicate-template-info,
+  .delete-template-warning, .pantry-low-stock-settings, .meal-copy-summary) {
+  background: var(--fh-inset) !important;
+  border-color: var(--fh-border) !important;
+  color: var(--fh-text);
+}
+html[data-theme] .fh-dialog :is(.week-template-card-copy strong, .save-template-summary strong,
+  .clear-week-meal, .copy-last-week-meal, .delete-template-warning strong,
+  .duplicate-template-info strong) { color: var(--fh-text) !important; }
+html[data-theme] .fh-dialog .copy-last-week-item.selected {
+  border-color: var(--familyhub-accent, #007aff) !important;
+  background: color-mix(in srgb, var(--familyhub-accent, #007aff) 12%, var(--fh-surface)) !important;
+}
+
+/* The same button roles are used by page controls and dialog actions. */
+html[data-theme] :is(.secondary-button, .event-secondary-button, .event-cancel-button,
+  .camera-editor-cancel, .camera-delete-confirm-cancel, .meal-copy-cancel,
+  .meal-wheel-recipe-cancel, .pantry-item-cancel, .pantry-image-change-cancel,
+  .recipe-shopping-picker-cancel, .recurring-choice-cancel, .settings-confirm-cancel-button,
+  .shopping-image-change-cancel, .meal-copy-last-week, .meal-week-templates,
+  .meal-week-previous, .meal-week-next, .meal-week-current, .week-template-rename) {
+  background: var(--fh-inset) !important;
+  color: var(--fh-text) !important;
+  border: 1px solid var(--fh-border) !important;
+  border-radius: 12px;
+  min-height: 44px;
+  box-shadow: none;
+  font: inherit;
+  font-weight: 600;
+}
+html[data-theme] :is(.primary-button, .event-save-button, .add-event-button,
+  .camera-primary-button, .camera-editor-save, .meal-wheel-recipe-save,
+  .pantry-item-save, .save-template-confirm, .week-template-save-current,
+  .week-template-use, .duplicate-template-replace, .meal-copy-confirm,
+  .rename-template-confirm, .apply-template-confirm, .recipe-details-plan,
+  .recipe-shopping-picker-add) {
+  background: var(--familyhub-accent, #007aff) !important;
+  color: #fff !important;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  min-height: 44px;
+  font-weight: 600;
+  box-shadow: none;
+}
+html[data-theme] :is(.event-delete-button, .list-item-delete-button, .camera-editor-delete,
+  .camera-delete-confirm-delete, .clear-week-confirm, .delete-template-confirm,
+  .reward-delete-confirm-button, .settings-confirm-delete-button, .pantry-item-delete,
+  .week-template-delete, .shopping-delete-all-button, .meal-clear-week,
+  .occurrence-delete-button, .meal-wheel-group-delete, .settings-calendar-source-delete-button) {
+  background: color-mix(in srgb, var(--fh-danger) 10%, var(--fh-surface)) !important;
+  color: var(--fh-danger) !important;
+  border: 1px solid color-mix(in srgb, var(--fh-danger) 28%, transparent) !important;
+  border-radius: 12px;
+  min-height: 44px;
+  box-shadow: none;
+}
+html[data-theme] :is(.event-modal-close, .modal-close-button, .meal-wheel-close,
+  .recipe-details-close, .recipe-shopping-picker-close, .home-camera-viewer-close,
+  .meal-planner-toast-close, .meal-shopping-toast-close, .recipe-shopping-success-close) {
+  background: var(--fh-inset) !important;
+  color: var(--fh-text) !important;
+  border: 1px solid var(--fh-border);
+  border-radius: 12px;
+  min-width: 40px;
+  min-height: 40px;
+}
+html[data-theme] :is(.familyhub-shell, .fh-dialog) :is(button, a, input, select, textarea):focus-visible {
+  outline: 3px solid var(--familyhub-accent, #007aff);
+  outline-offset: 3px;
+}
+html[data-theme] :is(.familyhub-shell, .fh-dialog) button:disabled { opacity: .5; cursor: not-allowed; }
+html[data-theme] :is(.meal-planner-toast, .meal-shopping-toast, .recipe-shopping-success) {
+  background: var(--fh-surface) !important;
+  color: var(--fh-text) !important;
+  border: 1px solid var(--fh-border) !important;
+  border-radius: 18px;
+  box-shadow: var(--fh-shadow);
+}
+html[data-theme] :is(.meal-planner-toast-copy, .meal-shopping-toast-copy) strong { color: var(--fh-text) !important; }
+html[data-theme] :is(.meal-planner-toast-copy, .meal-shopping-toast-copy) span { color: var(--fh-muted) !important; }
+html[data-theme] .familyhub-shell .meals-page :is(.meal-week-range strong, .meal-week-day.today .meal-week-day-heading strong) { color: var(--fh-text); }
+html[data-theme] .familyhub-shell :is(.camera-editor-error, .camera-form-error, .event-form-error,
+  .form-error, .meal-status-error, .meal-wheel-group-error, .settings-calendar-form-error,
+  .settings-calendar-source-error, .shopping-status-error, .status-message-error, .task-status-error) { color: var(--fh-danger); }
+@media (max-width: 600px) {
+  html[data-theme] .fh-dialog { max-width: calc(100vw - 24px); border-radius: 20px; }
+}
+/* Recipe details and stock editors contain inset panels of their own. */
+html[data-theme] .fh-dialog :is(.rename-template-header, .rename-template-footer,
+  .apply-template-header, .apply-template-footer) {
+  background: var(--fh-surface);
+  border-color: var(--fh-border);
+}
+html[data-theme] .fh-dialog :is(.rename-template-info, .apply-template-summary,
+  .apply-template-row) {
+  background: var(--fh-inset);
+  border-color: var(--fh-border);
+}
+html[data-theme] .fh-dialog :is(.rename-template-info strong, .apply-template-day,
+  .apply-template-day strong, .apply-template-meal-line strong, .apply-template-summary strong,
+  .apply-template-footer-copy strong) { color: var(--fh-text); }
+html[data-theme] .fh-dialog :is(.rename-template-info span, .apply-template-summary-note,
+  .apply-template-label, .apply-template-day span, .apply-template-footer-copy span) { color: var(--fh-muted); }
+html[data-theme] .fh-dialog .apply-template-summary span { color: var(--fh-muted); }
+html[data-theme] .fh-dialog :is(.apply-template-match-badge, .apply-template-add-badge) {
+  color: var(--fh-success);
+  background: color-mix(in srgb, var(--fh-success) 10%, var(--fh-surface));
+  border-color: color-mix(in srgb, var(--fh-success) 25%, transparent);
+}
+html[data-theme] .fh-dialog .apply-template-choice button {
+  color: var(--fh-text);
+  background: var(--fh-inset);
+  border-color: var(--fh-border);
+}
+html[data-theme] .fh-dialog .apply-template-choice button.selected {
+  background: color-mix(in srgb, var(--familyhub-accent, #007aff) 15%, var(--fh-surface));
+  border-color: var(--familyhub-accent, #007aff);
+}
+html[data-theme] .fh-dialog :is(.recipe-details-meta-item, .recipe-details-method li,
+  .recipe-details-ingredients li, .pantry-item-image-preview, .pantry-low-stock-control) {
+  background: var(--fh-inset) !important;
+  border-color: var(--fh-border) !important;
+  color: var(--fh-text);
+}
+html[data-theme] .fh-dialog :is(.recipe-details-meta-item strong,
+  .recipe-details-ingredients li, .recipe-details-method p,
+  .pantry-item-image-preview-copy strong, .pantry-low-stock-heading strong) {
+  color: var(--fh-text) !important;
+}
+html[data-theme] .fh-dialog :is(.recipe-details-meta-item span,
+  .recipe-details-section-heading > span, .pantry-item-image-preview-copy span,
+  .pantry-low-stock-heading span) { color: var(--fh-muted) !important; }
+html[data-theme] .fh-dialog :is(.pantry-item-image-preview-picture,
+  .shopping-item-image-preview-picture):not(:has(img)) { background: var(--fh-track); }
+html[data-theme] .fh-dialog :is(.recipe-details-edit, .recipe-details-link,
+  .recipe-details-shopping, .recipe-shopping-picker-tools button) {
+  background: var(--fh-inset) !important;
+  color: var(--fh-text) !important;
+  border: 1px solid var(--fh-border);
+  border-radius: 12px;
+}
+html[data-theme] .fh-dialog :is(.recipe-shopping-picker-tools, .recipe-shopping-picker-list) {
+  background: var(--fh-surface) !important;
+  color: var(--fh-text);
+  border-color: var(--fh-border);
+}
+html[data-theme] .fh-dialog .recipe-shopping-picker-item {
+  background: var(--fh-inset) !important;
+  border-color: var(--fh-border) !important;
+  color: var(--fh-text) !important;
+}
+html[data-theme] .fh-dialog .recipe-shopping-picker-item.selected {
+  background: color-mix(in srgb, var(--familyhub-accent, #007aff) 12%, var(--fh-surface)) !important;
+}
+html[data-theme] .fh-dialog .recipe-shopping-picker-tools > span {
+  background: var(--fh-inset);
+  color: var(--fh-text);
+}
+html[data-theme] .fh-dialog .shopping-item-image-copy strong { color: var(--fh-text); }
+html[data-theme] .fh-dialog .shopping-item-image-copy :is(span, p) { color: var(--fh-muted); }
+html[data-theme] .fh-dialog .shopping-item-image-picture:not(:has(img)) { background: var(--fh-inset); }

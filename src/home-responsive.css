@@ -1,0 +1,988 @@
+/*
+ * Final responsive contract for the Home dashboard.
+ * This file intentionally loads after the older tablet and page styles so
+ * Home has one predictable cascade across desktop, tablet, and phone sizes.
+ */
+
+html:has(.familyhub-shell .apple-home),
+body:has(.familyhub-shell .apple-home),
+.familyhub-shell:has(.apple-home) {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.familyhub-shell:not(.wall-mode):has(.apple-home) .familyhub-header {
+  padding-inline:
+    max(18px, env(safe-area-inset-left))
+    max(18px, env(safe-area-inset-right));
+}
+
+.familyhub-shell:not(.wall-mode):has(.apple-home) .familyhub-main {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  padding-inline:
+    max(clamp(16px, 2.4vw, 36px), env(safe-area-inset-left))
+    max(clamp(16px, 2.4vw, 36px), env(safe-area-inset-right));
+}
+
+.familyhub-shell .apple-home,
+.familyhub-shell .apple-home > *,
+.familyhub-shell .apple-home .home-layout-grid,
+.familyhub-shell .apple-home .home-layout-item,
+.familyhub-shell .apple-home .home-layout-panel-content,
+.familyhub-shell .apple-home .panel {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.familyhub-shell .apple-home > .page-title-row {
+  min-height: 0;
+  margin: 0 0 clamp(12px, 1.5vw, 18px);
+  gap: 16px;
+}
+
+.familyhub-shell .apple-home > .page-title-row h2 {
+  margin: 2px 0 0;
+  font-size: clamp(1.65rem, 2.4vw, 2.35rem);
+}
+
+.familyhub-shell .apple-home .home-weather {
+  min-width: 0;
+  min-height: 52px;
+  padding: 9px 13px;
+}
+
+.familyhub-shell .apple-home .home-weather > div {
+  min-width: 0;
+}
+
+.familyhub-shell .apple-home .home-weather span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.familyhub-shell .apple-home .home-quick-actions {
+  gap: clamp(8px, 1vw, 12px);
+  margin: 0 0 clamp(12px, 1.5vw, 18px);
+}
+
+.familyhub-shell .apple-home .home-quick-action {
+  min-height: clamp(58px, 5.2vw, 68px);
+  padding: 10px 12px;
+  gap: 5px;
+  border-radius: 18px;
+}
+
+.familyhub-shell .apple-home .family-filter-section {
+  margin: 0;
+  padding: 0;
+}
+
+.familyhub-shell .apple-home .family-selector {
+  max-width: 100%;
+  margin: 0;
+  padding: 0 0 4px;
+  gap: 8px;
+}
+
+.familyhub-shell .apple-home .family-selector-button {
+  min-width: 0;
+  min-height: 48px;
+  padding: 5px 13px 5px 6px;
+  gap: 8px;
+}
+
+.familyhub-shell .apple-home .family-selector-avatar {
+  width: 34px;
+  height: 34px;
+  flex-basis: 34px;
+}
+
+.familyhub-shell .apple-home .home-layout-grid {
+  grid-auto-rows: minmax(170px, auto);
+  gap: clamp(12px, 1.35vw, 18px);
+  margin-top: clamp(14px, 1.6vw, 20px);
+}
+
+.familyhub-shell .apple-home .home-layout-item,
+.familyhub-shell .apple-home .home-layout-panel-content,
+.familyhub-shell .apple-home .home-layout-panel-content > .panel {
+  min-height: 0;
+  height: auto;
+}
+
+.familyhub-shell .apple-home .panel {
+  padding: clamp(15px, 1.45vw, 21px);
+  border-radius: clamp(19px, 1.6vw, 24px);
+}
+
+.familyhub-shell .apple-home .panel-heading {
+  min-width: 0;
+  gap: 10px;
+}
+
+.familyhub-shell .apple-home .panel-heading > div {
+  min-width: 0;
+}
+
+.familyhub-shell .apple-home .panel-heading h3 {
+  overflow-wrap: anywhere;
+  font-size: clamp(1.02rem, 1.35vw, 1.28rem);
+}
+
+.familyhub-shell .apple-home :is(
+  .home-event-main strong,
+  .home-task-main strong,
+  .home-meal-content strong,
+  .home-countdown-copy strong,
+  .home-family-list-copy strong,
+  .home-planning-card-copy strong,
+  .home-shopping-summary-copy strong
+) {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+}
+
+.familyhub-shell .apple-home :is(
+  .home-event-card,
+  .home-task-item,
+  .home-meal-card,
+  .home-countdown-card,
+  .home-family-list-card,
+  .home-shopping-summary,
+  .home-planning-card
+) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.familyhub-shell .apple-home .home-event-list > .home-event-card:nth-of-type(n + 4),
+.familyhub-shell .apple-home .home-task-list > .home-task-item:nth-child(n + 4) {
+  display: none;
+}
+
+.familyhub-shell .apple-home .home-smart-planning {
+  min-width: 0;
+  margin: clamp(12px, 1.5vw, 18px) 0 0;
+}
+
+/* Laptop and small desktop: retain the user-arranged 12-column layout, but
+   tighten its row rhythm so short cards do not create large blank areas. */
+@media (min-width: 1181px) and (max-width: 1500px) {
+  .familyhub-shell .apple-home .home-layout-grid {
+    grid-auto-rows: minmax(155px, auto);
+  }
+
+  .familyhub-shell .apple-home .panel {
+    padding: 17px;
+  }
+
+  .familyhub-shell .apple-home .home-outlook-day {
+    min-height: 128px;
+    padding: 10px;
+  }
+}
+
+/* Tablet landscape and compact laptops: a stable two-column dashboard.
+   Saved desktop coordinates remain intact and resume above this breakpoint. */
+@media (min-width: 901px) and (max-width: 1180px) {
+  .familyhub-shell .apple-home .home-layout-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: auto;
+    grid-auto-flow: row dense;
+  }
+
+  .familyhub-shell .apple-home .home-layout-item {
+    grid-column: span 1 !important;
+    grid-row: auto !important;
+  }
+
+  .familyhub-shell .apple-home :is(
+    .home-layout-item-today,
+    .home-layout-item-chores,
+    .home-layout-item-outlook
+  ) {
+    grid-column: 1 / -1 !important;
+  }
+
+  .familyhub-shell .apple-home .home-event-list,
+  .familyhub-shell .apple-home .home-task-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .familyhub-shell .apple-home .home-family-stars-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .familyhub-shell .apple-home .home-family-lists {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html .familyhub-shell .apple-home .upcoming-panel > .upcoming-placeholder {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .familyhub-shell .apple-home .home-outlook-day {
+    min-height: 116px;
+  }
+}
+
+.familyhub-shell .apple-home .home-family-list-copy strong {
+  display: block;
+  overflow: hidden;
+  overflow-wrap: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Tablet portrait: preserve two useful columns while giving the schedule,
+   chores, and weekly outlook the full row when their content needs it. */
+@media (min-width: 701px) and (max-width: 900px) {
+  .familyhub-shell:not(.wall-mode):has(.apple-home) .familyhub-main {
+    padding: 14px 16px calc(88px + env(safe-area-inset-bottom));
+  }
+
+  .familyhub-shell .apple-home {
+    gap: 0;
+  }
+
+  .familyhub-shell .apple-home .home-layout-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: auto;
+    grid-auto-flow: row dense;
+    gap: 10px;
+  }
+
+  .familyhub-shell .apple-home .home-layout-item {
+    grid-column: span 1 !important;
+    grid-row: auto !important;
+  }
+
+  .familyhub-shell .apple-home :is(
+    .home-layout-item-today,
+    .home-layout-item-chores,
+    .home-layout-item-outlook
+  ) {
+    grid-column: 1 / -1 !important;
+  }
+
+  .familyhub-shell .apple-home .panel {
+    padding: 12px;
+  }
+
+  .familyhub-shell .apple-home .home-event-list,
+  .familyhub-shell .apple-home .home-task-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .familyhub-shell .apple-home .home-family-stars-list,
+  .familyhub-shell .apple-home .home-family-lists {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .familyhub-shell .apple-home .upcoming-placeholder {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .familyhub-shell .apple-home .home-outlook-day {
+    min-height: 108px;
+  }
+
+  .familyhub-shell .apple-home .home-smart-planning {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px;
+  }
+}
+
+/* Phone: compact dashboard, contained horizontal strips, and one-row dock. */
+@media (max-width: 700px) {
+  html {
+    scroll-padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+
+  .familyhub-shell:not(.wall-mode):has(.apple-home) .familyhub-header {
+    min-height: 58px;
+    padding:
+      max(7px, env(safe-area-inset-top))
+      max(10px, env(safe-area-inset-right))
+      7px
+      max(10px, env(safe-area-inset-left));
+  }
+
+  .familyhub-shell:not(.wall-mode):has(.apple-home) .brand-mark {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+    border-radius: 12px;
+  }
+
+  .familyhub-shell:not(.wall-mode):has(.apple-home) .brand-mark svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .familyhub-shell:not(.wall-mode):has(.apple-home) .brand-kicker,
+  .familyhub-shell:not(.wall-mode):has(.apple-home) .header-date span {
+    display: none;
+  }
+
+  .familyhub-shell:not(.wall-mode):has(.apple-home) .brand-area {
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .familyhub-shell:not(.wall-mode):has(.apple-home) .brand-area h1 {
+    overflow: hidden;
+    font-size: 1rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .familyhub-shell:not(.wall-mode):has(.apple-home) .wall-mode-button {
+    min-height: 40px;
+    padding: 5px 9px;
+    font-size: 0.72rem;
+  }
+
+  .familyhub-shell:not(.wall-mode):has(.apple-home) .header-date strong {
+    font-size: 0.82rem;
+  }
+
+  .familyhub-shell:not(.wall-mode):has(.apple-home) .familyhub-main {
+    padding:
+      11px
+      max(10px, env(safe-area-inset-right))
+      calc(78px + env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
+  }
+
+  .familyhub-shell .apple-home > .page-title-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 8px;
+  }
+
+  .familyhub-shell .apple-home > .page-title-row h2 {
+    margin: 1px 0 0;
+    font-size: clamp(1.35rem, 6.2vw, 1.65rem);
+  }
+
+  .familyhub-shell .apple-home > .page-title-row .section-kicker {
+    margin: 0;
+    font-size: 0.61rem;
+  }
+
+  .familyhub-shell .apple-home .home-header-actions {
+    width: auto;
+    min-width: 0;
+  }
+
+  .familyhub-shell .apple-home .home-weather {
+    min-height: 44px;
+    max-width: min(43vw, 170px);
+    padding: 6px 9px;
+    gap: 7px;
+  }
+
+  .familyhub-shell .apple-home .home-weather svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .familyhub-shell .apple-home .home-weather strong {
+    font-size: 0.83rem;
+  }
+
+  .familyhub-shell .apple-home .home-weather span {
+    font-size: 0.61rem;
+  }
+
+  .familyhub-shell .apple-home .home-quick-actions {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 9px;
+  }
+
+  .familyhub-shell .apple-home .home-quick-action {
+    min-height: 54px;
+    padding: 7px 3px;
+    gap: 3px;
+    border-radius: 14px;
+  }
+
+  .familyhub-shell .apple-home .home-quick-action svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .familyhub-shell .apple-home .home-quick-action span {
+    font-size: 0.7rem;
+  }
+
+  .familyhub-shell .apple-home .family-selector {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 6px;
+    padding: 1px 1px 7px;
+    scrollbar-width: none;
+    overscroll-behavior-inline: contain;
+  }
+
+  .familyhub-shell .apple-home .family-selector::-webkit-scrollbar,
+  .familyhub-shell:not(.wall-mode) .bottom-navigation::-webkit-scrollbar,
+  .familyhub-shell .apple-home .upcoming-placeholder::-webkit-scrollbar,
+  .familyhub-shell .apple-home .home-smart-planning-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .familyhub-shell .apple-home .family-selector-button {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 4px 10px 4px 5px;
+    font-size: 0.76rem;
+  }
+
+  .familyhub-shell .apple-home .family-selector-avatar {
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
+  }
+
+  .familyhub-shell .apple-home .home-layout-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: auto;
+    grid-auto-flow: row dense;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .familyhub-shell .apple-home .home-layout-item {
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
+  }
+
+  .familyhub-shell .apple-home :is(
+    .home-layout-item-countdown,
+    .home-layout-item-dinner,
+    .home-layout-item-context,
+    .home-layout-item-camera
+  ) {
+    grid-column: span 1 !important;
+  }
+
+  .familyhub-shell .apple-home .panel {
+    padding: 12px;
+    border-radius: 17px;
+  }
+
+  .familyhub-shell .apple-home .panel-heading {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 7px;
+  }
+
+  .familyhub-shell .apple-home .panel-heading h3 {
+    margin-top: 2px;
+    font-size: 0.96rem;
+    line-height: 1.18;
+  }
+
+  .familyhub-shell .apple-home .section-kicker {
+    margin: 0 0 3px;
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+  }
+
+  .familyhub-shell .apple-home .text-button {
+    min-height: 44px;
+    min-width: 44px;
+    flex: 0 0 auto;
+    padding: 0;
+    font-size: 0.7rem;
+    white-space: nowrap;
+  }
+
+  .familyhub-shell .apple-home .text-button svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .familyhub-shell .apple-home :is(.empty-state, .small-empty-state, .home-tasks-clear) {
+    min-height: 0;
+    margin-top: 9px;
+    padding: 10px;
+  }
+
+  .familyhub-shell .apple-home .home-family-stars-heading button,
+  .familyhub-shell .apple-home .home-camera-edit-button,
+  .familyhub-shell .apple-home .home-checkin-editor-heading button,
+  .familyhub-shell .apple-home .home-checkin-save {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .familyhub-shell .apple-home .empty-state {
+    justify-content: flex-start;
+  }
+
+  .familyhub-shell .apple-home .empty-icon {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+    border-radius: 13px;
+  }
+
+  .familyhub-shell .apple-home .empty-state h4 {
+    font-size: 0.86rem;
+  }
+
+  .familyhub-shell .apple-home .empty-state p {
+    font-size: 0.72rem;
+    line-height: 1.35;
+  }
+
+  .familyhub-shell .apple-home .home-event-list,
+  .familyhub-shell .apple-home .home-task-list,
+  .familyhub-shell .apple-home .home-countdown-list,
+  .familyhub-shell .apple-home .home-meal-list {
+    gap: 7px;
+    margin-top: 9px;
+  }
+
+  .familyhub-shell .apple-home .home-event-list > .home-event-card:nth-of-type(n + 3),
+  .familyhub-shell .apple-home .home-task-list > .home-task-item:nth-child(n + 3),
+  .familyhub-shell .apple-home .home-countdown-list > .home-countdown-card:nth-child(n + 3) {
+    display: none;
+  }
+
+  .familyhub-shell .apple-home .home-event-card {
+    min-height: 56px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding: 8px;
+  }
+
+  .familyhub-shell .apple-home .home-event-time {
+    min-width: 58px;
+    padding-inline: 7px;
+    font-size: 0.68rem;
+  }
+
+  .familyhub-shell .apple-home .home-event-members {
+    max-width: 76px;
+    overflow: hidden;
+  }
+
+  .familyhub-shell .apple-home .home-event-member-name {
+    display: none;
+  }
+
+  .familyhub-shell .apple-home .home-family-stars {
+    margin-top: 10px;
+    padding-top: 9px;
+  }
+
+  .familyhub-shell .apple-home .home-family-stars-heading {
+    margin-bottom: 7px;
+  }
+
+  .familyhub-shell .apple-home .home-family-stars-list {
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .familyhub-shell .apple-home .home-family-star-member {
+    flex: 1 0 126px;
+    padding: 6px 7px;
+  }
+
+  .familyhub-shell .apple-home .home-task-item,
+  .familyhub-shell .apple-home .home-meal-card,
+  .familyhub-shell .apple-home .home-family-list-card {
+    padding: 8px;
+  }
+
+  .familyhub-shell .apple-home .home-task-member-check {
+    width: 34px;
+    height: 34px;
+  }
+
+  .familyhub-shell .apple-home .home-checkin-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .familyhub-shell .apple-home .home-checkin-person {
+    min-height: 52px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 6px;
+    padding: 6px;
+    border-radius: 13px;
+  }
+
+  .familyhub-shell .apple-home .home-checkin-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+  }
+
+  .familyhub-shell .apple-home .home-checkin-person-copy strong {
+    font-size: 0.76rem;
+  }
+
+  .familyhub-shell .apple-home .home-checkin-person-copy span {
+    font-size: 0.62rem;
+  }
+
+  .familyhub-shell .apple-home .home-checkin-mood {
+    width: 25px;
+    height: 25px;
+    font-size: 1rem;
+  }
+
+  .familyhub-shell .apple-home .home-checkin-count {
+    padding: 5px 7px;
+    font-size: 0.62rem;
+  }
+
+  .familyhub-shell .apple-home .home-checkin-editor {
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px;
+  }
+
+  .familyhub-shell .apple-home .home-checkin-moods button {
+    min-height: 52px;
+  }
+
+  .familyhub-shell .apple-home .home-layout-item-countdown .panel-heading,
+  .familyhub-shell .apple-home .home-layout-item-dinner .panel-heading,
+  .familyhub-shell .apple-home .home-layout-item-context .panel-heading,
+  .familyhub-shell .apple-home .home-layout-item-camera .panel-heading {
+    flex-wrap: wrap;
+  }
+
+  .familyhub-shell .apple-home .home-layout-item-countdown .panel-heading h3,
+  .familyhub-shell .apple-home .home-layout-item-dinner .panel-heading h3,
+  .familyhub-shell .apple-home .home-layout-item-context .panel-heading h3 {
+    font-size: 0.84rem;
+  }
+
+  .familyhub-shell .apple-home .home-countdown-card {
+    min-height: 0;
+    padding: 7px;
+    gap: 5px;
+  }
+
+  .familyhub-shell .apple-home .home-countdown-copy strong {
+    font-size: 0.72rem;
+  }
+
+  .familyhub-shell .apple-home .home-countdown-copy span {
+    font-size: 0.61rem;
+  }
+
+  .familyhub-shell .apple-home .home-countdown-days {
+    min-width: 42px;
+    padding: 5px;
+  }
+
+  .familyhub-shell .apple-home .home-countdown-days strong {
+    font-size: 1rem;
+  }
+
+  .familyhub-shell .apple-home .home-countdown-days span {
+    font-size: 0.55rem;
+  }
+
+  .familyhub-shell .apple-home .home-meal-icon,
+  .familyhub-shell .apple-home .home-shopping-summary-icon {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .familyhub-shell .apple-home .home-meal-content strong,
+  .familyhub-shell .apple-home .home-shopping-summary-copy strong {
+    font-size: 0.75rem;
+  }
+
+  .familyhub-shell .apple-home .home-meal-meta,
+  .familyhub-shell .apple-home .home-meal-member,
+  .familyhub-shell .apple-home .home-shopping-summary-copy small {
+    font-size: 0.61rem;
+  }
+
+  .familyhub-shell .apple-home .home-meal-members {
+    gap: 4px;
+  }
+
+  .familyhub-shell .apple-home .home-shopping-summary {
+    grid-template-columns: auto minmax(0, 1fr);
+    min-height: 60px;
+    padding: 8px;
+  }
+
+  .familyhub-shell .apple-home .home-shopping-summary > svg {
+    display: none;
+  }
+
+  .familyhub-shell .apple-home .home-camera-panel {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .familyhub-shell .apple-home .home-camera-heading h3 {
+    font-size: 0.84rem;
+  }
+
+  .familyhub-shell .apple-home .home-camera-placeholder {
+    gap: 4px;
+    font-size: 0.64rem;
+    text-align: center;
+  }
+
+  .familyhub-shell .apple-home .home-week-summary {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 5px;
+    margin: 9px 0;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .familyhub-shell .apple-home .home-week-summary > span {
+    flex: 0 0 auto;
+    min-height: 28px;
+    padding: 0 8px;
+    font-size: 0.65rem;
+  }
+
+  .familyhub-shell .apple-home .upcoming-placeholder {
+    display: flex;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 7px;
+    padding: 1px 1px 6px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    overscroll-behavior-inline: contain;
+  }
+
+  .familyhub-shell .apple-home .home-outlook-day {
+    flex: 0 0 min(37vw, 142px);
+    min-height: 104px;
+    padding: 8px;
+    scroll-snap-align: start;
+  }
+
+  .familyhub-shell .apple-home .home-outlook-date {
+    margin-bottom: 6px;
+  }
+
+  .familyhub-shell .apple-home .home-outlook-date > strong {
+    font-size: 1.35rem;
+  }
+
+  .familyhub-shell .apple-home .home-outlook-preview > span:nth-child(n + 2),
+  .familyhub-shell .apple-home .home-outlook-arrow {
+    display: none;
+  }
+
+  .familyhub-shell .apple-home .home-family-lists {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .familyhub-shell .apple-home .home-family-list-card {
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 7px;
+  }
+
+  .familyhub-shell .apple-home .home-family-list-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+  }
+
+  .familyhub-shell .apple-home .home-family-list-card > svg {
+    display: none;
+  }
+
+  .familyhub-shell .apple-home .home-smart-planning {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 9px;
+    margin-top: 10px;
+    padding: 11px;
+    border-radius: 17px;
+  }
+
+  .familyhub-shell .apple-home .home-smart-planning-heading > span {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .familyhub-shell .apple-home .home-smart-planning-grid {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 7px;
+    padding-bottom: 3px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    overscroll-behavior-inline: contain;
+  }
+
+  .familyhub-shell .apple-home .home-planning-card {
+    flex: 0 0 min(72vw, 238px);
+    min-height: 70px;
+    padding: 9px;
+    scroll-snap-align: start;
+  }
+
+  .familyhub-shell:not(.wall-mode) .bottom-navigation {
+    display: flex;
+    grid-template-columns: none;
+    justify-content: flex-start;
+    gap: 3px;
+    width: calc(100% - 12px);
+    max-width: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    left: 50%;
+    right: auto;
+    bottom: max(6px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    padding: 5px;
+    border-radius: 18px;
+    scrollbar-width: none;
+    overscroll-behavior-inline: contain;
+  }
+
+  .familyhub-shell:not(.wall-mode) .bottom-navigation .nav-button {
+    width: auto;
+    min-width: 0;
+    min-height: 52px;
+    flex: 0 0 64px;
+    padding: 4px 2px;
+    gap: 2px;
+    border-radius: 13px;
+  }
+
+  .familyhub-shell:not(.wall-mode) .bottom-navigation .nav-button svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .familyhub-shell:not(.wall-mode) .bottom-navigation .nav-label {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 0.62rem;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .familyhub-shell :is(
+    .event-modal-backdrop,
+    .modal-backdrop,
+    .pantry-item-backdrop,
+    .home-camera-viewer-backdrop
+  ) {
+    padding:
+      max(8px, env(safe-area-inset-top))
+      max(8px, env(safe-area-inset-right))
+      max(8px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
+  }
+}
+
+/* Very narrow phones keep the mixed dashboard, but drop decorative detail so
+   the two small-card columns remain readable at 320–360 CSS pixels. */
+@media (max-width: 380px) {
+  .familyhub-shell .apple-home .home-layout-grid {
+    gap: 8px;
+  }
+
+  .familyhub-shell .apple-home .home-layout-item-countdown .section-kicker,
+  .familyhub-shell .apple-home .home-layout-item-dinner .section-kicker,
+  .familyhub-shell .apple-home .home-layout-item-context .section-kicker {
+    display: none;
+  }
+
+  .familyhub-shell .apple-home .home-layout-item-dinner .home-meal-members,
+  .familyhub-shell .apple-home .home-countdown-copy span:not(.home-countdown-age),
+  .familyhub-shell .apple-home .home-shopping-summary-copy small {
+    display: none;
+  }
+
+  .familyhub-shell .apple-home .home-layout-item-dinner .text-button,
+  .familyhub-shell .apple-home .home-layout-item-context .text-button {
+    font-size: 0;
+  }
+
+  .familyhub-shell .apple-home .home-layout-item-dinner .text-button svg,
+  .familyhub-shell .apple-home .home-layout-item-context .text-button svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Short landscape devices: use the extra width and keep the dock shallow. */
+@media (max-height: 560px) and (min-width: 640px) {
+  .familyhub-shell:not(.wall-mode):has(.apple-home) .familyhub-header {
+    min-height: 52px;
+    padding-top: max(5px, env(safe-area-inset-top));
+    padding-bottom: 5px;
+  }
+
+  .familyhub-shell:not(.wall-mode):has(.apple-home) .familyhub-main {
+    padding-top: 8px;
+    padding-bottom: calc(70px + env(safe-area-inset-bottom));
+  }
+
+  .familyhub-shell .apple-home .home-layout-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: auto;
+  }
+
+  .familyhub-shell .apple-home .home-layout-item {
+    grid-column: span 1 !important;
+    grid-row: auto !important;
+  }
+
+  .familyhub-shell .apple-home :is(
+    .home-layout-item-today,
+    .home-layout-item-chores,
+    .home-layout-item-outlook
+  ) {
+    grid-column: 1 / -1 !important;
+  }
+
+  .familyhub-shell .apple-home .upcoming-placeholder {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .familyhub-shell .apple-home .home-smart-planning {
+    grid-template-columns: minmax(170px, 0.45fr) minmax(0, 1fr);
+  }
+}

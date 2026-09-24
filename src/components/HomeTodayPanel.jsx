@@ -5,9 +5,6 @@ import {
 
 import { API_BASE_URL } from "../config/api";
 import {
-  formatLongDate,
-} from "../utils/homeUtils";
-import {
   formatEventTime,
 } from "../utils/calendarUtils";
 
@@ -16,7 +13,6 @@ function HomeTodayPanel({
   todayEvents,
   homeEventsLoading,
   homeEventsError,
-  nextTodayEvent,
   onNavigate,
 }) {
   return (
@@ -27,9 +23,7 @@ function HomeTodayPanel({
             Today
           </p>
 
-          <h3>
-            {formatLongDate(currentTime)}
-          </h3>
+          <h3>Today&apos;s schedule</h3>
         </div>
 
         <button
@@ -174,104 +168,6 @@ function HomeTodayPanel({
             );
           })}
 
-          {nextTodayEvent && (
-            <button
-              type="button"
-              className="home-next-up"
-              onClick={() =>
-                onNavigate("calendar")
-              }
-              style={{
-                "--next-up-colour":
-                  nextTodayEvent
-                    .members?.[0]
-                    ?.colour ||
-                  nextTodayEvent
-                    .colour_override ||
-                  nextTodayEvent
-                    .colourOverride ||
-                  "#64748b",
-              }}
-            >
-              <span className="home-next-up-label">
-                Next up
-              </span>
-
-              {nextTodayEvent
-                .members?.[0] && (
-                <div
-                  className="home-next-up-member"
-                  title={
-                    nextTodayEvent
-                      .members[0].name
-                  }
-                >
-                  {nextTodayEvent
-                    .members[0]
-                    .photo_url ? (
-                    <img
-                      src={
-                        nextTodayEvent
-                          .members[0]
-                          .photo_url
-                      }
-                      alt=""
-                    />
-                  ) : (
-                    <span
-                      style={{
-                        backgroundColor:
-                          nextTodayEvent
-                            .members[0]
-                            .colour ||
-                          "#64748b",
-                      }}
-                    >
-                      {
-                        nextTodayEvent
-                          .members[0]
-                          .initials
-                      }
-                    </span>
-                  )}
-
-                  <span className="home-next-up-member-name">
-                    {
-                      nextTodayEvent
-                        .members[0]
-                        .name
-                    }
-                  </span>
-                </div>
-              )}
-
-              <strong>
-                {nextTodayEvent.all_day
-                  ? nextTodayEvent.title
-                  : `${formatEventTime(
-                      nextTodayEvent.start_time
-                    )} · ${nextTodayEvent.title}`}
-              </strong>
-
-              <ChevronRight
-                className="home-next-up-arrow"
-                size={17}
-              />
-            </button>
-          )}
-
-          {!nextTodayEvent && (
-            <div className="today-status">
-              <strong>
-                Day underway
-              </strong>
-
-              <span>
-                No more events scheduled
-                today
-              </span>
-            </div>
-          )}
         </div>
       )}
     </article>

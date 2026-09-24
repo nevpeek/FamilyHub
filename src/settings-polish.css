@@ -46,6 +46,115 @@ html .familyhub-shell .settings-page :is(.settings-calendar-source-row, .setting
   box-shadow: none;
 }
 .familyhub-shell .settings-page .settings-calendar-source-row { flex-wrap: wrap; gap: 20px; }
+
+.familyhub-shell .settings-page .settings-integration-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0 22px 22px;
+}
+
+.familyhub-shell .settings-page .settings-integration-card {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--settings-border);
+  border-radius: 16px;
+  background: var(--settings-inset);
+}
+
+.familyhub-shell .settings-page .settings-integration-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--settings-surface);
+  color: var(--familyhub-accent);
+}
+
+.familyhub-shell .settings-page .settings-integration-copy {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+}
+
+.familyhub-shell .settings-page .settings-integration-copy > div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.familyhub-shell .settings-page .settings-integration-copy > div > span {
+  flex: 0 0 auto;
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: var(--settings-surface);
+  color: var(--settings-muted);
+  font-size: .67rem;
+  font-weight: 700;
+}
+
+.familyhub-shell .settings-page .settings-integration-copy > div > span.connected {
+  background: color-mix(in srgb, #22c55e 14%, var(--settings-surface));
+  color: #16803a;
+}
+
+html[data-theme="dark"] .familyhub-shell .settings-page .settings-integration-copy > div > span.connected {
+  color: #86efac;
+}
+
+.familyhub-shell .settings-page .settings-integration-copy p {
+  margin: 0;
+  color: var(--settings-muted);
+  font-size: .79rem;
+  line-height: 1.45;
+}
+
+.familyhub-shell .settings-page :is(.settings-integration-actions, .settings-integration-connect) {
+  grid-column: 1 / -1;
+}
+
+.familyhub-shell .settings-page .settings-integration-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.familyhub-shell .settings-page :is(.settings-integration-actions button, .settings-integration-connect) {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--settings-border);
+  border-radius: 10px;
+  background: var(--settings-surface);
+  color: var(--settings-text);
+  cursor: pointer;
+}
+
+.familyhub-shell .settings-page .settings-integration-connect {
+  justify-self: start;
+}
+
+.familyhub-shell .settings-page .settings-integration-guidance {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 4px;
+  padding: 13px 14px;
+  border: 1px solid color-mix(in srgb, var(--familyhub-accent) 28%, var(--settings-border));
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--familyhub-accent) 7%, var(--settings-surface));
+}
+
+.familyhub-shell .settings-page .settings-integration-guidance span {
+  color: var(--settings-muted);
+  font-size: .79rem;
+  line-height: 1.45;
+}
 .familyhub-shell .settings-page .settings-calendar-source-copy { flex: 1 1 260px; gap: 5px; }
 .familyhub-shell .settings-page .settings-calendar-source-copy small { white-space: normal; overflow-wrap: anywhere; font-size: .8rem; }
 .familyhub-shell .settings-page .settings-calendar-source-status { flex-wrap: wrap; gap: 10px; }
@@ -85,6 +194,9 @@ html .familyhub-shell .settings-page button:disabled { opacity: .5; cursor: not-
   html .familyhub-shell .settings-page .settings-member-card:hover { background: var(--settings-surface); border-color: var(--familyhub-accent); transform: none; }
 }
 @media (max-width: 700px) {
+  .familyhub-shell .settings-page .settings-integration-grid { grid-template-columns: 1fr; padding: 0 16px 16px; }
+  .familyhub-shell .settings-page .settings-integration-actions { align-items: stretch; flex-direction: column; }
+  .familyhub-shell .settings-page .settings-integration-connect { width: 100%; justify-self: stretch; }
   .familyhub-shell .settings-page .settings-calendar-source-form { grid-template-columns: 1fr; }
   .familyhub-shell .settings-page .settings-calendar-source-status { width: 100%; }
   .familyhub-shell .settings-page .settings-calendar-heading-actions { width: 100%; }

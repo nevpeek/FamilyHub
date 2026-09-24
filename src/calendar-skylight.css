@@ -1,0 +1,767 @@
+/* Skylight-inspired FamilyHub calendar. Week is the glanceable family board;
+   Day keeps the detailed hourly planner. */
+.familyhub-shell .calendar-page {
+  --calendar-warm-page: #f8f7f3;
+  --calendar-card: #ffffff;
+  --calendar-line: rgba(45, 55, 72, 0.12);
+  --calendar-soft-text: #697386;
+  --calendar-event-text: #172033;
+}
+
+html[data-theme="dark"] .familyhub-shell .calendar-page {
+  --calendar-warm-page: #141416;
+  --calendar-card: #1c1c1f;
+  --calendar-line: rgba(255, 255, 255, 0.12);
+  --calendar-soft-text: #b5b5bd;
+  --calendar-event-text: #f7f7fa;
+}
+
+html[data-theme] .familyhub-shell:has(.calendar-page) {
+  background: var(--calendar-warm-page);
+}
+
+.familyhub-shell .calendar-page .calendar-page-heading {
+  align-items: flex-start;
+}
+
+.familyhub-shell .calendar-page .calendar-page-heading h2 {
+  font-size: clamp(2rem, 3vw, 3.2rem);
+  line-height: 1.04;
+}
+
+.familyhub-shell .calendar-page .calendar-panel {
+  overflow: hidden;
+  border: 1px solid var(--calendar-line);
+  border-radius: 24px;
+  background: var(--calendar-card);
+  box-shadow: 0 14px 40px rgba(31, 42, 68, 0.08);
+}
+
+html[data-theme="dark"] .familyhub-shell .calendar-page .calendar-panel {
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+}
+
+.familyhub-shell .calendar-page .calendar-toolbar {
+  min-height: 66px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--calendar-line);
+  background: var(--calendar-card);
+}
+
+.familyhub-shell .calendar-page .calendar-view-switch {
+  border: 0;
+  background: var(--fh-inset);
+}
+
+.familyhub-shell .calendar-page .calendar-view-button {
+  min-height: 40px;
+  border-radius: 10px;
+  color: var(--fh-muted);
+  font-weight: 650;
+}
+
+.familyhub-shell .calendar-page .calendar-view-button:hover {
+  color: var(--fh-text);
+}
+
+.familyhub-shell .calendar-page .calendar-view-button.active {
+  background: var(--fh-surface);
+  color: var(--familyhub-accent, #007aff);
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.1);
+}
+
+.familyhub-shell .calendar-page .family-selector {
+  gap: 10px;
+}
+
+.familyhub-shell .calendar-page .family-selector-button {
+  background: var(--calendar-card);
+  box-shadow: 0 3px 12px rgba(31, 42, 68, 0.035);
+}
+
+.familyhub-shell .calendar-page .family-selector-button.selected {
+  box-shadow: inset 0 0 0 1px var(--familyhub-accent, #007aff);
+}
+
+.skylight-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(150px, 1fr));
+  min-width: 1050px;
+  background: var(--calendar-card);
+}
+
+.skylight-week-day {
+  min-width: 0;
+  min-height: 570px;
+  border-right: 1px solid var(--calendar-line);
+  background: var(--calendar-card);
+  transition: background 150ms ease, box-shadow 150ms ease;
+}
+
+.skylight-week-day:last-child {
+  border-right: 0;
+}
+
+.skylight-week-day.today {
+  background: color-mix(in srgb, var(--familyhub-accent, #007aff) 5%, var(--calendar-card));
+  box-shadow: inset 0 3px 0 var(--familyhub-accent, #007aff);
+}
+
+.skylight-week-day.drag-target {
+  background: color-mix(in srgb, var(--familyhub-accent, #007aff) 11%, var(--calendar-card));
+  box-shadow: inset 0 0 0 2px var(--familyhub-accent, #007aff);
+}
+
+.skylight-week-day-heading {
+  display: flex;
+  width: 100%;
+  min-height: 112px;
+  align-items: center;
+  flex-direction: column;
+  gap: 3px;
+  padding: 16px 9px 13px;
+  border: 0;
+  border-bottom: 1px solid var(--calendar-line);
+  background: transparent;
+  color: var(--fh-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.skylight-week-weekday {
+  color: var(--calendar-soft-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.skylight-week-day-heading strong {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 12px;
+  color: var(--fh-text);
+  font-size: 1.1rem;
+  font-weight: 750;
+}
+
+.skylight-week-day.today .skylight-week-day-heading strong {
+  background: var(--familyhub-accent, #007aff);
+  color: #fff;
+}
+
+.skylight-week-month,
+.skylight-week-weather {
+  color: var(--calendar-soft-text);
+  font-size: 0.72rem;
+  font-weight: 550;
+}
+
+.skylight-week-weather {
+  display: flex;
+  min-height: 16px;
+  align-items: center;
+  gap: 4px;
+}
+
+.skylight-week-weather svg {
+  width: 14px;
+  height: 14px;
+}
+
+.skylight-week-events {
+  display: flex;
+  min-height: 456px;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 9px 18px;
+}
+
+.skylight-week-event {
+  display: flex;
+  width: 100%;
+  min-height: 82px;
+  align-items: stretch;
+  flex-direction: column;
+  gap: 5px;
+  padding: 11px 10px 10px 13px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--event-colour) 23%, transparent);
+  border-left: 5px solid var(--event-colour);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--event-colour) 14%, var(--calendar-card));
+  color: var(--calendar-event-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.skylight-week-event:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--event-colour) 50%, transparent);
+  background: color-mix(in srgb, var(--event-colour) 21%, var(--calendar-card));
+}
+
+.skylight-week-event:focus-visible,
+.skylight-week-day-heading:focus-visible,
+.skylight-week-empty:focus-visible {
+  outline: 3px solid var(--familyhub-accent, #007aff);
+  outline-offset: 2px;
+}
+
+.skylight-week-event.dragging {
+  opacity: 0.42;
+}
+
+.skylight-week-event-time {
+  color: color-mix(in srgb, var(--event-colour) 72%, var(--calendar-event-text));
+  font-size: 0.73rem;
+  font-weight: 750;
+}
+
+.skylight-week-event-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.skylight-week-event-heading > strong {
+  display: -webkit-box;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--calendar-event-text);
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.skylight-week-event-place {
+  overflow: hidden;
+  color: var(--calendar-soft-text);
+  font-size: 0.71rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skylight-week-event-avatars {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.skylight-week-event-avatar {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+  place-items: center;
+  border: 2px solid var(--calendar-card);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.57rem;
+  font-weight: 800;
+}
+
+.skylight-week-event-avatar + .skylight-week-event-avatar {
+  margin-left: -6px;
+}
+
+.skylight-week-event-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.skylight-week-empty {
+  display: flex;
+  width: 100%;
+  min-height: 82px;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px;
+  border: 1px dashed var(--calendar-line);
+  border-radius: 13px;
+  background: transparent;
+  color: var(--calendar-soft-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.skylight-week-empty strong {
+  color: var(--familyhub-accent, #007aff);
+  font-size: 0.78rem;
+}
+
+@media (max-width: 1180px) {
+  .familyhub-shell .calendar-page .calendar-panel {
+    overflow-x: auto;
+  }
+
+  .skylight-week {
+    min-width: 980px;
+  }
+}
+
+@media (max-width: 760px) {
+  .familyhub-shell .calendar-page .calendar-panel {
+    overflow: visible;
+    border-radius: 20px;
+  }
+
+  .skylight-week {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+  }
+
+  .skylight-week-day {
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--calendar-line);
+  }
+
+  .skylight-week-day:last-child {
+    border-bottom: 0;
+  }
+
+  .skylight-week-day-heading {
+    min-height: 68px;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 11px 14px;
+  }
+
+  .skylight-week-day-heading strong {
+    order: -1;
+  }
+
+  .skylight-week-month {
+    margin-right: auto;
+  }
+
+  .skylight-week-events {
+    min-height: 0;
+    padding: 10px 12px 16px;
+  }
+
+  .skylight-week-event {
+    min-height: 72px;
+  }
+}
+
+/* =========================================
+   Magic event import
+   ========================================= */
+
+.calendar-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.calendar-magic-import-button {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 17px;
+  border: 1px solid color-mix(in srgb, #8b5cf6 32%, var(--calendar-line));
+  border-radius: 13px;
+  background: color-mix(in srgb, #8b5cf6 9%, var(--calendar-card));
+  color: color-mix(in srgb, #7c3aed 82%, var(--calendar-text));
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+html[data-theme="dark"] .calendar-magic-import-button {
+  color: #c4b5fd;
+}
+
+.magic-import-backdrop {
+  z-index: 1500;
+  padding: 22px;
+}
+
+.magic-import-modal {
+  display: flex;
+  width: min(980px, calc(100vw - 32px));
+  max-height: min(860px, calc(100vh - 32px));
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--fh-border);
+  border-radius: 26px;
+  background: var(--fh-surface);
+  color: var(--fh-text);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.28);
+}
+
+.magic-import-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 24px 26px 20px;
+  border-bottom: 1px solid var(--fh-border);
+}
+
+.magic-import-header .section-kicker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #8b5cf6;
+}
+
+.magic-import-header h2 {
+  margin: 5px 0 5px;
+  color: var(--fh-text);
+  font-size: 1.55rem;
+}
+
+.magic-import-header > div > span {
+  color: var(--fh-muted);
+  font-size: 0.84rem;
+}
+
+.magic-import-source {
+  display: grid;
+  gap: 12px;
+  padding: 20px 26px;
+  border-bottom: 1px solid var(--fh-border);
+}
+
+.magic-import-source label > span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--fh-text);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.magic-import-source textarea {
+  width: 100%;
+  min-height: 126px;
+  box-sizing: border-box;
+  resize: vertical;
+  padding: 13px 14px;
+  border: 1px solid var(--fh-border);
+  border-radius: 15px;
+  outline: none;
+  background: var(--fh-inset);
+  color: var(--fh-text);
+  font: inherit;
+  line-height: 1.5;
+}
+
+.magic-import-source textarea:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #8b5cf6 15%, transparent);
+}
+
+.magic-import-source-actions,
+.magic-import-footer,
+.magic-import-footer > div,
+.magic-import-review-heading,
+.magic-import-members {
+  display: flex;
+  align-items: center;
+}
+
+.magic-import-source-actions {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.magic-import-file,
+.magic-import-analyse {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid var(--fh-border);
+  border-radius: 12px;
+  background: var(--fh-inset);
+  color: var(--fh-text);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.magic-import-file input {
+  display: none;
+}
+
+.magic-import-analyse {
+  border-color: #8b5cf6;
+  background: #8b5cf6;
+  color: #fff;
+}
+
+.magic-import-analyse:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.magic-import-review {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.magic-import-review-heading {
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 26px;
+  border-bottom: 1px solid var(--fh-border);
+}
+
+.magic-import-review-heading > div:first-child {
+  display: grid;
+  gap: 2px;
+}
+
+.magic-import-review-heading strong {
+  color: var(--fh-text);
+  font-size: 0.88rem;
+}
+
+.magic-import-review-heading span {
+  color: var(--fh-muted);
+  font-size: 0.72rem;
+}
+
+.magic-import-members {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.magic-import-members button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--fh-border);
+  border-radius: 999px;
+  background: var(--fh-inset);
+  color: var(--fh-text);
+  font: inherit;
+  font-size: 0.69rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.magic-import-members button.selected {
+  border-color: var(--member-colour);
+  background: color-mix(in srgb, var(--member-colour) 14%, var(--fh-surface));
+}
+
+.magic-import-list {
+  display: grid;
+  gap: 10px;
+  padding: 16px 26px 20px;
+  overflow-y: auto;
+}
+
+.magic-import-event {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px;
+  border: 1px solid var(--fh-border);
+  border-radius: 16px;
+  background: var(--fh-inset);
+  opacity: 0.62;
+}
+
+.magic-import-event.selected {
+  border-color: color-mix(in srgb, #8b5cf6 38%, var(--fh-border));
+  opacity: 1;
+}
+
+.magic-import-event > input {
+  width: 18px;
+  height: 18px;
+  margin-top: 10px;
+  accent-color: #8b5cf6;
+}
+
+.magic-import-event-fields {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.magic-import-event-fields > div {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) auto minmax(116px, 0.7fr) minmax(116px, 0.7fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.magic-import-event-fields input {
+  min-width: 0;
+  min-height: 38px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: 1px solid var(--fh-border);
+  border-radius: 10px;
+  background: var(--fh-surface);
+  color: var(--fh-text);
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.magic-import-event-fields > input:first-child {
+  font-weight: 750;
+}
+
+.magic-import-all-day {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--fh-muted);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.magic-import-remove {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid var(--fh-border);
+  border-radius: 11px;
+  background: var(--fh-surface);
+  color: #ef4444;
+  cursor: pointer;
+}
+
+.magic-import-conflict {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 11px;
+  border: 1px solid color-mix(in srgb, var(--fh-warning, #d97706) 42%, transparent);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--fh-warning, #d97706) 11%, var(--fh-surface));
+  color: var(--fh-text);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.magic-import-conflict svg {
+  flex: 0 0 auto;
+  color: var(--fh-warning, #d97706);
+}
+
+.magic-import-error {
+  margin: 0;
+  padding: 10px 26px;
+  color: #dc2626;
+  font-size: 0.78rem;
+}
+
+.magic-import-footer {
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 26px 20px;
+  border-top: 1px solid var(--fh-border);
+}
+
+.magic-import-footer > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--fh-muted);
+  font-size: 0.72rem;
+}
+
+.magic-import-footer > div {
+  gap: 9px;
+}
+
+.magic-import-success {
+  display: grid;
+  min-height: 330px;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  padding: 34px;
+  text-align: center;
+}
+
+.magic-import-success > svg {
+  color: #22c55e;
+}
+
+.magic-import-success h3,
+.magic-import-success p {
+  margin: 0;
+}
+
+.magic-import-success p {
+  color: var(--fh-muted);
+}
+
+@media (max-width: 760px) {
+  .calendar-page-heading,
+  .calendar-heading-actions,
+  .magic-import-review-heading,
+  .magic-import-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .calendar-heading-actions > button {
+    width: 100%;
+  }
+
+  .magic-import-backdrop {
+    padding: 8px;
+  }
+
+  .magic-import-modal {
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+    border-radius: 20px;
+  }
+
+  .magic-import-header,
+  .magic-import-source,
+  .magic-import-list,
+  .magic-import-footer {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .magic-import-members {
+    justify-content: flex-start;
+  }
+
+  .magic-import-event-fields > div {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .magic-import-all-day {
+    grid-column: 1 / -1;
+  }
+}

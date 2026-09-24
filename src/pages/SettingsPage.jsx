@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import {
   Bell,
   CalendarDays,
+  CalendarSync,
   CloudSun,
+  Link2,
+  Mail,
   Settings,
   Users,
 } from "lucide-react";
@@ -20,6 +23,20 @@ function SettingsPage({
   setAccentColour,
   theme,
   setTheme,
+  dailyBriefEnabled,
+  setDailyBriefEnabled,
+  dailyBriefTime,
+  setDailyBriefTime,
+  dailyBriefSummary,
+  displayScheduleEnabled,
+  setDisplayScheduleEnabled,
+  displayScheduleStart,
+  setDisplayScheduleStart,
+  displayScheduleEnd,
+  setDisplayScheduleEnd,
+  displaySchedulePhotos,
+  setDisplaySchedulePhotos,
+  onPreviewDisplay,
 }) {
 
   const [
@@ -69,6 +86,9 @@ const [
 
 const [calendarSources, setCalendarSources] =
   useState([]);
+
+const [calendarFeedProvider, setCalendarFeedProvider] =
+  useState("other");
 
 const [calendarSourcesLoading, setCalendarSourcesLoading] =
   useState(true);
@@ -133,7 +153,7 @@ const [weatherSettings, setWeatherSettings] =
   const [weatherSettingsDirty, setWeatherSettingsDirty] =
     useState(false);
 
-    const [
+const [
   notificationPermission,
   setNotificationPermission,
 ] = useState(() => {
@@ -143,6 +163,9 @@ const [weatherSettings, setWeatherSettings] =
 
   return Notification.permission;
 });
+
+const [showDailyBriefPreview, setShowDailyBriefPreview] =
+  useState(false);
 
 
 useEffect(() => {
@@ -477,6 +500,14 @@ async function deleteCalendarSource(source) {
 
 
   function editCalendarSource(source) {
+  const providerValue = `${source.name || ""} ${source.sourceUrl || ""}`.toLowerCase();
+  setCalendarFeedProvider(
+    /apple|icloud|webcal/.test(providerValue)
+      ? "apple"
+      : /outlook|office365|microsoft|live\.com/.test(providerValue)
+        ? "outlook"
+        : "other"
+  );
   setEditingCalendarSourceId(source.id);
 
   setCalendarSourceName(
@@ -783,7 +814,9 @@ async function connectGoogleCalendar() {
 
 async function addCalendarSource() {
   const name = calendarSourceName.trim();
-  const sourceUrl = calendarSourceUrl.trim();
+  const sourceUrl = calendarSourceUrl
+    .trim()
+    .replace(/^webcal:/i, "https:");
 
   if (!name) {
     setCalendarSourceFormError(
@@ -878,6 +911,41 @@ syncIntervalMinutes:
   }
 }
 
+function openCalendarFeed(provider) {
+  const providerNames = {
+    apple: "Apple / iCloud Calendar",
+    outlook: "Outlook Calendar",
+    other: "",
+  };
+
+  setCalendarFeedProvider(provider);
+  setCalendarSourceFormOpen(true);
+  setCalendarSourceSyncInterval(60);
+  setEditingCalendarSourceId(null);
+  setCalendarSourceName(providerNames[provider] || "");
+  setCalendarSourceUrl("");
+  setCalendarSourceFormError("");
+}
+
+const googleSourceCount = calendarSources.filter(
+  (source) => source.sourceType === "google"
+).length;
+const appleSourceCount = calendarSources.filter((source) => {
+  const value = `${source.name || ""} ${source.sourceUrl || ""}`.toLowerCase();
+  return source.sourceType === "ics" && /apple|icloud|webcal/.test(value);
+}).length;
+const outlookSourceCount = calendarSources.filter((source) => {
+  const value = `${source.name || ""} ${source.sourceUrl || ""}`.toLowerCase();
+  return source.sourceType === "ics" && /outlook|office365|microsoft|live\.com/.test(value);
+}).length;
+const otherFeedCount = calendarSources.filter(
+  (source) =>
+    source.sourceType === "ics" &&
+    !`${source.name || ""} ${source.sourceUrl || ""}`
+      .toLowerCase()
+      .match(/apple|icloud|webcal|outlook|office365|microsoft|live\.com/)
+).length;
+
   return (
     <div className="settings-page">
       <section className="calendar-page-heading">
@@ -913,33 +981,6 @@ syncIntervalMinutes:
   <button
     type="button"
     className="settings-calendar-add-button"
-    onClick={connectGoogleCalendar}
-  >
-    Connect Google Account
-  </button>
-
-<button
-  type="button"
-  className="settings-calendar-add-button"
-  onClick={() => {
-    if (googleCalendarPickerOpen) {
-      setGoogleCalendarPickerOpen(false);
-    } else {
-      loadGoogleCalendars();
-    }
-  }}
-  disabled={googleCalendarsLoading}
->
-  {googleCalendarsLoading
-    ? "Loading..."
-    : googleCalendarPickerOpen
-      ? "Hide Google Calendars"
-      : "Choose Google Calendars"}
-</button>
-
-  <button
-    type="button"
-    className="settings-calendar-add-button"
     onClick={() => {
       if (calendarSourceFormOpen) {
         setCalendarSourceFormOpen(false);
@@ -948,21 +989,66 @@ syncIntervalMinutes:
         setCalendarSourceUrl("");
         setCalendarSourceFormError("");
       } else {
-        setCalendarSourceFormOpen(true);
-        setCalendarSourceSyncInterval(60);
-        setEditingCalendarSourceId(null);
-        setCalendarSourceName("");
-        setCalendarSourceUrl("");
-        setCalendarSourceFormError("");
+        openCalendarFeed("other");
       }
     }}
   >
     {calendarSourceFormOpen
       ? "Cancel"
-      : "Add Calendar Source"}
+      : "Add Calendar Feed"}
   </button>
 </div>
 </div>
+</div>
+
+<div className="settings-integration-grid" aria-label="Calendar integrations">
+  <article className="settings-integration-card">
+    <span className="settings-integration-icon"><CalendarSync size={21} /></span>
+    <div className="settings-integration-copy">
+      <div><strong>Google Calendar</strong><span className={googleSourceCount ? "connected" : "available"}>{googleSourceCount ? `${googleSourceCount} connected` : "Available"}</span></div>
+      <p>Connect your Google account, then choose the calendars the family can see.</p>
+    </div>
+    <div className="settings-integration-actions">
+      <button type="button" onClick={connectGoogleCalendar}>Connect account</button>
+      <button
+        type="button"
+        onClick={() => {
+          if (googleCalendarPickerOpen) setGoogleCalendarPickerOpen(false);
+          else loadGoogleCalendars();
+        }}
+        disabled={googleCalendarsLoading}
+      >
+        {googleCalendarsLoading ? "Loading…" : googleCalendarPickerOpen ? "Hide calendars" : "Choose calendars"}
+      </button>
+    </div>
+  </article>
+
+  <article className="settings-integration-card">
+    <span className="settings-integration-icon"><CloudSun size={21} /></span>
+    <div className="settings-integration-copy">
+      <div><strong>Apple / iCloud</strong><span className={appleSourceCount ? "connected" : "available"}>{appleSourceCount ? `${appleSourceCount} connected` : "Calendar link"}</span></div>
+      <p>Add an iCloud calendar subscription link and keep it refreshed automatically.</p>
+    </div>
+    <button type="button" className="settings-integration-connect" onClick={() => openCalendarFeed("apple")}>Add iCloud link</button>
+  </article>
+
+  <article className="settings-integration-card">
+    <span className="settings-integration-icon"><Mail size={21} /></span>
+    <div className="settings-integration-copy">
+      <div><strong>Outlook</strong><span className={outlookSourceCount ? "connected" : "available"}>{outlookSourceCount ? `${outlookSourceCount} connected` : "Calendar link"}</span></div>
+      <p>Add an Outlook published calendar link for school, work, or shared plans.</p>
+    </div>
+    <button type="button" className="settings-integration-connect" onClick={() => openCalendarFeed("outlook")}>Add Outlook link</button>
+  </article>
+
+  <article className="settings-integration-card">
+    <span className="settings-integration-icon"><Link2 size={21} /></span>
+    <div className="settings-integration-copy">
+      <div><strong>Other calendar feed</strong><span className={otherFeedCount ? "connected" : "available"}>{otherFeedCount ? `${otherFeedCount} connected` : "ICS link"}</span></div>
+      <p>Use a subscription link from a school, sports club, or another calendar app.</p>
+    </div>
+    <button type="button" className="settings-integration-connect" onClick={() => openCalendarFeed("other")}>Add calendar feed</button>
+  </article>
 </div>
 
 {googleCalendarPickerOpen && (
@@ -1031,6 +1117,23 @@ syncIntervalMinutes:
 
 {calendarSourceFormOpen && (
   <div className="settings-calendar-source-form">
+    <div className="settings-integration-guidance event-form-full">
+      <strong>
+        {calendarFeedProvider === "apple"
+          ? "Apple / iCloud calendar link"
+          : calendarFeedProvider === "outlook"
+            ? "Outlook published calendar link"
+            : "Calendar subscription link"}
+      </strong>
+      <span>
+        {calendarFeedProvider === "apple"
+          ? "In iCloud Calendar, share the calendar publicly and copy its webcal link. FamilyHub converts it to a read-only subscription; keep sharing enabled so it can refresh."
+          : calendarFeedProvider === "outlook"
+            ? "In Outlook calendar settings, publish the calendar and copy the ICS link. Paste that read-only link below."
+            : "Paste a read-only ICS or webcal subscription link supplied by the calendar owner."}
+      </span>
+    </div>
+
     <div className="settings-calendar-form-field">
       <span>Calendar name</span>
 
@@ -1048,10 +1151,14 @@ syncIntervalMinutes:
     <div className="settings-calendar-form-field">
       <span>Calendar type</span>
 
-      <select defaultValue="ics" aria-label="Calendar type">
-        <option value="ics">
+      <select value={calendarFeedProvider} aria-label="Calendar type" disabled>
+        {calendarFeedProvider === "apple" && <option value="apple">Apple / iCloud subscription</option>}
+        {calendarFeedProvider === "outlook" && <option value="outlook">Outlook subscription</option>}
+        {calendarFeedProvider === "other" && (
+        <option value="other">
           ICS Calendar
         </option>
+        )}
       </select>
     </div>
 
@@ -1513,14 +1620,80 @@ syncIntervalMinutes:
       <span className="settings-toggle-switch">
         <span className="settings-toggle-knob" />
       </span>
-    </label>
-  </div>
-</section> 
+      </label>
+    </div>
+
+    <div className="settings-appearance-block settings-display-schedule">
+      <label className="settings-weather-warning-toggle">
+        <div>
+          <strong>Display Schedule</strong>
+          <span>
+            Show the calm clock and family overview automatically while FamilyHub is open.
+          </span>
+        </div>
+
+        <input
+          type="checkbox"
+          className="settings-toggle-input"
+          checked={displayScheduleEnabled}
+          onChange={(event) => setDisplayScheduleEnabled(event.target.checked)}
+        />
+
+        <span className="settings-toggle-switch">
+          <span className="settings-toggle-knob" />
+        </span>
+      </label>
+
+      {displayScheduleEnabled && (
+        <>
+          <div className="settings-display-schedule-times">
+            <label>
+              <span>Starts</span>
+              <input
+                type="time"
+                value={displayScheduleStart}
+                onChange={(event) => setDisplayScheduleStart(event.target.value)}
+              />
+            </label>
+
+            <label>
+              <span>Ends</span>
+              <input
+                type="time"
+                value={displayScheduleEnd}
+                onChange={(event) => setDisplayScheduleEnd(event.target.value)}
+              />
+            </label>
+
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => onPreviewDisplay?.()}
+            >
+              Preview Display
+            </button>
+          </div>
+
+          <label className="settings-display-photo-option">
+            <input
+              type="checkbox"
+              checked={displaySchedulePhotos}
+              onChange={(event) => setDisplaySchedulePhotos(event.target.checked)}
+            />
+
+            <span>
+              <strong>Use family photos</strong>
+              <small>Rotate available family profile photos behind the clock.</small>
+            </span>
+          </label>
+        </>
+      )}
+    </div>
+  </section> 
 
       <h3>Notifications</h3>
       <p>
-        Allow FamilyHub to show browser notifications
-        for event and task reminders.
+        Manage reminders and your daily family summary.
       </p>
     </div>
   </div>
@@ -1557,6 +1730,65 @@ syncIntervalMinutes:
       >
         Enable Notifications
       </button>
+    )}
+  </div>
+
+  <div className="settings-appearance-block settings-daily-brief">
+    <label className="settings-weather-warning-toggle">
+      <div>
+        <strong>Daily Brief</strong>
+        <span>
+          Get one morning summary of today’s events, tasks, dinner, and shopping.
+        </span>
+      </div>
+
+      <input
+        type="checkbox"
+        className="settings-toggle-input"
+        checked={dailyBriefEnabled}
+        onChange={(event) => {
+          setDailyBriefEnabled(event.target.checked);
+          setShowDailyBriefPreview(false);
+        }}
+      />
+
+      <span className="settings-toggle-switch">
+        <span className="settings-toggle-knob" />
+      </span>
+    </label>
+
+    {dailyBriefEnabled && (
+      <div className="settings-daily-brief-controls">
+        <label>
+          <span>Send at</span>
+          <input
+            type="time"
+            value={dailyBriefTime}
+            onChange={(event) => setDailyBriefTime(event.target.value)}
+          />
+        </label>
+
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={() => setShowDailyBriefPreview((current) => !current)}
+        >
+          {showDailyBriefPreview ? "Hide Preview" : "Preview Today’s Brief"}
+        </button>
+      </div>
+    )}
+
+    {dailyBriefEnabled && showDailyBriefPreview && (
+      <div className="settings-daily-brief-preview" role="status">
+        <span>FamilyHub Daily Brief</span>
+        <strong>{dailyBriefSummary}</strong>
+      </div>
+    )}
+
+    {dailyBriefEnabled && notificationPermission !== "granted" && (
+      <small className="settings-daily-brief-note">
+        Enable browser notifications above so the brief can appear at the chosen time.
+      </small>
     )}
   </div>
 </section>
@@ -1703,7 +1935,7 @@ syncIntervalMinutes:
 
 {calendarSourceToDelete && (
   <div className="settings-confirm-overlay">
-    <div className="settings-confirm-modal">
+    <div className="settings-confirm-modal fh-dialog">
       <h3>Delete Calendar Source?</h3>
 
       <p>

@@ -1,20 +1,20 @@
 /* Lists: a quiet sidebar and readable checklist in both themes. */
 .familyhub-shell .lists-page {
-  --lists-surface: #fff;
-  --lists-inset: #f5f5f7;
-  --lists-text: #1d1d1f;
-  --lists-muted: #636366;
-  --lists-border: rgba(60, 60, 67, 0.12);
+  --lists-surface: var(--fh-surface);
+  --lists-inset: var(--fh-inset);
+  --lists-text: var(--fh-text);
+  --lists-muted: var(--fh-muted);
+  --lists-border: var(--fh-border);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--lists-text);
 }
 
 html[data-theme="dark"] .familyhub-shell .lists-page {
-  --lists-surface: #1c1c1e;
-  --lists-inset: #2c2c2e;
-  --lists-text: #f5f5f7;
-  --lists-muted: #aeaeb2;
-  --lists-border: rgba(255, 255, 255, 0.12);
+  --lists-surface: var(--fh-surface);
+  --lists-inset: var(--fh-inset);
+  --lists-text: var(--fh-text);
+  --lists-muted: var(--fh-muted);
+  --lists-border: var(--fh-border);
   color-scheme: dark;
 }
 

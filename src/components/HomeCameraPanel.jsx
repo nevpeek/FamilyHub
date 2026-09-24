@@ -208,7 +208,7 @@ function CameraViewer({ camera, onClose }) {
   }, [onClose]);
   return (
     <div className="home-camera-viewer-backdrop" onClick={onClose}>
-      <div className="home-camera-viewer" role="dialog" aria-modal="true" aria-label={`${camera.name} live camera`} onClick={(event) => event.stopPropagation()}>
+      <div className="home-camera-viewer fh-dialog" role="dialog" aria-modal="true" aria-label={`${camera.name} live camera`} onClick={(event) => event.stopPropagation()}>
         <div className="home-camera-viewer-header">
           <div><span className="home-camera-eyebrow">Live camera</span><h2>{camera.name}</h2></div>
           <button ref={closeRef} type="button" className="home-camera-viewer-close" onClick={onClose} aria-label={`Close ${camera.name} camera`}>×</button>
@@ -486,7 +486,7 @@ function CameraEditor({
       }}
     >
       <div
-        className="camera-editor-dialog"
+        className="camera-editor-dialog fh-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="camera-editor-title"

@@ -1,23 +1,23 @@
 /* Pantry inventory and item editor share one set of theme colours. */
 .familyhub-shell .pantry-page {
-  --pantry-surface: #fff;
-  --pantry-inset: #f5f5f7;
-  --pantry-text: #1d1d1f;
-  --pantry-muted: #636366;
-  --pantry-border: rgba(60, 60, 67, 0.12);
-  --pantry-danger: #b42318;
+  --pantry-surface: var(--fh-surface);
+  --pantry-inset: var(--fh-inset);
+  --pantry-text: var(--fh-text);
+  --pantry-muted: var(--fh-muted);
+  --pantry-border: var(--fh-border);
+  --pantry-danger: var(--fh-danger);
   color: var(--pantry-text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   gap: 24px;
 }
 
 html[data-theme="dark"] .familyhub-shell .pantry-page {
-  --pantry-surface: #1c1c1e;
-  --pantry-inset: #2c2c2e;
-  --pantry-text: #f5f5f7;
-  --pantry-muted: #aeaeb2;
-  --pantry-border: rgba(255, 255, 255, 0.12);
-  --pantry-danger: #ff8a80;
+  --pantry-surface: var(--fh-surface);
+  --pantry-inset: var(--fh-inset);
+  --pantry-text: var(--fh-text);
+  --pantry-muted: var(--fh-muted);
+  --pantry-border: var(--fh-border);
+  --pantry-danger: var(--fh-danger);
   color-scheme: dark;
 }
 

@@ -15,6 +15,7 @@ import {
   Soup,
   Utensils,
   X,
+  Trash2,
 } from "lucide-react";
 
 function toDateKey(date) {
@@ -122,6 +123,9 @@ function MealsPage({
   onViewRecipe,
   onPlanRecipe,
 }) {
+  const mealOperationRef = useRef(false);
+  const [plannerRefreshKey, setPlannerRefreshKey] = useState(0);
+  const [plannerOperationError, setPlannerOperationError] = useState("");
   const replacingTemplateRef = useRef(false);
   const [templateReplaceError, setTemplateReplaceError] = useState("");
 
@@ -356,6 +360,16 @@ const [
 ] = useState(false);
 
 const [
+  clearWeekMeals,
+  setClearWeekMeals,
+] = useState([]);
+
+const [
+  loadingClearWeek,
+  setLoadingClearWeek,
+] = useState(false);
+
+const [
   weekTemplatesOpen,
   setWeekTemplatesOpen,
 ] = useState(false);
@@ -399,6 +413,36 @@ const [
   duplicateWeekTemplate,
   setDuplicateWeekTemplate,
 ] = useState(null);
+
+const [
+  templateToRename,
+  setTemplateToRename,
+] = useState(null);
+
+const [
+  renameTemplateName,
+  setRenameTemplateName,
+] = useState("");
+
+const [
+  renamingWeekTemplate,
+  setRenamingWeekTemplate,
+] = useState(false);
+
+const [
+  templateToApply,
+  setTemplateToApply,
+] = useState(null);
+
+const [
+  templateApplyChoices,
+  setTemplateApplyChoices,
+] = useState({});
+
+const [
+  applyingWeekTemplate,
+  setApplyingWeekTemplate,
+] = useState(false);
 
 const [
   previousWeekMeals,
@@ -537,6 +581,7 @@ useEffect(() => {
   selectedMemberId,
   mealTypeFilter,
   mealRefreshKey,
+  plannerRefreshKey,
   weekStart,
 ]);
 
@@ -778,120 +823,61 @@ const filteredRecipes =
     );
   }
 
-async function handleDropMeal(
-  meal,
-  mealDate,
-  mealType
-) {
-  if (!meal) {
-    return;
+async function runMealOperation(operation, body) {
+  setPlannerOperationError("");
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/meals/operations/${operation}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw Object.assign(new Error(data.error || "Unable to update the dinner plan"), { status: response.status });
+    }
+    return data;
+  } finally {
+    // Re-fetch after success or an uncertain response, using the current view's
+    // filters. The effect aborts older reads instead of merging stale results.
+    setPlannerRefreshKey(current => current + 1);
   }
+}
 
-  if (
-    meal.meal_date === mealDate &&
-    meal.meal_type === mealType
-  ) {
+function showMealOperationError(error) {
+  setPlannerMessage("");
+  setPlannerOperationError(error.message || "Unable to update the dinner plan. Please refresh and try again.");
+}
+
+function showWeekOperationResult(data, action) {
+  const added = data.createdMeals.length;
+  const skipped = data.skippedMeals.length;
+  setPlannerMessage(
+    `${added} dinner${added === 1 ? "" : "s"} ${action}` +
+    (skipped ? ` · ${skipped} occupied day${skipped === 1 ? "" : "s"} skipped` : "")
+  );
+}
+
+async function handleDropMeal(meal, mealDate, mealType) {
+  if (!meal || mealOperationRef.current) return;
+  if (meal.meal_date === mealDate && meal.meal_type === mealType) {
     setDraggedMeal(null);
     setDragOverSlot(null);
     return;
   }
-
-  const existingMeal = meals.find(
-    (item) =>
-      item.id !== meal.id &&
-      item.meal_date === mealDate &&
-      item.meal_type === mealType
-  );
-
-  const originalDate = meal.meal_date;
-  const originalType = meal.meal_type;
-
-  async function updateMeal(
-    mealToUpdate,
-    newDate,
-    newType
-  ) {
-    const response = await fetch(
-      `${API_BASE_URL}/api/meals/${mealToUpdate.id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-        body: JSON.stringify({
-          title: mealToUpdate.title,
-          mealDate: newDate,
-          mealType: newType,
-          description:
-            mealToUpdate.description ||
-            null,
-          recipeUrl:
-            mealToUpdate.recipe_url ||
-            null,
-          ingredients:
-            mealToUpdate.ingredients ||
-            null,
-          recipeId:
-            mealToUpdate.recipe_id ||
-            null,
-          memberIds: (
-            mealToUpdate.members || []
-          ).map(
-            (member) => member.id
-          ),
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.error ||
-          "Unable to move meal"
-      );
-    }
-
-    return data.meal;
-  }
-
+  const target = meals.find(item => item.id !== meal.id &&
+    item.meal_date === mealDate && item.meal_type === mealType);
+  mealOperationRef.current = true;
   try {
-    let swappedMeal = null;
-
-    if (existingMeal) {
-      swappedMeal = await updateMeal(
-        existingMeal,
-        originalDate,
-        originalType
-      );
-    }
-
-    const movedMeal = await updateMeal(
-      meal,
-      mealDate,
-      mealType
-    );
-
-    setMeals((current) =>
-      current.map((item) => {
-        if (item.id === movedMeal.id) {
-          return movedMeal;
-        }
-
-        if (
-          swappedMeal &&
-          item.id === swappedMeal.id
-        ) {
-          return swappedMeal;
-        }
-
-        return item;
-      })
-    );
-  } catch (err) {
-    console.error(err);
+    await runMealOperation("move", {
+      mealId: meal.id, sourceRevision: meal.revision,
+      targetDate: mealDate, targetType: mealType,
+      expectedTargetId: target?.id ?? null, targetRevision: target?.revision,
+    });
+    setPlannerMessage(target ? "Dinners swapped" : "Dinner moved");
+  } catch (error) {
+    showMealOperationError(error);
   } finally {
+    mealOperationRef.current = false;
     setDraggedMeal(null);
     setDragOverSlot(null);
   }
@@ -955,6 +941,7 @@ async function handleOpenCopyLastWeek() {
       )
     );
 
+    setPlannerOperationError("");
     setCopyLastWeekOpen(true);
   } catch (error) {
     console.error(
@@ -962,76 +949,190 @@ async function handleOpenCopyLastWeek() {
       error
     );
 
-    setShoppingMessage(
-      error.message ||
-        "Unable to load last week's dinners"
-    );
+setPlannerMessage(
+  error.message ||
+    "Unable to load last week's dinners"
+);
   } finally {
     setLoadingPreviousWeek(false);
+  }
+}
+
+async function handleOpenClearWeek() {
+  if (
+    loadingClearWeek ||
+    clearingWeek
+  ) {
+    return;
+  }
+
+  setLoadingClearWeek(true);
+
+  try {
+    /*
+     * Load the entire household dinner
+     * plan for this week.
+     *
+     * Do not include selectedMemberId,
+     * because Clear Week applies to
+     * everybody.
+     */
+    const params =
+      new URLSearchParams({
+        start: toDateKey(weekStart),
+        end: toDateKey(weekEnd),
+        mealType: "dinner",
+      });
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/meals?${params.toString()}`,
+      {
+        cache: "no-store",
+      }
+    );
+
+    const data =
+      await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          "Unable to load this week's dinners"
+      );
+    }
+
+    const weekMeals =
+      Array.isArray(data.meals)
+        ? data.meals
+        : [];
+
+    setClearWeekMeals(
+      weekMeals
+    );
+
+    if (weekMeals.length === 0) {
+      setPlannerMessage(
+        "There are no dinners to clear"
+      );
+
+      return;
+    }
+
+    setClearWeekOpen(true);
+  } catch (error) {
+    console.error(
+      "Clear week preview error:",
+      error
+    );
+
+    setPlannerMessage(
+      error.message ||
+        "Unable to load this week's dinners"
+    );
+  } finally {
+    setLoadingClearWeek(false);
   }
 }
 
 async function handleClearWeek() {
   if (
     clearingWeek ||
-    meals.length === 0
+    mealOperationRef.current
   ) {
     return;
   }
 
+  mealOperationRef.current = true;
   setClearingWeek(true);
 
   try {
-    const mealsToDelete = [
-      ...meals,
-    ];
+    /*
+     * Always load every dinner for the
+     * displayed week before clearing.
+     *
+     * Do not use selectedMemberId here,
+     * because Clear Week means the whole
+     * household dinner plan.
+     */
+    const params =
+      new URLSearchParams({
+        start: toDateKey(weekStart),
+        end: toDateKey(weekEnd),
+        mealType: "dinner",
+      });
 
-    const deletedMealIds = [];
-
-    for (const meal of mealsToDelete) {
-      const response = await fetch(
-        `${API_BASE_URL}/api/meals/${meal.id}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-            `Unable to remove "${meal.title}"`
-        );
+    const response = await fetch(
+      `${API_BASE_URL}/api/meals?${params.toString()}`,
+      {
+        cache: "no-store",
       }
+    );
 
-      deletedMealIds.push(
-        meal.id
+    const data =
+      await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          "Unable to load this week's dinners"
       );
     }
 
-    setMeals((current) =>
-      current.filter(
-        (meal) =>
-          !deletedMealIds.includes(
-            meal.id
-          )
-      )
-    );
+    const weekMeals =
+      Array.isArray(data.meals)
+        ? data.meals
+        : [];
 
-    setClearWeekOpen(false);
+    if (weekMeals.length === 0) {
+setClearWeekOpen(false);
+setClearWeekMeals([]);
+
+setPlannerMessage(
+        "There are no dinners to clear"
+      );
+
+      return;
+    }
+
+    const result =
+      await runMealOperation(
+        "clear-week",
+        {
+          weekStart:
+            toDateKey(weekStart),
+
+          meals: weekMeals.map(
+            (meal) => ({
+              id: meal.id,
+              revision:
+                meal.revision,
+            })
+          ),
+        }
+      );
+
+setClearWeekOpen(false);
+setClearWeekMeals([]);
+
+setPlannerMessage(
+  `${
+    result.deletedMealIds.length
+  } dinner${
+    result.deletedMealIds.length ===
+    1
+      ? ""
+      : "s"
+  } removed`
+);
+
   } catch (error) {
-    console.error(
-      "Clear week error:",
+    showMealOperationError(
       error
     );
-
-    window.alert(
-      error.message ||
-        "Unable to clear this week's dinners"
-    );
   } finally {
+    mealOperationRef.current =
+      false;
+
     setClearingWeek(false);
   }
 }
@@ -1239,206 +1340,139 @@ async function handleSaveWeekTemplate() {
 
 
 async function handleCopySelectedPreviousMeals() {
-  const mealsToCopy =
-    previousWeekMeals.filter(
-      (meal) =>
-        selectedPreviousMeals.includes(
-          meal.id
-        )
-    );
-
-  if (mealsToCopy.length === 0) {
-    return;
-  }
-
+  const selected = previousWeekMeals.filter(meal => selectedPreviousMeals.includes(meal.id));
+  if (!selected.length || mealOperationRef.current || loadingPreviousWeek) return;
+  mealOperationRef.current = true;
   setLoadingPreviousWeek(true);
-
   try {
-    const copiedMeals = [];
-    const skippedMeals = [];
-
-    for (const meal of mealsToCopy) {
-      const originalDate =
-        new Date(
-          `${meal.meal_date}T12:00:00`
-        );
-
-      const targetDate =
-        toDateKey(
-          addDays(originalDate, 7)
-        );
-
-      const existingDinner =
-        meals.find(
-          (currentMeal) =>
-            currentMeal.meal_date ===
-              targetDate &&
-            currentMeal.meal_type ===
-              "dinner"
-        );
-
-      if (existingDinner) {
-        skippedMeals.push({
-          meal,
-          targetDate,
-          existingDinner,
-        });
-
-        continue;
-      }
-
-      const response = await fetch(
-        `${API_BASE_URL}/api/meals`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-
-          body: JSON.stringify({
-            title: meal.title,
-
-            mealDate: targetDate,
-
-            mealType: "dinner",
-
-            description:
-              meal.description || null,
-
-            recipeUrl:
-              meal.recipe_url || null,
-
-            ingredients:
-              meal.ingredients || null,
-
-            recipeId:
-              meal.recipe_id || null,
-
-            memberIds: (
-              meal.members || []
-            ).map(
-              (member) => member.id
-            ),
-          }),
-        }
-      );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-            `Unable to copy "${meal.title}"`
-        );
-      }
-
-      if (data.meal) {
-        copiedMeals.push(
-          data.meal
-        );
-      }
-    }
-
-    if (copiedMeals.length > 0) {
-      setMeals((current) => [
-        ...current,
-        ...copiedMeals,
-      ]);
-    }
-
+    const data = await runMealOperation("copy-week", {
+      weekStart: toDateKey(weekStart),
+      sourceMeals: selected.map(meal => ({ id: meal.id, revision: meal.revision })),
+    });
     setCopyLastWeekOpen(false);
-
     setPreviousWeekMeals([]);
-
     setSelectedPreviousMeals([]);
-
-    if (
-      copiedMeals.length > 0 &&
-      skippedMeals.length > 0
-    ) {
-      setShoppingMessage(
-        `${copiedMeals.length} dinner${
-          copiedMeals.length === 1
-            ? ""
-            : "s"
-        } copied. ${
-          skippedMeals.length
-        } occupied day${
-          skippedMeals.length === 1
-            ? " was"
-            : "s were"
-        } skipped.`
-      );
-    } else if (
-      skippedMeals.length > 0
-    ) {
-      setShoppingMessage(
-        `Nothing copied. ${
-          skippedMeals.length
-        } selected day${
-          skippedMeals.length === 1
-            ? " already has"
-            : "s already have"
-        } dinner planned.`
-      );
-    } else {
-      setShoppingMessage(
-        `${copiedMeals.length} dinner${
-          copiedMeals.length === 1
-            ? ""
-            : "s"
-        } copied from last week.`
-      );
-    }
+    showWeekOperationResult(data, "copied from last week");
   } catch (error) {
-    console.error(
-      "Copy last week error:",
-      error
-    );
-
-    setShoppingMessage(
-      error.message ||
-        "Unable to copy last week's dinners"
-    );
+    if (error.status === 409) {
+      error.message += " Close and reopen Copy Last Week to reload the changed dinners.";
+    }
+    showMealOperationError(error);
   } finally {
+    mealOperationRef.current = false;
     setLoadingPreviousWeek(false);
   }
 }
 
-async function handleUseWeekTemplate(
+function handleUseWeekTemplate(
   template
 ) {
   if (
     !template ||
-    loadingWeekTemplates
+    applyingWeekTemplate
   ) {
     return;
   }
 
-  const templateMeals =
-    Array.isArray(template.meals)
-      ? template.meals
-      : [];
+  const choices = {};
 
-  if (templateMeals.length === 0) {
-    window.alert(
-      "This template does not contain any dinners."
-    );
+  for (
+    const templateMeal of
+      template.meals || []
+  ) {
+    const dayOffset =
+      Number(
+        templateMeal.day_offset
+      );
 
+    if (
+      !Number.isInteger(dayOffset) ||
+      dayOffset < 0 ||
+      dayOffset > 6
+    ) {
+      continue;
+    }
+
+    const targetDate =
+      addDays(
+        weekStart,
+        dayOffset
+      );
+
+    const targetDateKey =
+      toDateKey(
+        targetDate
+      );
+
+    const existingMeal =
+      meals.find(
+        (meal) =>
+          meal.meal_date ===
+            targetDateKey &&
+          String(
+            meal.meal_type ||
+              "dinner"
+          ).toLowerCase() ===
+            "dinner"
+      );
+
+const alreadyMatches =
+  existingMeal &&
+  String(
+    existingMeal.title || ""
+  )
+    .trim()
+    .toLowerCase() ===
+  String(
+    templateMeal.title || ""
+  )
+    .trim()
+    .toLowerCase();
+
+choices[dayOffset] =
+  alreadyMatches
+    ? "match"
+    : existingMeal
+      ? "keep"
+      : "add";
+  }
+
+  setTemplateApplyChoices(
+    choices
+  );
+
+  setTemplateToApply(
+    template
+  );
+}
+
+async function handleApplyWeekTemplate() {
+  if (
+    !templateToApply ||
+    applyingWeekTemplate ||
+    mealOperationRef.current
+  ) {
     return;
   }
 
-  setLoadingWeekTemplates(true);
+  mealOperationRef.current = true;
+  setApplyingWeekTemplate(true);
+  setPlannerOperationError("");
 
   try {
-    const createdMeals = [];
-    const skippedMeals = [];
+    /*
+     * Send the user's preview choices and
+     * the revisions of any existing dinners
+     * to the atomic backend operation.
+     *
+     * The backend validates everything
+     * before changing the planner.
+     */
+    const existingMeals = {};
 
     for (
-      const templateMeal of templateMeals
+      const templateMeal of
+        templateToApply.meals || []
     ) {
       const dayOffset =
         Number(
@@ -1453,7 +1487,7 @@ async function handleUseWeekTemplate(
         continue;
       }
 
-      const targetDate =
+      const targetDateKey =
         toDateKey(
           addDays(
             weekStart,
@@ -1461,29 +1495,236 @@ async function handleUseWeekTemplate(
           )
         );
 
-      const existingDinner =
+      const existingMeal =
         meals.find(
           (meal) =>
             meal.meal_date ===
-              targetDate &&
-            meal.meal_type ===
+              targetDateKey &&
+            String(
+              meal.meal_type ||
+                "dinner"
+            ).toLowerCase() ===
               "dinner"
         );
 
-      if (existingDinner) {
-        skippedMeals.push({
-          templateMeal,
-          targetDate,
-          existingDinner,
-        });
-
-        continue;
+      if (existingMeal) {
+        existingMeals[dayOffset] = {
+          id: existingMeal.id,
+          revision:
+            existingMeal.revision,
+        };
       }
+    }
 
-      const response = await fetch(
-        `${API_BASE_URL}/api/meals`,
+    const result =
+      await runMealOperation(
+        "apply-template",
         {
-          method: "POST",
+          weekStart:
+            toDateKey(weekStart),
+
+          templateId:
+            Number(
+              templateToApply.id
+            ),
+
+          choices:
+            templateApplyChoices,
+
+          existingMeals,
+        }
+      );
+
+    const addedCount =
+      Array.isArray(
+        result.createdMeals
+      )
+        ? result.createdMeals.length
+        : 0;
+
+    const replacedCount =
+      Array.isArray(
+        result.replacedMeals
+      )
+        ? result.replacedMeals.length
+        : 0;
+
+    const keptCount =
+      Array.isArray(
+        result.keptMeals
+      )
+        ? result.keptMeals.length
+        : 0;
+
+    const matchedCount =
+      Array.isArray(
+        result.matchedMeals
+      )
+        ? result.matchedMeals.length
+        : 0;
+
+    setTemplateToApply(null);
+    setTemplateApplyChoices({});
+
+    const resultParts = [];
+
+    if (addedCount > 0) {
+      resultParts.push(
+        `${addedCount} added`
+      );
+    }
+
+    if (replacedCount > 0) {
+      resultParts.push(
+        `${replacedCount} replaced`
+      );
+    }
+
+    if (keptCount > 0) {
+      resultParts.push(
+        `${keptCount} kept`
+      );
+    }
+
+    if (matchedCount > 0) {
+      resultParts.push(
+        `${matchedCount} already matched`
+      );
+    }
+
+    setPlannerMessage(
+      resultParts.length > 0
+        ? `"${templateToApply.name}" applied · ${resultParts.join(
+            " · "
+          )}`
+        : `"${templateToApply.name}" applied`
+    );
+  } catch (error) {
+    if (error.status === 409) {
+      error.message +=
+        " Close and reopen the template preview to reload the changed dinners.";
+    }
+
+    showMealOperationError(
+      error
+    );
+  } finally {
+    mealOperationRef.current =
+      false;
+
+    setApplyingWeekTemplate(false);
+  }
+}
+
+async function handleRenameWeekTemplate() {
+  const cleanName =
+    renameTemplateName.trim();
+
+  if (
+    !templateToRename ||
+    !cleanName ||
+    renamingWeekTemplate
+  ) {
+    return;
+  }
+
+  /*
+   * Nothing changed.
+   */
+  if (
+    cleanName.toLowerCase() ===
+    String(
+      templateToRename.name || ""
+    )
+      .trim()
+      .toLowerCase()
+  ) {
+    return;
+  }
+
+  /*
+   * Prevent duplicate template names.
+   */
+  const duplicateTemplate =
+    weekTemplates.find(
+      (template) =>
+        Number(template.id) !==
+          Number(
+            templateToRename.id
+          ) &&
+        String(template.name || "")
+          .trim()
+          .toLowerCase() ===
+          cleanName.toLowerCase()
+    );
+
+  if (duplicateTemplate) {
+    window.alert(
+      `A template called "${duplicateTemplate.name}" already exists.`
+    );
+
+    return;
+  }
+
+  setRenamingWeekTemplate(true);
+
+  try {
+    /*
+     * The PUT route replaces the template
+     * contents, so preserve every saved
+     * dinner already in this template.
+     */
+    const templateMeals = (
+      templateToRename.meals || []
+    ).map((meal) => ({
+      dayOffset:
+        meal.day_offset,
+
+      title:
+        meal.title,
+
+      mealTime:
+        meal.meal_time || null,
+
+      description:
+        meal.description || null,
+
+      recipeUrl:
+        meal.recipe_url || null,
+
+      ingredients:
+        meal.ingredients || null,
+
+      recipeId:
+        meal.recipe_id || null,
+
+      reminderEnabled:
+        Boolean(
+          meal.reminder_enabled
+        ),
+
+      reminderMinutes:
+        meal.reminder_minutes ??
+        null,
+
+      memberIds: (
+        meal.members || []
+      ).map(
+        (member) => member.id
+      ),
+    }));
+
+    if (templateMeals.length === 0) {
+      throw new Error(
+        "This template has no dinners to preserve."
+      );
+    }
+
+    const response =
+      await fetch(
+        `${API_BASE_URL}/api/meal-templates/${templateToRename.id}`,
+        {
+          method: "PUT",
 
           headers: {
             "Content-Type":
@@ -1491,280 +1732,55 @@ async function handleUseWeekTemplate(
           },
 
           body: JSON.stringify({
-            title:
-              templateMeal.title,
-
-            mealDate:
-              targetDate,
-
-            mealType:
-              "dinner",
-
-            mealTime:
-              templateMeal.meal_time ||
-              null,
-
-            description:
-              templateMeal.description ||
-              null,
-
-            recipeUrl:
-              templateMeal.recipe_url ||
-              null,
-
-            ingredients:
-              templateMeal.ingredients ||
-              null,
-
-            recipeId:
-              templateMeal.recipe_id ||
-              null,
-
-            reminderEnabled:
-              Boolean(
-                templateMeal.reminder_enabled
-              ),
-
-            reminderMinutes:
-              templateMeal.reminder_minutes ??
-              null,
-
-            memberIds: (
-              templateMeal.members || []
-            ).map(
-              (member) => member.id
-            ),
+            name: cleanName,
+            meals: templateMeals,
           }),
         }
       );
 
-      const data =
-        await response.json();
+    const data =
+      await response.json();
 
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-            `Unable to add "${templateMeal.title}"`
-        );
-      }
-
-      if (data.meal) {
-        createdMeals.push(
-          data.meal
-        );
-      }
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          "Unable to rename week template"
+      );
     }
 
-    if (createdMeals.length > 0) {
-      setMeals((current) => [
-        ...current,
-        ...createdMeals,
-      ]);
-    }
+    /*
+     * Replace the renamed template in
+     * frontend state.
+     */
+    setWeekTemplates(
+      (current) =>
+        current.map(
+          (template) =>
+            Number(template.id) ===
+            Number(data.template.id)
+              ? data.template
+              : template
+        )
+    );
 
-    setWeekTemplatesOpen(false);
+    setTemplateToRename(null);
+    setRenameTemplateName("");
 
-if (
-  createdMeals.length > 0 &&
-  skippedMeals.length > 0
-) {
-  setPlannerMessage(
-    `${createdMeals.length} dinner${
-      createdMeals.length === 1
-        ? ""
-        : "s"
-    } added from "${template.name}" · ${
-      skippedMeals.length
-    } occupied day${
-      skippedMeals.length === 1
-        ? ""
-        : "s"
-    } skipped`
-  );
-} else if (
-  skippedMeals.length > 0
-) {
-  setPlannerMessage(
-    `Nothing added · ${
-      skippedMeals.length
-    } day${
-      skippedMeals.length === 1
-        ? " already has"
-        : "s already have"
-    } dinner planned`
-  );
-} else {
-  setPlannerMessage(
-    `${createdMeals.length} dinner${
-      createdMeals.length === 1
-        ? ""
-        : "s"
-    } added from "${template.name}"`
-  );
-}
+    setPlannerMessage(
+      `"${cleanName}" template renamed`
+    );
   } catch (error) {
     console.error(
-      "Use week template error:",
+      "Rename week template error:",
       error
     );
 
     window.alert(
       error.message ||
-        "Unable to use week template"
+        "Unable to rename week template"
     );
   } finally {
-    setLoadingWeekTemplates(false);
-  }
-}
-
-async function handleReplaceWeekTemplate() {
-  if (
-    !duplicateWeekTemplate ||
-    savingWeekTemplate ||
-    replacingTemplateRef.current ||
-    meals.length === 0
-  ) {
-    return;
-  }
-
-  replacingTemplateRef.current = true;
-  setTemplateReplaceError("");
-  setSavingWeekTemplate(true);
-
-  try {
-    const templateMeals =
-      meals.map((meal) => {
-        const mealDate =
-          new Date(
-            `${meal.meal_date}T12:00:00`
-          );
-
-        const startDate =
-          new Date(weekStart);
-
-        startDate.setHours(
-          12,
-          0,
-          0,
-          0
-        );
-
-        const dayOffset =
-          Math.round(
-            (
-              mealDate.getTime() -
-              startDate.getTime()
-            ) /
-              (
-                1000 *
-                60 *
-                60 *
-                24
-              )
-          );
-
-        return {
-          dayOffset,
-
-          title:
-            meal.title,
-
-          mealTime:
-            meal.meal_time || null,
-
-          description:
-            meal.description || null,
-
-          recipeUrl:
-            meal.recipe_url || null,
-
-          ingredients:
-            meal.ingredients || null,
-
-          recipeId:
-            meal.recipe_id || null,
-
-          reminderEnabled:
-            Boolean(
-              meal.reminder_enabled
-            ),
-
-          reminderMinutes:
-            meal.reminder_minutes ??
-            null,
-
-          memberIds: (
-            meal.members || []
-          ).map(
-            (member) => member.id
-          ),
-        };
-      });
-
-    // One server transaction preserves the saved template if any step fails.
-    const replaceResponse = await fetch(
-      `${API_BASE_URL}/api/meal-templates/${duplicateWeekTemplate.id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: duplicateWeekTemplate.replacementName || duplicateWeekTemplate.name,
-          meals: templateMeals,
-        }),
-      }
-    );
-
-    const replaceData =
-      await replaceResponse.json();
-
-    if (!replaceResponse.ok) {
-      throw new Error(
-        replaceData.error ||
-          "Unable to save replacement template"
-      );
-    }
-
-    /*
-     * Replace the old template in
-     * frontend state.
-     */
-    setWeekTemplates(
-      (current) => [
-        replaceData.template,
-        ...current.filter(
-          (template) =>
-            Number(template.id) !==
-            Number(
-              duplicateWeekTemplate.id
-            )
-        ),
-      ]
-    );
-
-    const replacedName =
-      duplicateWeekTemplate
-        .replacementName ||
-      duplicateWeekTemplate.name;
-
-    setDuplicateWeekTemplate(null);
-    setTemplateName("");
-    setSaveTemplateOpen(false);
-
-    setPlannerMessage(
-      `"${replacedName}" template updated`
-    );
-  } catch (error) {
-    console.error(
-      "Replace week template error:",
-      error
-    );
-
-    setTemplateReplaceError(
-      error.message || "Unable to replace week template. Please try again."
-    );
-  } finally {
-    replacingTemplateRef.current = false;
-    setSavingWeekTemplate(false);
+    setRenamingWeekTemplate(false);
   }
 }
 
@@ -2907,9 +2923,9 @@ Dinner Planner
 <button
   type="button"
   className="meal-clear-week"
-  onClick={() =>
-    setClearWeekOpen(true)
-  }
+onClick={
+  handleOpenClearWeek
+}
 >
   Clear Week
 </button>
@@ -2920,6 +2936,7 @@ Dinner Planner
   onClick={async () => {
     await loadWeekTemplates();
 
+    setPlannerOperationError("");
     setWeekTemplatesOpen(true);
   }}
   disabled={
@@ -3264,7 +3281,550 @@ Dinner Planner
         </section>
       )}
 
+{templateToApply && (
+  <div
+    className="event-modal-backdrop apply-template-backdrop"
+    onMouseDown={(event) => {
+      if (
+        event.target ===
+          event.currentTarget &&
+        !applyingWeekTemplate
+      ) {
+        setTemplateToApply(null);
+        setTemplateApplyChoices({});
+      }
+    }}
+  >
+    <div
+      className="apply-template-modal fh-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="apply-template-title"
+    >
+      <div className="apply-template-header">
+        <div>
+          <p className="section-kicker">
+            Week Templates
+          </p>
 
+          <h2 id="apply-template-title">
+            Apply {templateToApply.name}
+          </h2>
+
+          <p>
+            Review the dinners before
+            applying this template to the
+            selected week.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="meal-wheel-close"
+          onClick={() => {
+            setTemplateToApply(null);
+            setTemplateApplyChoices({});
+          }}
+          disabled={
+            applyingWeekTemplate
+          }
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="apply-template-summary">
+        <div>
+<strong>
+  {formatWeekStart(
+    weekStart
+  )}
+  {" – "}
+  {formatWeekEnd(
+    addDays(
+      weekStart,
+      6
+    )
+  )}
+</strong>
+
+          <span>
+            {
+              (
+                templateToApply.meals ||
+                []
+              ).length
+            }{" "}
+            saved dinners
+          </span>
+        </div>
+
+        <span className="apply-template-summary-note">
+          Existing dinners are kept
+          unless you choose Replace.
+        </span>
+      </div>
+
+      <div className="apply-template-list">
+        {(templateToApply.meals || [])
+          .slice()
+          .sort(
+            (a, b) =>
+              Number(
+                a.day_offset
+              ) -
+              Number(
+                b.day_offset
+              )
+          )
+          .map((templateMeal) => {
+            const dayOffset =
+              Number(
+                templateMeal.day_offset
+              );
+
+            const targetDate =
+              addDays(
+                weekStart,
+                dayOffset
+              );
+
+            const targetDateKey =
+            toDateKey(
+  targetDate
+);
+            const existingMeal =
+              meals.find(
+                (meal) =>
+                  meal.meal_date ===
+                    targetDateKey &&
+                  String(
+                    meal.meal_type ||
+                      "dinner"
+                  ).toLowerCase() ===
+                    "dinner"
+              );
+
+const alreadyMatches =
+  existingMeal &&
+  String(
+    existingMeal.title || ""
+  )
+    .trim()
+    .toLowerCase() ===
+  String(
+    templateMeal.title || ""
+  )
+    .trim()
+    .toLowerCase();
+
+const choice =
+  templateApplyChoices[
+    dayOffset
+  ] ||
+  (
+    alreadyMatches
+      ? "match"
+      : existingMeal
+        ? "keep"
+        : "add"
+  );
+
+const willReplace =
+  existingMeal &&
+  choice === "replace";
+
+            return (
+              <div
+                key={
+                  templateMeal.id ||
+                  `${templateToApply.id}-${dayOffset}`
+                }
+                className={[
+                  "apply-template-row",
+                  existingMeal
+                    ? "has-conflict"
+                    : "is-empty",
+                  willReplace
+                    ? "will-replace"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+<div className="apply-template-day">
+  <strong>
+    {new Intl.DateTimeFormat(
+      "en-AU",
+      {
+        weekday: "short",
+      }
+    ).format(targetDate)}
+  </strong>
+
+  <span>
+    {formatWeekStart(
+      targetDate
+    )}
+  </span>
+</div>
+
+                <div className="apply-template-meals">
+                  {existingMeal ? (
+                    <>
+                      <div className="apply-template-meal-line existing">
+                        <span className="apply-template-label">
+                          Current
+                        </span>
+
+                        <strong>
+                          {
+                            existingMeal.title
+                          }
+                        </strong>
+                      </div>
+
+                      <div className="apply-template-meal-line template">
+                        <span className="apply-template-label">
+                          Template
+                        </span>
+
+                        <strong>
+                          {
+                            templateMeal.title
+                          }
+                        </strong>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="apply-template-meal-line template">
+                      <span className="apply-template-label">
+                        Add
+                      </span>
+
+                      <strong>
+                        {
+                          templateMeal.title
+                        }
+                      </strong>
+                    </div>
+                  )}
+                </div>
+
+<div className="apply-template-action">
+  {alreadyMatches ? (
+    <span className="apply-template-match-badge">
+      ✓ Already Matches
+    </span>
+  ) : existingMeal ? (
+    <div className="apply-template-choice">
+      <button
+        type="button"
+        className={
+          choice === "keep"
+            ? "active"
+            : ""
+        }
+        onClick={() =>
+          setTemplateApplyChoices(
+            (current) => ({
+              ...current,
+              [dayOffset]:
+                "keep",
+            })
+          )
+        }
+        disabled={
+          applyingWeekTemplate
+        }
+      >
+        Keep Existing
+      </button>
+
+      <button
+        type="button"
+        className={[
+          "replace",
+          choice === "replace"
+            ? "active"
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        onClick={() =>
+          setTemplateApplyChoices(
+            (current) => ({
+              ...current,
+              [dayOffset]:
+                "replace",
+            })
+          )
+        }
+        disabled={
+          applyingWeekTemplate
+        }
+      >
+        Replace
+      </button>
+    </div>
+  ) : (
+    <span className="apply-template-add-badge">
+      ✓ Will Add
+    </span>
+  )}
+</div>
+              </div>
+            );
+          })}
+      </div>
+
+      <div className="apply-template-footer">
+        <div className="apply-template-footer-copy">
+          <strong>
+            Ready to apply
+          </strong>
+
+          <span>
+            No changes are made until
+            you confirm.
+          </span>
+        </div>
+
+        <div className="apply-template-footer-actions">
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={() => {
+              setTemplateToApply(null);
+              setTemplateApplyChoices({});
+            }}
+            disabled={
+              applyingWeekTemplate
+            }
+          >
+            Cancel
+          </button>
+
+{(() => {
+  const hasChanges = (
+    templateToApply.meals || []
+  ).some((templateMeal) => {
+    const dayOffset =
+      Number(
+        templateMeal.day_offset
+      );
+
+    const targetDate =
+      addDays(
+        weekStart,
+        dayOffset
+      );
+
+    const targetDateKey =
+      toDateKey(
+        targetDate
+      );
+
+    const existingMeal =
+      meals.find(
+        (meal) =>
+          meal.meal_date ===
+            targetDateKey &&
+          String(
+            meal.meal_type ||
+              "dinner"
+          ).toLowerCase() ===
+            "dinner"
+      );
+
+    if (!existingMeal) {
+      return true;
+    }
+
+    const alreadyMatches =
+      String(
+        existingMeal.title || ""
+      )
+        .trim()
+        .toLowerCase() ===
+      String(
+        templateMeal.title || ""
+      )
+        .trim()
+        .toLowerCase();
+
+    if (alreadyMatches) {
+      return false;
+    }
+
+    return (
+      templateApplyChoices[
+        dayOffset
+      ] === "replace"
+    );
+  });
+
+  return (
+    <button
+      type="button"
+      className="apply-template-confirm"
+      onClick={
+        handleApplyWeekTemplate
+      }
+      disabled={
+        applyingWeekTemplate ||
+        !hasChanges
+      }
+    >
+      {applyingWeekTemplate
+        ? "Applying..."
+        : hasChanges
+          ? "Apply Template"
+          : "Already Applied"}
+    </button>
+  );
+})()}
+        </div>
+      </div>
+    </div>
+  </div>
+)}      
+
+{templateToRename && (
+  <div
+    className="event-modal-backdrop rename-template-backdrop"
+    onMouseDown={(event) => {
+      if (
+        event.target ===
+          event.currentTarget &&
+        !renamingWeekTemplate
+      ) {
+        setTemplateToRename(null);
+        setRenameTemplateName("");
+      }
+    }}
+  >
+    <div
+      className="rename-template-modal fh-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="rename-template-title"
+    >
+      <div className="rename-template-header">
+        <div>
+          <p className="section-kicker">
+            Week Templates
+          </p>
+
+          <h2 id="rename-template-title">
+            Rename Template
+          </h2>
+
+          <p>
+            Give this dinner plan a new
+            name.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="meal-wheel-close"
+          onClick={() => {
+            setTemplateToRename(null);
+            setRenameTemplateName("");
+          }}
+          disabled={
+            renamingWeekTemplate
+          }
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="rename-template-body">
+        <label className="rename-template-field">
+          <span>Template Name</span>
+
+          <input
+            type="text"
+            value={renameTemplateName}
+            onChange={(event) =>
+              setRenameTemplateName(
+                event.target.value
+              )
+            }
+            placeholder="e.g. Soccer Week"
+            autoFocus
+            disabled={
+              renamingWeekTemplate
+            }
+            onKeyDown={(event) => {
+              if (
+                event.key === "Escape" &&
+                !renamingWeekTemplate
+              ) {
+                setTemplateToRename(null);
+                setRenameTemplateName("");
+              }
+            }}
+          />
+        </label>
+
+        <div className="rename-template-info">
+          <strong>
+            {templateToRename.name}
+          </strong>
+
+          <span>
+            Only the template name will
+            change. All saved dinners,
+            recipes and family members
+            will stay the same.
+          </span>
+        </div>
+      </div>
+
+      <div className="rename-template-footer">
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={() => {
+            setTemplateToRename(null);
+            setRenameTemplateName("");
+          }}
+          disabled={
+            renamingWeekTemplate
+          }
+        >
+          Cancel
+        </button>
+
+<button
+  type="button"
+  className="rename-template-confirm"
+  onClick={
+    handleRenameWeekTemplate
+  }
+  disabled={
+    renamingWeekTemplate ||
+    !renameTemplateName.trim() ||
+    renameTemplateName.trim() ===
+      String(
+        templateToRename.name ||
+          ""
+      ).trim()
+  }
+>
+  {renamingWeekTemplate
+    ? "Renaming..."
+    : "Rename Template"}
+</button>
+      </div>
+    </div>
+  </div>
+)}
       
 {duplicateWeekTemplate && (
   <div
@@ -3280,7 +3840,7 @@ Dinner Planner
     }}
   >
     <div
-      className="duplicate-template-modal"
+      className="duplicate-template-modal fh-dialog"
       role="dialog"
       aria-modal="true"
       aria-labelledby="duplicate-template-title"
@@ -3389,7 +3949,7 @@ Dinner Planner
     }}
   >
     <div
-      className="delete-template-modal"
+      className="delete-template-modal fh-dialog"
       role="dialog"
       aria-modal="true"
       aria-labelledby="delete-template-title"
@@ -3488,7 +4048,7 @@ Dinner Planner
     }}
   >
     <div
-      className="save-template-modal"
+      className="save-template-modal fh-dialog"
       role="dialog"
       aria-modal="true"
       aria-labelledby="save-template-title"
@@ -3607,7 +4167,7 @@ Dinner Planner
     }}
   >
     <div
-      className="week-templates-modal"
+      className="week-templates-modal fh-dialog"
       role="dialog"
       aria-modal="true"
       aria-labelledby="week-templates-title"
@@ -3641,6 +4201,7 @@ Dinner Planner
       </div>
 
       <div className="week-templates-toolbar">
+        {plannerOperationError && <p role="alert">{plannerOperationError}</p>}
         <div>
           <strong>
             Saved Templates
@@ -3706,17 +4267,27 @@ Dinner Planner
 
 <button
   type="button"
+  className="week-template-rename"
+  onClick={() => {
+    setTemplateToRename(template);
+
+    setRenameTemplateName(
+      template.name || ""
+    );
+  }}
+>
+  <Pencil size={15} />
+  Rename
+</button>
+
+<button
+  type="button"
   className="week-template-delete"
   onClick={() =>
-    setTemplateToDelete(
-      template
-    )
-  }
-  disabled={
-    loadingWeekTemplates ||
-    deletingWeekTemplate
+    setTemplateToDelete(template)
   }
 >
+  <Trash2 size={15} />
   Delete
 </button>
 
@@ -3766,17 +4337,19 @@ Dinner Planner
 {clearWeekOpen && (
   <div
     className="event-modal-backdrop"
-    onMouseDown={(event) => {
-      if (
-        event.target ===
-        event.currentTarget
-      ) {
-        setClearWeekOpen(false);
-      }
-    }}
+
+onMouseDown={(event) => {
+  if (
+    event.target ===
+    event.currentTarget
+  ) {
+    setClearWeekOpen(false);
+    setClearWeekMeals([]);
+  }
+}}
   >
     <div
-      className="clear-week-modal"
+      className="clear-week-modal fh-dialog"
       role="dialog"
       aria-modal="true"
       aria-labelledby="clear-week-title"
@@ -3815,7 +4388,7 @@ Dinner Planner
         </button>
       </div>
 
-      {meals.length === 0 ? (
+      {clearWeekMeals.length === 0 ? (
         <div className="clear-week-empty">
           <Utensils size={32} />
 
@@ -3830,7 +4403,7 @@ Dinner Planner
         </div>
       ) : (
         <div className="clear-week-list">
-          {meals.map((meal) => {
+          {clearWeekMeals.map((meal) => {
             const mealDate =
               new Date(
                 `${meal.meal_date}T12:00:00`
@@ -3870,6 +4443,12 @@ Dinner Planner
         </div>
       )}
 
+      {plannerOperationError && (
+        <p role="alert">
+          {plannerOperationError}
+        </p>
+      )}
+
       <div className="clear-week-footer">
         <span className="clear-week-warning">
           Saved recipes will not be deleted.
@@ -3879,34 +4458,33 @@ Dinner Planner
           <button
             type="button"
             className="secondary-button"
-            onClick={() =>
-              setClearWeekOpen(false)
-            }
+onClick={() => {
+  setClearWeekOpen(false);
+  setClearWeekMeals([]);
+}}
           >
             Cancel
           </button>
 
-<button
-  type="button"
-  className="clear-week-confirm"
-  onClick={
-    handleClearWeek
-  }
-  disabled={
-    meals.length === 0 ||
-    clearingWeek
-  }
->
-  {clearingWeek
-    ? "Clearing..."
-    : `Clear ${
-        meals.length
-      } ${
-        meals.length === 1
-          ? "Dinner"
-          : "Dinners"
-      }`}
-</button>
+          <button
+            type="button"
+            className="clear-week-confirm"
+            onClick={handleClearWeek}
+            disabled={
+              clearWeekMeals.length === 0 ||
+              clearingWeek
+            }
+          >
+            {clearingWeek
+              ? "Clearing..."
+              : `Clear ${
+                  clearWeekMeals.length
+                } ${
+                  clearWeekMeals.length === 1
+                    ? "Dinner"
+                    : "Dinners"
+                }`}
+          </button>
         </div>
       </div>
     </div>
@@ -3926,7 +4504,7 @@ Dinner Planner
     }}
   >
     <div
-      className="copy-last-week-modal"
+      className="copy-last-week-modal fh-dialog"
       role="dialog"
       aria-modal="true"
       aria-labelledby="copy-last-week-title"
@@ -4093,6 +4671,8 @@ Dinner Planner
         </>
       )}
 
+      {plannerOperationError && <p role="alert">{plannerOperationError}</p>}
+
       <div className="copy-last-week-footer">
         <button
           type="button"
@@ -4146,7 +4726,7 @@ Dinner Planner
     }}
   >
     <div
-      className="meal-slot-recipe-picker"
+      className="meal-slot-recipe-picker fh-dialog"
       role="dialog"
       aria-modal="true"
     >
@@ -4233,7 +4813,7 @@ Dinner Planner
           }}
         >
           <div
-            className="meal-wheel-modal"
+            className="meal-wheel-modal fh-dialog"
             role="dialog"
             aria-modal="true"
           >
@@ -4537,7 +5117,7 @@ return (
             }
           }}
         >
-          <div className="meal-wheel-group-manager">
+          <div className="meal-wheel-group-manager fh-dialog">
             <div className="meal-wheel-group-manager-header">
               <div>
                 <span className="meal-wheel-group-manager-kicker">
@@ -4695,7 +5275,7 @@ return (
             }
           }}
         >
-          <div className="meal-wheel-recipe-manager">
+          <div className="meal-wheel-recipe-manager fh-dialog">
             <div className="meal-wheel-group-manager-header">
               <div>
                 <span className="meal-wheel-group-manager-kicker">
@@ -4883,7 +5463,7 @@ return (
     }}
   >
     <div
-      className="meal-copy-modal"
+      className="meal-copy-modal fh-dialog"
       role="dialog"
       aria-modal="true"
       onClick={(event) =>
@@ -4946,7 +5526,7 @@ return (
 {weekShoppingPickerOpen && (
   <div className="event-modal-backdrop">
     <div
-      className="recipe-details-modal weekly-shopping-modal"
+      className="recipe-details-modal weekly-shopping-modal fh-dialog"
       role="dialog"
       aria-modal="true"
     >
@@ -5164,6 +5744,19 @@ return (
       }
       aria-label="Dismiss notification"
     >
+      <X size={16} />
+    </button>
+  </div>
+)}
+
+{plannerOperationError && (
+  <div className="meal-planner-toast" role="alert">
+    <div className="meal-planner-toast-copy">
+      <strong>Dinner plan needs attention</strong>
+      <span>{plannerOperationError}</span>
+    </div>
+    <button type="button" className="meal-planner-toast-close"
+      aria-label="Dismiss planner error" onClick={() => setPlannerOperationError("")}>
       <X size={16} />
     </button>
   </div>

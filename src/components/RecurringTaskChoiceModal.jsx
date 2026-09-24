@@ -20,7 +20,7 @@ function RecurringTaskChoiceModal({
   return (
     <div className="event-modal-backdrop">
       <div
-        className="recurring-choice-modal"
+        className="recurring-choice-modal fh-dialog"
         role="dialog"
         aria-modal="true"
       >

@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
+  Sparkles,
 } from "lucide-react";
 
 import EventDetailsModal from "../components/EventDetailsModal";
@@ -15,6 +16,7 @@ import CalendarScheduleView from "../components/CalendarScheduleView";
 import CalendarMonthView from "../components/CalendarMonthView";
 import CalendarDayView from "../components/CalendarDayView";
 import CalendarWeekView from "../components/CalendarWeekView";
+import MagicEventImportModal from "../components/MagicEventImportModal";
 import { API_BASE_URL } from "../config/api";
 import { startAutoRefresh } from "../utils/startAutoRefresh";
 import {
@@ -49,6 +51,8 @@ const [calendarView, setCalendarView] = useState(() =>
 );
 const [draggedEvent, setDraggedEvent] = useState(null);
 const [dragPreview, setDragPreview] = useState(null);
+const [magicImportOpen, setMagicImportOpen] = useState(false);
+const [magicImportRefreshKey, setMagicImportRefreshKey] = useState(0);
 
 const [weather, setWeather] = useState(null);
 
@@ -390,6 +394,7 @@ const visibleEndDate =
     visibleEndDate,
     selectedMemberId,
     eventRefreshKey,
+    magicImportRefreshKey,
   ]);
   const eventsByDate = useMemo(() => {
     const map = new Map();
@@ -723,14 +728,25 @@ function goToToday() {
           </p>
         </div>
 
-        <button
-  type="button"
-  className="add-event-button"
-  onClick={onAddEvent}
->
-  <Plus size={22} />
-  <span>Add Event</span>
-</button>
+        <div className="calendar-heading-actions">
+          <button
+            type="button"
+            className="calendar-magic-import-button"
+            onClick={() => setMagicImportOpen(true)}
+          >
+            <Sparkles size={19} />
+            <span>Magic Import</span>
+          </button>
+
+          <button
+            type="button"
+            className="add-event-button"
+            onClick={onAddEvent}
+          >
+            <Plus size={22} />
+            <span>Add Event</span>
+          </button>
+        </div>
       </section>
 
 <section className="family-selector family-selector-section">
@@ -971,6 +987,15 @@ onClick={() => {
         }}
       />
     )}
+
+    <MagicEventImportModal
+      open={magicImportOpen}
+      members={members}
+      onClose={() => setMagicImportOpen(false)}
+      onImported={() =>
+        setMagicImportRefreshKey((current) => current + 1)
+      }
+    />
 
     </div>
   );
