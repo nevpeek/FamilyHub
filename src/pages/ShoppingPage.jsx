@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "../config/api";
 import { startAutoRefresh } from "../utils/startAutoRefresh";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   CheckCircle2,
@@ -77,6 +77,10 @@ const [deletingAll, setDeletingAll] =
 
 const [clearingCompleted, setClearingCompleted] =
   useState(false);
+
+const completingItemIdsRef = useRef(new Set());
+const [completingItemIds, setCompletingItemIds] =
+  useState(() => new Set());
 
   useEffect(() => {
     if (!shoppingMode || !("wakeLock" in navigator)) return;
@@ -220,57 +224,19 @@ const [clearingCompleted, setClearingCompleted] =
     }, [activeItems]);
 
 async function toggleItemCompletion(item) {
+  if (completingItemIdsRef.current.has(item.id)) {
+    return;
+  }
+
+  completingItemIdsRef.current.add(item.id);
+  setCompletingItemIds(
+    new Set(completingItemIdsRef.current)
+  );
+
   try {
-    /*
-     * Marking an active Shopping item
-     * as bought also restocks Pantry.
-     */
-    if (!item.is_completed) {
-      const pantryResponse =
-        await fetch(
-          `${API_BASE_URL}/api/pantry/from-shopping`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            body: JSON.stringify({
-              name: item.name,
+    const completed =
+      !item.is_completed;
 
-              quantity:
-                item.quantity ||
-                null,
-
-              category:
-                item.category ||
-                "other",
-
-              notes:
-                item.notes ||
-                null,
-            }),
-          }
-        );
-
-      const pantryData =
-        await pantryResponse.json();
-
-      if (!pantryResponse.ok) {
-        throw new Error(
-          pantryData.error ||
-            "Unable to restock Pantry"
-        );
-      }
-    }
-
-    /*
-     * Pantry succeeded, so now update
-     * the Shopping completion state.
-     *
-     * Completed → active does NOT
-     * subtract anything from Pantry.
-     */
     const response = await fetch(
       `${API_BASE_URL}/api/shopping/${item.id}/completion`,
       {
@@ -280,8 +246,8 @@ async function toggleItemCompletion(item) {
             "application/json",
         },
         body: JSON.stringify({
-          completed:
-            !item.is_completed,
+          completed,
+          restockPantry: completed,
         }),
       }
     );
@@ -317,6 +283,11 @@ async function toggleItemCompletion(item) {
     window.alert(
       err.message ||
         "Unable to mark item as bought"
+    );
+  } finally {
+    completingItemIdsRef.current.delete(item.id);
+    setCompletingItemIds(
+      new Set(completingItemIdsRef.current)
     );
   }
 }
@@ -419,6 +390,7 @@ setDeletingAll(true);
           onClick={() =>
             toggleItemCompletion(item)
           }
+          disabled={completingItemIds.has(item.id)}
           aria-label={
             item.is_completed
               ? "Mark item incomplete"
@@ -438,6 +410,10 @@ setDeletingAll(true);
           onClick={() => shoppingMode
             ? toggleItemCompletion(item)
             : onEditItem?.(item)
+          }
+          disabled={
+            shoppingMode &&
+            completingItemIds.has(item.id)
           }
         >
 <div className="shopping-card-main">
